@@ -144,7 +144,7 @@ class Demo:
 
 
 def build(n_points: int = 60, n_defects: int = 30, seed: int = 1) -> Demo:
-    rnd = random.Random(seed)
+    rnd = random.Random(seed)  # nosec B311
     P = {
         "R1": Path(X0, Y0, 90, [_Line(2000)]),
         "R2": Path(X0, Y0 + 500, 90, [_Line(500), _Arc(300, 90), _Line(500)]),

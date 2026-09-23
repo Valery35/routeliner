@@ -126,6 +126,39 @@ class RouteGeometry:
         return LocatedPoint(float(r["x"][0]), float(r["y"][0]),
                             None if math.isnan(z) else z, float(r["azimuth"][0]))
 
+    def vertices(self) -> dict:
+        """Вершины маршрута по частям: мера, координаты и угол поворота в плане
+        (градусы, плюс влево), а также изменение уклона по Z (безразмерное)."""
+        ms, xs, ys, zs, turn, dgrade = [], [], [], [], [], []
+        for pi in range(len(self._part_m)):
+            idx = np.nonzero(self._part == pi)[0]
+            if not len(idx):
+                continue
+            a, b = self._a[idx], self._b[idx]
+            pts = np.vstack([a, b[-1:]])
+            m = np.concatenate([self._m0[idx], [self._m0[idx[-1]] + self._len[idx[-1]]]])
+            d = b[:, :2] - a[:, :2]
+            az = np.arctan2(d[:, 1], d[:, 0])
+            t = np.zeros(len(pts))
+            if len(az) > 1:
+                t[1:-1] = np.degrees((az[1:] - az[:-1] + np.pi) % (2 * np.pi) - np.pi)
+            g = np.zeros(len(pts))
+            if self._has_z and len(idx) > 1:
+                h = np.maximum(np.hypot(d[:, 0], d[:, 1]), EPS)
+                gr = (b[:, 2] - a[:, 2]) / h
+                g[1:-1] = gr[1:] - gr[:-1]
+            ms.append(m)
+            xs.append(pts[:, 0])
+            ys.append(pts[:, 1])
+            zs.append(pts[:, 2] if self._has_z else np.full(len(pts), np.nan))
+            turn.append(t)
+            dgrade.append(np.nan_to_num(g))
+        if not ms:
+            e = np.empty(0)
+            return dict(m=e, x=e, y=e, z=e, turn=e, dgrade=e)
+        return dict(m=np.concatenate(ms), x=np.concatenate(xs), y=np.concatenate(ys),
+                    z=np.concatenate(zs), turn=np.concatenate(turn), dgrade=np.concatenate(dgrade))
+
     # ------------------------------------------------------------ участки
     def substring(self, m_from: float, m_to: float,
                   offset: float = 0.0) -> Union[list[np.ndarray], CoreError]:

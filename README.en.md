@@ -9,7 +9,8 @@ accepted in the CIS countries and takes into account a ledger with broken
 pickets and station equations.
 
 Every record is either placed on the map or sent to the error table with a
-reason code.
+reason code. A longitudinal profile with raster levels, grades and ledger
+stations is built along a route.
 
 ## Tools
 
@@ -26,6 +27,8 @@ repeated in the Plugins - Routeliner menu under the same numbers.
 | 3.02 | Live layer of sections | The same for sections |
 | 4.01 | Picket stakeout | Points of whole pickets with station equations taken into account |
 | 4.02 | Locate points on routes | Measure, station and offset for every point |
+| 5.01 | Profile table | Profile points with stations and raster levels |
+| 5.02 | Profile drawing | Longitudinal profile with a grid and a straightened plan for a print layout |
 
 ## Installation
 
@@ -73,7 +76,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.3.1
+Routeliner v0.4.0
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

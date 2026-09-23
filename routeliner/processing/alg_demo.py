@@ -21,6 +21,7 @@ from .common import T_DBL, T_INT, T_STR, RoutelinerAlgorithm, fields_of, fld
 
 TOL = 0.01          # допуск сравнения с эталоном, м
 GPKG = "routeliner_demo.gpkg"
+DEM = "routeliner_demo_dem.tif"
 
 
 def _memory(geom: str, fields, name):
@@ -142,6 +143,9 @@ class DemoAlgorithm(RoutelinerAlgorithm):
              [QgsGeometry.fromPointXY(QgsPointXY(f["x"], f["y"])) for f in d.defects])
         _write(dl, path, "defects", context)
 
+        dem_path = os.path.join(folder, DEM)
+        self._write_dem(dem_path)
+
         feedback.pushInfo(tr("Пример записан: {path}").format(path=path))
         feedback.pushInfo(tr("Событий: точечных {a}, линейных {b}, дефектов {c}").format(
             a=len(d.points), b=len(d.lines), c=len(d.defects)))
@@ -151,11 +155,36 @@ class DemoAlgorithm(RoutelinerAlgorithm):
                             ("ledger", "Ведомость"), ("events_points", "Точечные события"),
                             ("events_lines", "Линейные события")):
             self._load(context, f"{path}|layername={name}", tr(title), group)
+        self._load(context, dem_path, tr("Рельеф"), group)
 
         summary = {}
         if self.parameterAsBoolean(parameters, "RUN", context):
-            summary = self._check(path, context, feedback, group)
+            summary = self._check(path, context, feedback, group, dem_path)
         return {"FOLDER": folder, **summary}
+
+    @staticmethod
+    def _write_dem(dem_path):
+        """Растр рельефа примера: плоскость D.dem_z по центрам ячеек, GeoTIFF."""
+        import numpy as np
+        from osgeo import gdal, osr
+        x0, y0, x1, y1 = D.DEM_EXTENT
+        c = D.DEM_CELL
+        cols, rows = int(round((x1 - x0) / c)), int(round((y1 - y0) / c))
+        xc = x0 + (np.arange(cols) + 0.5) * c
+        yc = y1 - (np.arange(rows) + 0.5) * c
+        grid = D.dem_z(xc[None, :], yc[:, None]).astype("float64")
+        if os.path.exists(dem_path):
+            os.remove(dem_path)
+        ds = gdal.GetDriverByName("GTiff").Create(dem_path, cols, rows, 1, gdal.GDT_Float64)
+        ds.SetGeoTransform((x0, c, 0.0, y1, 0.0, -c))
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(D.CRS.split(":")[1]))
+        ds.SetProjection(srs.ExportToWkt())
+        band = ds.GetRasterBand(1)
+        band.WriteArray(grid)
+        band.SetNoDataValue(-9999.0)
+        band.FlushCache()
+        ds = None
 
     def _load(self, context, uri, title, group):
         det = QgsProcessingContext.LayerDetails(title, context.project(), title)
@@ -164,7 +193,7 @@ class DemoAlgorithm(RoutelinerAlgorithm):
         context.addLayerToLoadOnCompletion(uri, det)
 
     # ------------------------------------------------------------ проверка
-    def _check(self, path, context, feedback, group):
+    def _check(self, path, context, feedback, group, dem_path):
         import processing
 
         def uri(n):
@@ -232,12 +261,48 @@ class DemoAlgorithm(RoutelinerAlgorithm):
                      and abs(f["rl_offset"] - f["exp_offset"]) <= TOL)
         self._load(context, res["OUTPUT"], tr("Дефекты, привязка"), group)
 
+        located = res["OUTPUT"]
+
         res = run("pickets", dict(STEP=100.0, OUTPUT="memory:"))
         self._load(context, res["OUTPUT"], tr("Пикеты"), group)
 
+        # профиль: отметки рельефа и оси сверяются с формулами
+        res = run("profile_table", dict(RASTERS=[dem_path], PICKET_STEP=100.0, STEP=50.0,
+                                        VERTICES=0, POIS=uri("defects"), POI_LABEL="did",
+                                        CORRIDOR=5.0, OUTPUT="memory:"))
+        table = layer(res["OUTPUT"])
+        zf = "z_" + os.path.splitext(DEM)[0]
+        g_ok = g_total = a_ok = a_total = n_eq = 0
+        g_worst = 0.0
+        for f in table.getFeatures():
+            n_eq += f["route_id"] == "R3" and f["kind"] == "equation"
+            if f[zf] is not None:
+                g_total += 1
+                dz = abs(f[zf] - D.dem_z(f["x"], f["y"]))
+                g_worst = max(g_worst, dz)
+                g_ok += dz <= TOL
+            if f["route_id"] == "R1":
+                a_total += 1
+                a_ok += f["z_axis"] is not None and abs(f["z_axis"] - D.r1_z(f["m"])) <= TOL
+        self._load(context, res["OUTPUT"], tr("Таблица профиля"), group)
+        n_table = table.featureCount()
+        res = processing.run("routeliner:profile_drawing", dict(
+            TABLE=res["OUTPUT"], ROUTE="R1", GROUND=zf, PLAN=located, PLAN_LABEL="did",
+            LINES="memory:", TEXTS="memory:"), context=context, feedback=None, is_child_algorithm=True)
+        drawn = (abs(res["WIDTH_MM"] - 2000.0 / 500.0 * 1000.0) <= TOL
+                 and layer(res["LINES"]).featureCount() > 0 and layer(res["TEXTS"]).featureCount() > 0)
+        from .alg_profile import _KEEP, _StyleLines, _StyleTexts
+        for ref, title, style in ((res["LINES"], "Профиль, линии", _StyleLines()),
+                                  (res["TEXTS"], "Профиль, подписи", _StyleTexts())):
+            self._load(context, ref, tr(title), group)
+            _KEEP.append(style)
+            context.layerToLoadOnCompletionDetails(ref).setPostProcessor(style)
+
         n_def = QgsVectorLayer(uri("defects")).featureCount()
         passed = (ok_routes and p_ok == p_total == p_total_all and e_ok == exp_err
-                  and l_ok == l_total and l_err == 1 and d_ok == d_total == n_def)
+                  and l_ok == l_total and l_err == 1 and d_ok == d_total == n_def
+                  and g_total == n_table and g_ok == g_total and a_ok == a_total > 0
+                  and n_eq == 2 and drawn)
         yes, no = tr("да"), tr("нет")
         lines = [
             tr("Маршруты: не собран только R4 - {v}").format(
@@ -248,6 +313,10 @@ class DemoAlgorithm(RoutelinerAlgorithm):
             tr("Участки: совпало {a} из {n}, ошибка нулевой длины распознана: {v}").format(
                 a=l_ok, n=l_total, v=yes if l_err == 1 else no),
             tr("Дефекты: привязано верно {a} из {n}").format(a=d_ok, n=n_def),
+            tr("Профиль: отметки рельефа совпали {a} из {n} (наибольшее расхождение {w:.1f} мм), "
+               "отметки оси R1 {b} из {m}, уравнений R3 {e} из 2, чертёж построен: {v}").format(
+                a=g_ok, n=n_table, w=g_worst * 1000, b=a_ok, m=a_total, e=n_eq,
+                v=yes if drawn else no),
             tr("ПРОВЕРКА ПРОЙДЕНА") if passed else tr("ПРОВЕРКА НЕ ПРОЙДЕНА"),
         ]
         for s in lines:

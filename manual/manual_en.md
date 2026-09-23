@@ -131,7 +131,7 @@ continues across a gap without counting its length.
 
 ## Common route and chainage parameters
 
-These parameters belong to tools 1.02, 2.01, 2.02, 3.01, 3.02, 4.01 and 4.02.
+These parameters belong to tools 1.02, 2.01, 2.02, 3.01, 3.02, 4.01, 4.02 and 5.01.
 
 | Parameter | Meaning |
 |---|---|
@@ -253,6 +253,139 @@ coordinate system are transformed to the route coordinate system.
 The values of rl_side are written as codes, so that they do not depend on the
 interface language.
 
+## 5.01 Profile table
+
+The tool collects the points of a longitudinal profile along every route and
+samples raster values at them. Points are placed at the route start and end,
+at station equations, at whole pickets, at axis vertices and with a constant
+step. Points closer than 1 cm along the measure are merged into one.
+
+A raster may be terrain, a design surface, the roof or floor of a seam, the
+groundwater level or any other surface. The value is interpolated bilinearly
+between cell centres, and the raster may be in any coordinate system.
+
+Points from an event layer, such as crossings, manholes or boreholes, are put
+on the profile by projection onto the axis. A point gets onto the profile only
+when it lies closer to the axis than the corridor parameter allows.
+
+| Parameter | Meaning |
+|---|---|
+| Routes separated by commas | Empty - all routes of the layer |
+| Rasters | One or several rasters, one field for each |
+| Raster band number | 1 by default |
+| Points at whole pickets every, m | 100 m by default, 0 - no pickets |
+| Points with a constant step, m | 0 by default - no step |
+| Axis vertices | Only with a turn above 1° or a grade break above 1 ‰, all vertices or no vertices |
+| Events for the profile | Optional point layer and label field |
+| Events: corridor from the axis, m | 10 m by default |
+
+The other parameters are those of the section Common route and chainage
+parameters.
+
+| Result field | Type | Content |
+|---|---|---|
+| route_id | text | Route ID |
+| n | integer | Point number in the order of the measure |
+| kind | text | Point kind, start, end, equation, event, picket, vertex or step |
+| m | number | Measure along the axis, m |
+| station | number | Chainage, m, chainage back for an equation |
+| station_ahead | number | Chainage ahead, filled for an equation only |
+| pk | text | Station in the chosen notation, both stations with an equals sign for an equation |
+| section | integer | Chainage section number |
+| x, y | number | Point coordinates on the axis |
+| z_axis | number | Axis elevation from the route Z, empty without Z or with zero Z |
+| turn | number | Turn angle of the alignment at a vertex, degrees, positive to the left |
+| label | text | Event label |
+| z_name | number | Raster value, the field name is built from the raster layer name |
+
+## 5.02 Profile drawing
+
+The tool builds the drawing of the longitudinal profile of one route from the
+5.01 table. Surface lines and the elevation scale are drawn above the grid,
+and the grid rows and the straightened plan go below them.
+
+The drawing is placed in the same coordinate system as the table, in paper
+millimetres. One map unit equals one millimetre, so in a QGIS print layout the
+profile prints at full size with the map scale 1:1000. If the lower left
+corner is not given, the drawing is placed below the routes with a margin of
+100 units.
+
+The grid is set by a table of rows, and by default it holds the Pipeline
+template. Rows can be removed, added and reordered. A row without data is not
+put into the grid, so the drawing has no empty rows.
+
+| Row table column | Meaning |
+|---|---|
+| Title | Text in the title column on the left |
+| Type | value, text, grade, distance, station or plan |
+| Source | A QGIS expression for value and grade, a field of the section layer for text |
+| Decimals | Number of decimals in the labels |
+| Height, mm | Row height, 0 - the row only draws a line above the grid |
+| Line (1/0) | 1 - the values of a value row are drawn as a line above the grid |
+
+| Row type | What is drawn |
+|---|---|
+| value | A number at every point from an expression over the profile table fields |
+| text | Section labels from a field of the section layer, with separators at the boundaries |
+| grade | Grade in per mille and length of the sections of constant grade |
+| distance | Distances along the measure between neighbouring labelled points |
+| station | Point stations, an equation in two lines |
+| plan | Straightened plan with the axis, turn angles and points with offsets |
+
+Expressions may use the profile table fields and the placeholders {ground},
+{design}, {pipe}, {d} and {base}. The first three are replaced by the fields
+chosen in the parameters, and the last two by the pipe diameter and the
+bedding thickness. If a placeholder is not set, the row is skipped with a log
+message.
+
+| Pipeline template row | Type | Source |
+|---|---|---|
+| Design ground level, m | value | {design} |
+| Existing ground level, m | value | {ground} |
+| Pipe top level, m | value | {pipe} |
+| Trench bottom level, m | value | {pipe} - {d} - {base} |
+| Ground to pipe, m | value | {ground} - {pipe} |
+| Trench depth, m | value | {ground} - ({pipe} - {d} - {base}) |
+| Pipe type and coating | text | field pipe of the section layer |
+| Bedding | text | field base of the section layer |
+| Grade, ‰ / length, m | grade | {pipe} |
+| Distance, m | distance | |
+| Station | station | |
+| Straightened plan | plan | |
+
+Grade sections are found by vertical simplification of the line, and the
+simplification tolerance is a parameter with a default of 0.02 m. Sections for
+text rows come from the result of 2.02 or from any table with start and end
+measure fields.
+
+Point labels are thinned when the points are closer on paper than the given
+gap, 3 mm by default. The label stays at the point with the higher priority.
+The priority falls from the route start and end to an equation, an event, a
+picket, a vertex and a step point.
+
+The straightened plan is built from points with the fields rl_m and rl_offset,
+that is from the result of 4.02. The plan is schematic, so offsets are
+compressed until the farthest point fits into the row.
+
+| Parameter | Meaning |
+|---|---|
+| Profile table | Result of 5.01 |
+| Route | Empty - the first route of the table |
+| Ground level field {ground} | Usually the field of the terrain raster |
+| Design level field {design} | Optional field |
+| Pipe or axis level field {pipe} | Empty - z_axis |
+| Pipe outer diameter {d}, m | 0.16 m by default |
+| Bedding thickness {base}, m | 0.3 m by default |
+| Horizontal and vertical scale | 1:500 and 1:100 by default |
+| Datum, m | Empty - 1 m below the lowest level rounded down to a metre |
+| Smallest gap between labels, mm | 3 mm by default |
+
+The result consists of two layers. The line layer holds the fields kind (line
+kind), row (row), color (colour) and width (width, mm). The label layer holds
+the fields text, kind, rot (rotation, degrees), size (height, mm), halign and
+valign. The style of both layers is set on loading and takes colour, width,
+rotation and alignment from these fields.
+
 # Error table
 
 Tools 1.02, 2.01, 2.02, 3.01, 3.02 and 4.02 produce an error table without
@@ -283,6 +416,11 @@ geometry. It repeats the fields of the source record and adds three fields.
 Tool 1.01 writes five layers in the EPSG:32640 coordinate system to the file
 routeliner_demo.gpkg. The fields with the exp_ prefix hold the reference answer
 and are needed for the check only.
+
+The terrain raster routeliner_demo_dem.tif with a 5 m cell is written next to
+it. The terrain is an inclined plane z = 120 + 0.01 (x - 455000) + 0.02 (y -
+6428000), and bilinear interpolation on a plane is exact. That is why profile
+levels are checked against the formula and not against the raster itself.
 
 **routes.** Four routes. R1 is a 2000 m straight line with Z values from 150
 to 170 m. R2 is a 500 m straight line, an arc of 300 m radius turning 90° to
@@ -357,6 +495,11 @@ events in QGIS 4.0.3 matched all 3002 point events with the reference, with a
 largest deviation of 2.4 mm. All 1500 defects of the same run were located on
 their own route with a deviation of the measure and the offset below 1 cm.
 
+In the same run the profile table along routes R1-R3 gave 573 points. The
+terrain levels at all points matched the plane formula with a deviation below
+0.1 mm. The axis levels of R1 matched at all 194 points, and both
+equations of R3 got into the table.
+
 The deviation appears on arcs with an offset, because an arc is cut into
 chords, and the normal to a chord differs from the normal to the arc by no
 more than 0.01°. Chainage from a ledger does not depend on the cutting,
@@ -373,6 +516,7 @@ same geometry and adds the event table, the chainage and the ledger to it.
 | Line substring | Part of one line between two distances | Sections from a table, offset, route assembly from parts |
 | Points along geometry | Points with a constant step | Picket stakeout with equations |
 | Linear Referencing symbol layer (since 3.40) | Distance labels along a line at rendering | Pickets as layer features with fields |
+| Elevation profile (since 3.26) | Profile of surfaces along a line in a separate panel | Profile grid with ledger stations, grades and a straightened plan as layers for a print layout |
 | Network analysis, shortest path | A path over a road graph between points | Builds no networks, a path from network analysis can serve as a route |
 
 Network analysis and Routeliner solve different tasks, because network analysis
@@ -393,13 +537,21 @@ When gaps are allowed, the order of the route parts is set from the first part
 in storage order to the nearest end. For parts lying far from each other, the
 order is worth checking with tool 1.02.
 
+The profile drawing is built for one route per run and with one datum. That is
+why the profile of a long alignment with a large height difference comes out
+tall.
+
+Unlike the live layers 3.01 and 3.02, the profile drawing is not recalculated
+by itself after data edits. After an edit tools 5.01 and 5.02 have to be run
+again.
+
 - - -
 
 Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.informpp.ru)).
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.3.1
+Routeliner v0.4.0
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

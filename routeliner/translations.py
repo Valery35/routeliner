@@ -103,6 +103,18 @@ TRANSLATIONS = {
         'zero-length section',
     'ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}':
         'the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}',
+    'влево':
+        'left',
+    'вправо':
+        'right',
+    'Условный горизонт {z:.2f}':
+        'Datum {z:.2f}',
+    'М 1:{v:g} по вертикали':
+        'Vertical scale 1:{v:g}',
+    'М 1:{h:g} по горизонтали':
+        'Horizontal scale 1:{h:g}',
+    'ВУ{n} {a:.1f}° {side}':
+        'PI{n} {a:.1f}° {side}',
     'маршрут нулевой длины':
         'zero-length route',
     'мера {m:.3f} вне 0..{L:.3f}':
@@ -151,6 +163,10 @@ TRANSLATIONS = {
         'Picket stakeout',
     'Привязка точек к маршрутам':
         'Locate points on routes',
+    'Таблица профиля':
+        'Profile table',
+    'Чертёж профиля':
+        'Profile drawing',
     'Руководство (PDF)':
         'Manual (PDF)',
     'Создаёт GeoPackage с четырьмя маршрутами: прямая с отметками, настоящая дуга R=300 м, ломаная из частей в произвольном порядке, маршрут с разрывом. В нём же исполнительная ведомость с рублеными пикетами, обратной и прямой вставками, таблицы точечных и линейных событий, в том числе заведомо ошибочных, и точки дефектов. У каждой записи есть эталонный ответ в полях exp_*, посчитанный аналитически, без участия модуля.\n\nС включённой проверкой пример сразу прогоняется через инструменты модуля. Итог сравнения с эталоном выводится в журнал, результаты добавляются в проект.':
@@ -165,6 +181,8 @@ TRANSLATIONS = {
         'Ledger',
     'Линейные события':
         'Line events',
+    'Рельеф':
+        'Terrain',
     'Собранные маршруты':
         'Assembled routes',
     'Точечные события, результат':
@@ -177,6 +195,10 @@ TRANSLATIONS = {
         'Defects, located',
     'Пикеты':
         'Pickets',
+    'Профиль, линии':
+        'Profile, lines',
+    'Профиль, подписи':
+        'Profile, labels',
     'да':
         'yes',
     'нет':
@@ -211,6 +233,136 @@ TRANSLATIONS = {
         'Sections: {a} of {n} match, zero-length error recognised: {v}',
     'Дефекты: привязано верно {a} из {n}':
         'Defects: {a} of {n} located correctly',
+    'Профиль: отметки рельефа совпали {a} из {n} (наибольшее расхождение {w:.1f} мм), отметки оси R1 {b} из {m}, уравнений R3 {e} из 2, чертёж построен: {v}':
+        'Profile: terrain levels match {a} of {n} (largest deviation {w:.1f} mm), R1 axis levels {b} of {m}, R3 equations {e} of 2, drawing built: {v}',
+    'Собирает точки продольного профиля по каждому маршруту и снимает в них значения растров. Точки ставятся в начале и конце маршрута, на пикетажных уравнениях, на целых пикетах, на вершинах оси и с постоянным шагом. Точки из слоя событий (переходы, колодцы, скважины) ставятся по проекции на ось, если лежат в коридоре от оси.\n\nЗначения растров интерполируются билинейно по центрам ячеек. Растр может быть в любой системе координат, точки пересчитываются.\n\nПоля результата: route_id (ID маршрута), n (номер точки), kind (start, end, equation, event, picket, vertex, step), m (мера по оси, м), station (пикетаж, м), station_ahead (пикетаж вперёд, только у уравнения), pk (пикет в выбранной записи), section (номер участка пикетажа), x и y (координаты на оси), z_axis (отметка оси по Z маршрута, пусто, если у маршрута нет Z или все Z нулевые), turn (угол поворота трассы в вершине, градусы, плюс влево), label (подпись события) и по одному полю z_имя на каждый растр.':
+        'Collects the points of a longitudinal profile along every route and samples raster values at them. Points are placed at the route start and end, at station equations, at whole pickets, at axis vertices and with a constant step. Points from the event layer (crossings, manholes, boreholes) are placed by projection onto the axis if they lie within the corridor from the axis.\n\nRaster values are interpolated bilinearly between cell centres. A raster may be in any coordinate system, the points are transformed.\n\nResult fields: route_id (route ID), n (point number), kind (start, end, equation, event, picket, vertex, step), m (measure along the axis, m), station (chainage, m), station_ahead (chainage ahead, equations only), pk (station in the chosen notation), section (chainage section number), x and y (coordinates on the axis), z_axis (axis elevation from the route Z, empty if the route has no Z or all Z are zero), turn (turn angle of the alignment at a vertex, degrees, positive to the left), label (event label) and one z_name field for each raster.',
+    'Заголовок':
+        'Title',
+    'Тип':
+        'Type',
+    'Источник':
+        'Source',
+    'Знаков':
+        'Decimals',
+    'Высота, мм':
+        'Height, mm',
+    'Линия (1/0)':
+        'Line (1/0)',
+    'Строит чертёж продольного профиля одного маршрута по таблице 5.01: линии поверхностей над сеткой, сетку профиля со строками, шкалу отметок и развёрнутый план. Чертёж ставится в той же системе координат, что и таблица, в миллиметрах бумаги: одна единица карты равна миллиметру. В компоновке QGIS профиль печатается в натуральную величину при масштабе карты 1:1000.\n\nСтроки сетки задаются таблицей. Тип строки: value (число по выражению), text (подписи участков из поля слоя участков), grade (уклон и длина по выражению), distance (расстояния между точками), station (пикеты), plan (развёрнутый план). В выражениях можно писать поля таблицы профиля и подстановки {ground}, {design}, {pipe}, {d}, {base}, которые заменяются полями и числами из параметров. Строка, у которой нет данных, в сетку не выводится.\n\nПодписи точек прореживаются: если точки на бумаге ближе заданного промежутка, подпись остаётся у точки с большим приоритетом (начало и конец, уравнение, событие, пикет, вершина, шаг).\n\nПоля слоя линий: kind (вид линии), row (строка), color, width (толщина, мм). Поля слоя подписей: text, kind, rot (поворот, градусы), size (высота, мм), halign, valign.':
+        'Builds the drawing of the longitudinal profile of one route from the 5.01 table: surface lines above the grid, the profile grid with its rows, the elevation scale and the straightened plan. The drawing is placed in the same coordinate system as the table, in paper millimetres, so one map unit equals one millimetre. In a QGIS print layout the profile prints at full size with the map scale 1:1000.\n\nThe grid rows are set by a table. Row type: value (number from an expression), text (section labels from a field of the section layer), grade (grade and length from an expression), distance (distances between points), station (pickets), plan (straightened plan). Expressions may use the fields of the profile table and the placeholders {ground}, {design}, {pipe}, {d}, {base}, which are replaced by fields and numbers from the parameters. A row without data is not put into the grid.\n\nPoint labels are thinned: if points are closer on paper than the given gap, the label stays at the point with the higher priority (start and end, equation, event, picket, vertex, step).\n\nFields of the line layer: kind (line kind), row (row), color, width (width, mm). Fields of the label layer: text, kind, rot (rotation, degrees), size (height, mm), halign, valign.',
+    'только с поворотом или изломом уклона':
+        'only with a turn or a grade break',
+    'все вершины':
+        'all vertices',
+    'без вершин':
+        'no vertices',
+    'Отметка земли проектная, м':
+        'Design ground level, m',
+    'Отметка земли фактическая, м':
+        'Existing ground level, m',
+    'Отметка верха трубы, м':
+        'Pipe top level, m',
+    'Отметка дна траншеи, м':
+        'Trench bottom level, m',
+    'Расстояние земля - труба, м':
+        'Ground to pipe, m',
+    'Глубина траншеи, м':
+        'Trench depth, m',
+    'Обозначение трубы и тип изоляции':
+        'Pipe type and coating',
+    'Основание':
+        'Bedding',
+    'Уклон, ‰ / длина, м':
+        'Grade, ‰ / length, m',
+    'Расстояние, м':
+        'Distance, m',
+    'Пикет':
+        'Station',
+    'Развёрнутый план':
+        'Straightened plan',
+    'Поле отметки земли {ground}':
+        'Ground level field {ground}',
+    'Поле проектной отметки {design}':
+        'Design level field {design}',
+    'Поле отметки трубы или оси {pipe} (пусто - z_axis)':
+        'Pipe or axis level field {pipe} (empty - z_axis)',
+    'Участки: поле ID маршрута':
+        'Sections: route ID field',
+    'Участки: поле меры начала':
+        'Sections: start measure field',
+    'Участки: поле меры конца':
+        'Sections: end measure field',
+    'Маршруты через запятую (пусто - все)':
+        'Routes separated by commas (empty - all)',
+    'Растры (рельеф, проектная поверхность, пласт)':
+        'Rasters (terrain, design surface, seam)',
+    'Номер канала растров':
+        'Raster band number',
+    'Точки на целых пикетах через, м (0 - нет)':
+        'Points at whole pickets every, m (0 - none)',
+    'Точки с постоянным шагом, м (0 - нет)':
+        'Points with a constant step, m (0 - none)',
+    'Вершины оси':
+        'Axis vertices',
+    'События на профиль: точки (необязательно)':
+        'Events for the profile: points (optional)',
+    'События: поле подписи':
+        'Events: label field',
+    'События: коридор от оси, м':
+        'Events: corridor from the axis, m',
+    'Таблица профиля (результат 5.01)':
+        'Profile table (result of 5.01)',
+    'Маршрут (пусто - первый в таблице)':
+        'Route (empty - the first in the table)',
+    'Наружный диаметр трубы {d}, м':
+        'Pipe outer diameter {d}, m',
+    'Толщина основания {base}, м':
+        'Bedding thickness {base}, m',
+    'Строки сетки профиля':
+        'Profile grid rows',
+    'Участки для текстовых строк (необязательно)':
+        'Sections for text rows (optional)',
+    'Точки для развёрнутого плана (результат 4.02, необязательно)':
+        'Points for the straightened plan (result of 4.02, optional)',
+    'План: поле подписи':
+        'Plan: label field',
+    'Масштаб по горизонтали 1:':
+        'Horizontal scale 1:',
+    'Масштаб по вертикали 1:':
+        'Vertical scale 1:',
+    'Условный горизонт, м (пусто - автоматически)':
+        'Datum, m (empty - automatic)',
+    'Допуск выделения уклонов, м':
+        'Grade detection tolerance, m',
+    'Наименьший промежуток между подписями, мм':
+        'Smallest gap between labels, mm',
+    'Левый нижний угол профиля над сеткой (пусто - под маршрутом)':
+        'Lower left corner of the profile above the grid (empty - below the routes)',
+    'Не задана таблица профиля':
+        'The profile table is not set',
+    'В слое плана нужны поля rl_m и rl_offset (результат 4.02)':
+        'The plan layer needs the fields rl_m and rl_offset (result of 4.02)',
+    'Итого: точек профиля {n}, растров {r}':
+        'Total: profile points {n}, rasters {r}',
+    'Профиль маршрута «{rid}»: строк {r}, ширина {w:.0f} мм, условный горизонт {h:.2f}':
+        'Profile of route «{rid}»: rows {r}, width {w:.0f} mm, datum {h:.2f}',
+    'В таблице нет точек маршрута «{rid}»':
+        'The table has no points of route «{rid}»',
+    'В слое участков нет полей меры «{a}» и «{b}»':
+        'The section layer has no measure fields «{a}» and «{b}»',
+    'В таблице нет поля «{f}», нужна таблица инструмента 5.01':
+        'The table has no field «{f}», the table of tool 5.01 is needed',
+    'не задано: {names}':
+        'not set: {names}',
+    'Строка «{t}»: неизвестный тип «{k}»':
+        'Row «{t}»: unknown type «{k}»',
+    'Строка «{t}»: знаков и высота должны быть числами':
+        'Row «{t}»: decimals and height must be numbers',
+    'Строка «{t}» пропущена: {why}':
+        'Row «{t}» skipped: {why}',
+    'Строка «{t}» пропущена: нет участков с полем «{f}»':
+        'Row «{t}» skipped: no sections with the field «{f}»',
     'Таблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).':
         'The error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation).',
     'Ставит на маршруты записи таблицы по пикету в выбранной записи, со смещением от оси. Пикет переводится в меру через ведомость маршрута, а без ведомости по длине оси от пикета начала. Запись «+35» берёт пикет предыдущей записи того же маршрута.\n\nК полям исходной записи добавляются rl_m (мера по оси, м), rl_pk (пикет в выбранной записи), rl_x и rl_y (координаты точки в СК маршрутов), rl_azimuth (азимут оси в точке, градусы от севера по часовой стрелке).':
@@ -289,6 +441,8 @@ TRANSLATIONS = {
         '3. Live layers',
     '4. Пикетаж и привязка':
         '4. Chainage and locating',
+    '5. Профили':
+        '5. Profiles',
     'километр и метры (км 1+535)':
         'Kilometre and metres (км 1+535)',
     'железнодорожная запись (км 12 ПК 3+45)':

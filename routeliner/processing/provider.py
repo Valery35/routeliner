@@ -4,6 +4,7 @@ from qgis.PyQt.QtGui import QIcon
 from ..i18n import tr
 from .alg_demo import DemoAlgorithm
 from .algorithms import ALGORITHMS
+from .alg_profile import PROFILE_ALGORITHMS
 from ..resources import icon_path
 
 
@@ -21,5 +22,5 @@ class RoutelinerProvider(QgsProcessingProvider):
         return QIcon(icon_path())
 
     def loadAlgorithms(self):
-        for cls in [DemoAlgorithm, *ALGORITHMS]:
+        for cls in [DemoAlgorithm, *ALGORITHMS, *PROFILE_ALGORITHMS]:
             self.addAlgorithm(cls())

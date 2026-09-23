@@ -59,6 +59,7 @@ GROUPS = {
     "events": "2. События по пикетам",
     "live": "3. Динамические слои",
     "chainage": "4. Пикетаж и привязка",
+    "profile": "5. Профили",
 }
 
 SITE = "https://www.informpp.ru"

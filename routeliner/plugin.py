@@ -40,6 +40,9 @@ class RoutelinerPlugin:
             ("4.01", "Пикетная разбивка", "pickets"),
             ("4.02", "Привязка точек к маршрутам", "locate_points"),
             None,
+            ("5.01", "Таблица профиля", "profile_table"),
+            ("5.02", "Чертёж профиля", "profile_drawing"),
+            None,
         ]
         for item in items:
             if item is None:

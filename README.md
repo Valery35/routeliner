@@ -70,7 +70,7 @@ GNU GPL версии 2 или новее, см. [LICENSE](LICENSE).
 
 Страница плагина: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.3.0
+Routeliner v0.3.1
 
 Routeliner развивается на задачах реальных предприятий. Если вашему
 производству не хватает функции, напишите нам:

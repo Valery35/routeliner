@@ -70,8 +70,11 @@ class RouteGeometry:
             m += float(ln.sum())
         self.length = m
         dim = 3 if any(c.shape[1] > 2 for c in self.parts) else 2
-        pad = lambda arr: arr if arr.shape[1] >= dim else np.hstack(
-            [arr, np.full((len(arr), dim - arr.shape[1]), np.nan)])
+
+        def pad(arr):
+            if arr.shape[1] >= dim:
+                return arr
+            return np.hstack([arr, np.full((len(arr), dim - arr.shape[1]), np.nan)])
         self._a = np.vstack([pad(s[0][:, :dim]) for s in segs if len(s[2])]) if m > 0 else np.zeros((0, dim))
         self._b = np.vstack([pad(s[1][:, :dim]) for s in segs if len(s[2])]) if m > 0 else np.zeros((0, dim))
         self._len = np.concatenate([s[2] for s in segs]) if segs else np.empty(0)

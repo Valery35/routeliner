@@ -123,7 +123,10 @@ class _EventsBase(RoutelinerAlgorithm):
         src, routes, route_errors = self.routes(parameters, context, feedback)
         loc, _ = self.locator(parameters, context, feedback, routes)
         ev = self.parameterAsSource(parameters, "EVENTS", context)
-        s = lambda n: self.parameterAsString(parameters, n, context) or None
+
+        def s(n):
+            return self.parameterAsString(parameters, n, context) or None
+
         sign = -1.0 if self.parameterAsBoolean(parameters, "OFFSET_RIGHT", context) else 1.0
         records, feats = read_events(ev, s("EV_ROUTE"), s("EV_FROM"), s("EV_TO") if self.LINE else None,
                                      s("EV_OFFSET"), s("EV_SECTION"), sign)

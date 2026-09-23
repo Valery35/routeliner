@@ -12,7 +12,6 @@ from qgis.PyQt.QtCore import QMetaType
 
 from ..i18n import tr
 from ..core.assembler import RouteAssembler
-from ..core.errors import CoreError
 from ..core.events import EventLocator
 from ..core.stations import StationFormat, StationParser
 from ..layers.route_source import build_routes
@@ -186,7 +185,9 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
         systems, errors = {}, []
         ledger = self.parameterAsSource(parameters, "LEDGER", context)
         if ledger is not None:
-            f = lambda n: self.parameterAsString(parameters, n, context) or None
+            def f(n):
+                return self.parameterAsString(parameters, n, context) or None
+
             if not (f("LG_ROUTE") and f("LG_STATION")):
                 raise QgsProcessingException(tr("Для ведомости нужны поля ID маршрута и пикета"))
             systems, errors = read_ledger(

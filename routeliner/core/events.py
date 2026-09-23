@@ -15,8 +15,7 @@ import numpy as np
 from .chainage import ChainageSystem
 from ..i18n import tr
 from .errors import CoreError, ErrorCode
-from .route import RouteGeometry
-from .stations import Station, StationParser
+from .stations import StationParser
 
 
 @dataclass(frozen=True)

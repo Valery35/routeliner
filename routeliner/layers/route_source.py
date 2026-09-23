@@ -12,7 +12,7 @@ from typing import Iterable, Optional
 
 import numpy as np
 from qgis.core import (QgsAbstractGeometry, QgsCurve, QgsFeatureRequest,
-                       QgsGeometry, QgsVectorLayer, QgsWkbTypes)
+                       QgsGeometry, QgsWkbTypes)
 
 from ..core.assembler import RouteAssembler
 from ..core.errors import CoreError

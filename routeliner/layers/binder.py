@@ -91,7 +91,9 @@ class Binding(QObject):
                 sig = getattr(lyr, name, None)
                 if sig is None:
                     continue
-                slot = lambda *a: self.schedule()
+
+                def slot(*_args):
+                    self.schedule()
                 sig.connect(slot)
                 self._conns.append((sig, slot))
             path = _file_of(lyr)

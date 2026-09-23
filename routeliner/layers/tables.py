@@ -7,7 +7,7 @@ from typing import Optional
 from qgis.core import QgsFeatureSource
 
 from ..core.chainage import ChainageSystem
-from ..core.errors import CoreError, ErrorCode
+from ..core.errors import CoreError
 from ..core.events import EventRecord
 from ..core.stations import StationParser
 

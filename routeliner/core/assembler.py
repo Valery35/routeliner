@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 
@@ -147,9 +147,11 @@ class RouteAssembler:
             dfwd = np.hypot(*(self._endpoints(chains[fwd])[0] - tail))
             dback = np.hypot(*(self._endpoints(chains[back])[1] - head))
             if dfwd <= dback:
-                order.append(fwd); rest.remove(fwd)
+                order.append(fwd)
+                rest.remove(fwd)
             else:
-                order.insert(0, back); rest.remove(back)
+                order.insert(0, back)
+                rest.remove(back)
         return [chains[i] for i in order]
 
     def _merge(self, chain) -> np.ndarray:

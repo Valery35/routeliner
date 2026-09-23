@@ -8,16 +8,16 @@ import csv
 import math
 import os
 
-from qgis.core import (Qgis, QgsCoordinateReferenceSystem, QgsFeature, QgsGeometry,
+from qgis.core import (Qgis, QgsFeature, QgsGeometry,
                        QgsPointXY, QgsProcessingContext, QgsProcessingException,
                        QgsProcessingOutputBoolean, QgsProcessingOutputString,
                        QgsProcessingParameterBoolean, QgsProcessingParameterFolderDestination,
-                       QgsProcessingParameterNumber, QgsProcessingUtils, QgsProject,
+                       QgsProcessingParameterNumber, QgsProcessingUtils,
                        QgsVectorFileWriter, QgsVectorLayer)
 
 from ..core import demo as D
 from ..i18n import tr
-from .common import DBL, T_DBL, T_INT, T_STR, RoutelinerAlgorithm, fields_of, fld
+from .common import T_DBL, T_INT, T_STR, RoutelinerAlgorithm, fields_of, fld
 
 TOL = 0.01          # допуск сравнения с эталоном, м
 GPKG = "routeliner_demo.gpkg"
@@ -131,7 +131,7 @@ class DemoAlgorithm(RoutelinerAlgorithm):
                  "exp_error", "note"]
         ltypes = [T_INT, T_STR, T_STR, T_STR, T_DBL, T_DBL, T_DBL, T_STR, T_STR]
         le = _memory("None", fields_of(*[fld(c, t) for c, t in zip(lcols, ltypes)]), "events_lines")
-        _add(le, [[l[c] for c in lcols] for l in d.lines])
+        _add(le, [[ln[c] for c in lcols] for ln in d.lines])
         _write(le, path, "events_lines", context)
 
         dcols = ["did", "exp_route", "exp_m", "exp_station", "exp_offset"]
@@ -167,16 +167,22 @@ class DemoAlgorithm(RoutelinerAlgorithm):
     def _check(self, path, context, feedback, group):
         import processing
 
-        uri = lambda n: f"{path}|layername={n}"
+        def uri(n):
+            return f"{path}|layername={n}"
+
         common = dict(ROUTES=uri("routes"), ROUTE_ID="route_id", SNAP=0.01,
                       FORMAT=0, PICKET=100.0, START=0.0,
                       LEDGER=uri("ledger"), LG_ROUTE="route_id", LG_STATION="station",
                       LG_MEASURE="measure", LG_AHEAD="station_ahead", LG_SYSTEM="system",
                       SYSTEM=D.SYSTEM)
-        run = lambda alg, extra: processing.run(
-            f"routeliner:{alg}", {**common, **extra}, context=context, feedback=None,
-            is_child_algorithm=True)
-        layer = lambda ref: QgsProcessingUtils.mapLayerFromString(ref, context)
+
+        def run(alg, extra):
+            return processing.run(
+                f"routeliner:{alg}", {**common, **extra}, context=context, feedback=None,
+                is_child_algorithm=True)
+
+        def layer(ref):
+            return QgsProcessingUtils.mapLayerFromString(ref, context)
 
         res = run("check_routes", dict(OUTPUT="memory:", ERRORS="memory:"))
         bad_routes = [f["rl_route"] for f in layer(res["ERRORS"]).getFeatures()]

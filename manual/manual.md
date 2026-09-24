@@ -540,7 +540,7 @@ Routeliner использует ту же геометрию, но добавл�
 
 Страница плагина: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.1
+Routeliner v0.4.2
 
 Routeliner развивается на задачах реальных предприятий. Если вашему
 производству не хватает функции, напишите нам:

@@ -12,6 +12,9 @@ from qgis.core import (Qgis, QgsFeature, QgsFeatureSink, QgsField, QgsFields,
 from qgis.PyQt.QtCore import QMetaType
 
 from ..i18n import tr
+from ..core.aliases import (ALIASES, PLAIN_ALIASES, alias_source,  # noqa: F401
+                            all_alias_sources, is_raster_field, layer_is_ours,
+                            split_gpkg_ref)
 from ..core.assembler import RouteAssembler
 from ..core.events import EventLocator
 from ..core.stations import StationFormat, StationParser
@@ -52,53 +55,125 @@ def fields_of(*items) -> QgsFields:
 
 ERROR_FIELDS = [("rl_route", T_STR), ("rl_error", T_STR), ("rl_message", T_STR)]
 
-# Псевдонимы полей. Имена полей не зависят от языка, чтобы выражения, стили и
-# проекты работали в любой локали, а в таблице атрибутов и формах видны
-# псевдонимы на языке интерфейса.
-ALIASES = {
-    "rl_m": "Мера, м", "rl_pk": "Пикет", "rl_x": "X", "rl_y": "Y", "rl_azimuth": "Азимут, °",
-    "rl_m_from": "Мера начала, м", "rl_m_to": "Мера конца, м", "rl_length": "Длина участка, м",
-    "rl_pk_from": "Пикет начала", "rl_pk_to": "Пикет конца", "rl_swapped": "Начало и конец поменяны",
-    "rl_route": "Маршрут", "rl_offset": "Смещение от оси, м", "rl_side": "Сторона",
-    "rl_error": "Код ошибки", "rl_message": "Пояснение ошибки",
-    "exp_m": "Эталон, мера, м", "exp_x": "Эталон, X", "exp_y": "Эталон, Y",
-    "exp_error": "Эталон, код ошибки", "exp_m_from": "Эталон, мера начала, м",
-    "exp_m_to": "Эталон, мера конца, м", "exp_route": "Эталон, маршрут",
-    "exp_station": "Эталон, пикетаж, м", "exp_offset": "Эталон, смещение, м",
-}
-# Простые имена получают псевдоним только в слоях, целиком созданных модулем,
-# чтобы не переименовать чужое поле с тем же именем в таблице событий.
-PLAIN_ALIASES = {
-    "route_id": "ID маршрута", "length": "Длина по оси, м", "parts": "Частей",
-    "gaps": "Разрывов", "gap_max": "Наибольший разрыв, м", "pk": "Пикет",
-    "station": "Пикетаж", "m": "Мера, м", "section": "Участок пикетажа",
-    "azimuth": "Азимут, °", "km": "Целый километр", "n": "Номер точки", "kind": "Вид",
-    "station_ahead": "Пикетаж вперёд", "x": "X", "y": "Y", "z_axis": "Отметка оси, м",
-    "turn": "Угол поворота, °", "label": "Подпись", "row": "Строка сетки", "color": "Цвет",
-    "width": "Толщина линии, мм", "text": "Текст", "rot": "Поворот, °",
-    "size": "Высота текста, мм", "halign": "Выравнивание по горизонтали",
-    "valign": "Выравнивание по вертикали", "name": "Название", "system": "Система пикетажа",
-    "measure": "Мера, м", "note": "Примечание", "eid": "Номер события", "did": "Номер точки",
-    "offset": "Смещение от оси, м", "pk_from": "Пикет начала", "pk_to": "Пикет конца",
-    "fid": "fid",
-}
+# Псевдонимы полей лежат в core/aliases.py: словари и выбор псевдонима
+# проверяются без QGIS. Здесь остаётся работа со слоем и с файлом.
+_OURS = None
+
+
+def _our_aliases():
+    """Наши же псевдонимы на обоих языках, чтобы отличать свой от чужого."""
+    global _OURS
+    if _OURS is None:
+        from ..translations import TRANSLATIONS
+        src = all_alias_sources()
+        _OURS = src | {TRANSLATIONS.get(v, v) for v in src}
+    return _OURS
 
 
 def apply_aliases(layer) -> None:
-    """Ставит псевдонимы известным полям слоя, не трогая уже заданные."""
+    """Ставит псевдонимы полям слоя на языке интерфейса.
+
+    Чужой псевдоним не трогаем. Свой, записанный в файл при создании,
+    заменяем: язык интерфейса важнее языка, на котором файл собрали.
+    """
     if not isinstance(layer, QgsVectorLayer) or not layer.isValid():
         return
     names = [f.name() for f in layer.fields()]
-    own = all(n in ALIASES or n in PLAIN_ALIASES or n.startswith("z_") for n in names)
+    own = layer_is_ours(names)
+    ours = _our_aliases()
     for i, n in enumerate(names):
-        if layer.attributeAlias(i):
+        cur = layer.attributeAlias(i)
+        if cur and cur not in ours and not is_raster_field(n):
             continue
-        if n in ALIASES:
-            layer.setFieldAlias(i, tr(ALIASES[n]))
-        elif own and n in PLAIN_ALIASES and n != "fid":
-            layer.setFieldAlias(i, tr(PLAIN_ALIASES[n]))
-        elif own and n.startswith("z_") and n != "z_axis":
-            layer.setFieldAlias(i, tr("Растр {name}").format(name=n[2:]))
+        src = alias_source(n, own)
+        if src is None:
+            continue
+        text = tr(src).format(name=n[2:]) if is_raster_field(n) else tr(src)
+        layer.setFieldAlias(i, text)
+
+
+def _pick_layer(ds, path, layer_name):
+    """Слой GeoPackage по имени, а без имени - по имени файла.
+
+    Приёмник результата отдаёт один путь без имени слоя. QGIS называет
+    такой слой по файлу, и это первое, что стоит проверить. Если файл
+    несёт единственный слой, берём его.
+    """
+    import os
+    if layer_name:
+        return ds.GetLayerByName(layer_name)
+    stem = os.path.splitext(os.path.basename(path))[0]
+    lyr = ds.GetLayerByName(stem)
+    if lyr is not None:
+        return lyr
+    return ds.GetLayer(0) if ds.GetLayerCount() == 1 else None
+
+
+def bake_aliases(path, layer_name=None) -> int:
+    """Пишет псевдонимы в сам GeoPackage. Возвращает число полей.
+
+    Псевдоним, поставленный на слой, живёт в проекте. Демонстрационный
+    пример и результаты генерации открывают файлом и без проекта, и там
+    подписи снова становились латиницей. GDAL кладёт их в gpkg_data_columns,
+    откуда QGIS читает их сам при любом открытии.
+
+    Записывается язык, на котором файл собрали. Открытый в другой локали
+    слой перекрывается псевдонимом языка интерфейса в apply_aliases.
+    """
+    from osgeo import gdal, ogr
+    ds = gdal.OpenEx(path, gdal.OF_UPDATE | gdal.OF_VECTOR)
+    if ds is None:
+        return 0
+    lyr = _pick_layer(ds, path, layer_name)
+    if lyr is None:
+        return 0
+    defn = lyr.GetLayerDefn()
+    names = [defn.GetFieldDefn(i).GetName() for i in range(defn.GetFieldCount())]
+    own = layer_is_ours(names)
+    done = 0
+    for i, n in enumerate(names):
+        src = alias_source(n, own)
+        if src is None:
+            continue
+        text = tr(src).format(name=n[2:]) if is_raster_field(n) else tr(src)
+        old = defn.GetFieldDefn(i)
+        if old.GetAlternativeName() == text:
+            done += 1
+            continue
+        nd = ogr.FieldDefn(old.GetName(), old.GetType())
+        nd.SetSubType(old.GetSubType())
+        nd.SetAlternativeName(text)
+        if lyr.AlterFieldDefn(i, nd, ogr.ALTER_ALTERNATIVE_NAME_FLAG) == 0:
+            done += 1
+    ds = None
+    return done
+
+
+def bake_refs(refs, feedback=None) -> None:
+    """Псевдонимы в файл для тех результатов, что легли в GeoPackage.
+
+    Ссылки приходят из двух мест. Слои, которые инструмент грузит
+    в проект, стоят в контексте. Приёмники результата в контекст не
+    попадают вовсе, когда инструмент запущен скриптом, поэтому базовый
+    класс помнит их отдельно.
+    """
+    seen = set()
+    for ref in refs:
+        target = split_gpkg_ref(ref)
+        if target is None or target in seen:
+            continue
+        seen.add(target)
+        try:
+            bake_aliases(*target)
+        except Exception as e:      # запись подписей не вправе ронять инструмент
+            if feedback is not None:
+                feedback.pushDebugInfo(
+                    tr("псевдонимы в файл не записаны: {why}").format(why=e))
+
+
+def bake_loaded_layers(context, feedback=None) -> None:
+    """Псевдонимы в файл для слоёв, которые грузятся в проект."""
+    bake_refs(list(context.layersToLoadOnCompletion().keys()), feedback)
 
 
 class AliasPostProcessor(QgsProcessingLayerPostProcessorInterface):
@@ -193,8 +268,18 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
     def createInstance(self):
         return type(self)()
 
+    def parameterAsSink(self, *args, **kwargs):
+        """Помнит, куда лёг результат: туда же пишутся псевдонимы полей."""
+        sink, dest = super().parameterAsSink(*args, **kwargs)
+        if dest:
+            self._dests = getattr(self, "_dests", [])
+            self._dests.append(dest)
+        return sink, dest
+
     def postProcessAlgorithm(self, context, feedback):
         alias_loaded_layers(context)
+        bake_refs(list(context.layersToLoadOnCompletion().keys())
+                  + getattr(self, "_dests", []), feedback)
         return {}
 
     # ------------------------------------------------------------ параметры

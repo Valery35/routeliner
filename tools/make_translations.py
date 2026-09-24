@@ -316,6 +316,8 @@ EN = {
 "Строка «{t}»: знаков и высота": "Row «{t}»: decimals and height must be numbers",
 "Строка «{t}» пропущена: {why}": "Row «{t}» skipped: {why}",
 "Строка «{t}» пропущена: нет участков": "Row «{t}» skipped: no sections with the field «{f}»",
+# processing
+"псевдонимы в файл не записаны": "field aliases were not written to the file: {why}",
 # field aliases
 "Мера, м": "Measure, m",
 "Азимут, °": "Azimuth, °",

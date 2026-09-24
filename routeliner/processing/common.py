@@ -53,6 +53,23 @@ def fields_of(*items) -> QgsFields:
     return out
 
 
+# Округление значений в полях результатов. Точность модуля - миллиметры
+# (см. раздел «Точность» руководства), поэтому длины, меры, смещения,
+# координаты и отметки пишутся до 0,001 м, углы до 0,01°.
+DEC_M = 3
+DEC_DEG = 2
+
+
+def rm(v):
+    """Метры до миллиметра, пустое остаётся пустым."""
+    return None if v is None or v != v else round(float(v), DEC_M)
+
+
+def rdeg(v):
+    """Градусы до сотой, пустое остаётся пустым."""
+    return None if v is None or v != v else round(float(v), DEC_DEG)
+
+
 ERROR_FIELDS = [("rl_route", T_STR), ("rl_error", T_STR), ("rl_message", T_STR)]
 
 # Псевдонимы полей лежат в core/aliases.py: словари и выбор псевдонима

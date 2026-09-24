@@ -35,7 +35,8 @@ def _add(lyr, rows, geoms=None):
     feats = []
     for i, row in enumerate(rows):
         f = QgsFeature(lyr.fields())
-        f.setAttributes(list(row))
+        # эталон пишется до миллиметра, как и результаты модуля
+        f.setAttributes([round(v, 3) if isinstance(v, float) else v for v in row])
         if geoms is not None:
             f.setGeometry(geoms[i])
         feats.append(f)

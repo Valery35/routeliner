@@ -21,7 +21,7 @@ from ..i18n import tr
 from ..layers.rasters import sample
 from ..layers.tables import _key
 from .common import (DBL, FIELD_ANY, FIELD_NUM, SRC_ANY, SRC_POINT, T_DBL, T_INT, T_STR,
-                     RoutelinerAlgorithm, fields_of, fld)
+                     RoutelinerAlgorithm, fields_of, fld, rdeg, rm)
 
 FAST = QgsFeatureSink.Flag.FastInsert
 VERTEX_MODES = [("significant", "только с поворотом или изломом уклона"),
@@ -163,12 +163,10 @@ class ProfileTable(RoutelinerAlgorithm):
                 f = QgsFeature(fields)
                 f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(xyz["x"][i], xyz["y"][i])))
                 z = float(zs[i])
-                f.setAttributes([str(rid), i + 1, p.kind, p.m, p.station,
-                                 None if math.isnan(p.station_ahead) else p.station_ahead,
-                                 pk, p.section, float(xyz["x"][i]), float(xyz["y"][i]),
-                                 None if math.isnan(z) else z,
-                                 round(p.turn, 3) if p.turn else None, p.label or None,
-                                 *[None if math.isnan(v[i]) else float(v[i]) for v in values]])
+                f.setAttributes([str(rid), i + 1, p.kind, rm(p.m), rm(p.station),
+                                 rm(p.station_ahead), pk, p.section, rm(xyz["x"][i]),
+                                 rm(xyz["y"][i]), rm(z), rdeg(p.turn) if p.turn else None,
+                                 p.label or None, *[rm(v[i]) for v in values]])
                 sink.addFeature(f, FAST)
             total += len(pts)
         feedback.pushInfo(tr("Итого: точек профиля {n}, растров {r}").format(n=total, r=len(rasters)))

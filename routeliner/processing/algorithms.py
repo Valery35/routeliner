@@ -16,7 +16,7 @@ from ..core.errors import CoreError
 from ..i18n import tr
 from ..layers.tables import _key, read_events
 from .common import (DBL, FIELD_ANY, FIELD_NUM, SRC_ANY, SRC_POINT, T_DBL, T_INT,
-                     T_STR, RoutelinerAlgorithm, fields_of, fld)
+                     T_STR, RoutelinerAlgorithm, fields_of, fld, rdeg, rm)
 
 FAST = QgsFeatureSink.Flag.FastInsert
 
@@ -76,8 +76,8 @@ class CheckRoutes(RoutelinerAlgorithm):
             if not g.isMultipart():
                 g.convertToMultiType()
             f.setGeometry(g)
-            f.setAttributes([str(rid), r.length, len(r.parts), len(r.gaps),
-                             max((x.distance for x in r.gaps), default=0.0)])
+            f.setAttributes([str(rid), rm(r.length), len(r.parts), len(r.gaps),
+                             rm(max((x.distance for x in r.gaps), default=0.0))])
             sink.addFeature(f, FAST)
         err = self.write_errors(parameters, context, fields_of(), [(None, e) for e in errors])
         feedback.pushInfo(tr("Итого: собрано {a}, ошибок {b}").format(a=len(routes), b=len(errors)))
@@ -160,11 +160,11 @@ class _EventsBase(RoutelinerAlgorithm):
                 g = _line_geometry(r.pieces)
                 if not g.isMultipart():
                     g.convertToMultiType()
-                attrs += [r.m_from, r.m_to, r.m_to - r.m_from, fmt(r.st_from), fmt(r.st_to),
-                          int(r.swapped)]
+                attrs += [rm(r.m_from), rm(r.m_to), rm(r.m_to - r.m_from), fmt(r.st_from),
+                          fmt(r.st_to), int(r.swapped)]
             else:
                 g = QgsGeometry.fromPointXY(QgsPointXY(r.x, r.y))
-                attrs += [r.m, fmt(r.station), r.x, r.y, r.azimuth]
+                attrs += [rm(r.m), fmt(r.station), rm(r.x), rm(r.y), rdeg(r.azimuth)]
             f.setGeometry(g)
             f.setAttributes(attrs)
             sink.addFeature(f, FAST)
@@ -342,8 +342,8 @@ class Pickets(RoutelinerAlgorithm):
             for i, (m, st, sec) in enumerate(items):
                 f = QgsFeature(fields)
                 f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p["x"][i], p["y"][i])))
-                f.setAttributes([str(rid), loc.parser.format(st), st, m, sec,
-                                 float(p["azimuth"][i]), int(abs(st) % 1000 < 1e-6)])
+                f.setAttributes([str(rid), loc.parser.format(st), rm(st), rm(m), sec,
+                                 rdeg(p["azimuth"][i]), int(abs(st) % 1000 < 1e-6)])
                 sink.addFeature(f, FAST)
                 n += 1
         feedback.pushInfo(tr("Итого: пикетов {n}").format(n=n))
@@ -409,9 +409,10 @@ class LocatePoints(RoutelinerAlgorithm):
             out = QgsFeature(fields)
             out.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p)))
             # сторона - код, а не слово: значение поля не зависит от языка интерфейса
-            side = "left" if r.offset > 0 else ("right" if r.offset < 0 else "axis")
+            off = rm(r.offset)
+            side = "left" if off > 0 else ("right" if off < 0 else "axis")
             out.setAttributes(list(f.attributes()) + [
-                str(r.route_id), r.m, loc.parser.format(r.station), r.offset, side])
+                str(r.route_id), rm(r.m), loc.parser.format(r.station), off, side])
             sink.addFeature(out, FAST)
             n += 1
         err = self.write_errors(parameters, context, pts.fields(), errors)

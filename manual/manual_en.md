@@ -499,14 +499,18 @@ sides.
 
 # Accuracy
 
+Measures, lengths, offsets, coordinates and levels in the result fields are
+rounded to 0.001 m, and angles to 0.01°. This rounding is finer than the
+computation error described below.
+
 Accuracy is checked on the demo example. A run with seed 42 and 3000 random
 events in QGIS 4.0.3 matched all 3002 point events with the reference, with a
-largest deviation of 2.4 mm. All 1500 defects of the same run were located on
+largest deviation of 2.2 mm. All 1500 defects of the same run were located on
 their own route with a deviation of the measure and the offset below 1 cm.
 
 In the same run the profile table along routes R1-R3 gave 573 points. The
-terrain levels at all points matched the plane formula with a deviation below
-0.1 mm. The axis levels of R1 matched at all 194 points, and both
+terrain levels at all points matched the plane formula with a deviation of at
+most 0.5 mm, which comes from rounding the values to a millimetre. The axis levels of R1 matched at all 194 points, and both
 equations of R3 got into the table.
 
 The deviation appears on arcs with an offset, because an arc is cut into
@@ -560,7 +564,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.2
+Routeliner v0.4.3
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

@@ -23,6 +23,7 @@
 5. Новый инструмент получает номер группы и порядковый номер, например 2.03, одинаковый в Processing, меню и руководстве.
 6. Имена полей не переводятся. Перевод полей делается псевдонимами. Словари ALIASES и PLAIN_ALIASES и выбор псевдонима лежат в routeliner/core/aliases.py и проверяются без QGIS, установка псевдонима на слой и запись его в файл - в routeliner/processing/common.py.
 7. Псевдоним пишется и в сам GeoPackage, через GDAL AlterFieldDefn. Иначе он живёт только в проекте, и файл, открытый сам по себе, снова показывает латиницу. В файл идёт язык сборки, а слой, открытый инструментом, перекрывается языком интерфейса.
+8. M-значения геометрии хранятся в ядре отдельно от координат, в RouteGeometry.measures, чтобы M не путался с Z. Пикетаж из M строит ChainageSystem.from_measures, а все инструменты получают его через общий параметр USE_M. Отдельной логики под M в инструментах нет.
 
 ## Перевод
 
@@ -37,7 +38,13 @@
 3. Источником каждого числа служит параметр по умолчанию в коде или прогон демонстрационного примера с указанием зерна и версии QGIS.
 4. Сравнение со штатными инструментами QGIS ставит факты рядом, без оценок.
 5. Русская и английская версии совпадают по разделам и таблицам.
-6. PDF собирается pandoc с движком xelatex в routeliner/doc/Routeliner.pdf и routeliner/doc/Routeliner_en.pdf. Заголовок передаётся параметром pandoc, в тексте YAML-шапки нет.
+6. PDF собирается pandoc с движком xelatex в routeliner/doc/Routeliner.pdf и routeliner/doc/Routeliner_en.pdf. Заголовок, подзаголовок и версия передаются файлом `--metadata-file`, в тексте YAML-шапки нет. Кириллица через `-M` в командной строке портится, поэтому только файл.
+
+```
+pandoc manual/manual.md -o routeliner/doc/Routeliner.pdf --pdf-engine=xelatex --toc --metadata-file=ru.yaml -V fontfamily=fontspec -V mainfont="DejaVu Serif" -V geometry:margin=2cm
+```
+
+   В ru.yaml лежат title: Routeliner, subtitle «События на маршрутах и пикетаж для QGIS. Руководство пользователя», date с номером версии вида v0.5.0 и lang: ru. Английская сборка берёт en.yaml с subtitle «Route events and chainage for QGIS. User manual» и lang: en.
 
 ## Проверка перед выпуском
 

@@ -28,11 +28,13 @@ CURVE_ANGLE_DEG = 0.02
 
 
 def geometry_parts(geom: QgsGeometry, curve_angle_deg: float = CURVE_ANGLE_DEG) -> list[np.ndarray]:
-    """Все линейные части геометрии как массивы (N,2) или (N,3)."""
+    """Все линейные части геометрии как массивы (N,2) или (N,3). У геометрии
+    с M массив (N,4): x, y, z (NaN без Z) и m."""
     if geom is None or geom.isEmpty():
         return []
     g: QgsAbstractGeometry = geom.constGet()
     has_z = QgsWkbTypes.hasZ(g.wkbType())
+    has_m = QgsWkbTypes.hasM(g.wkbType())
     out = []
     for part in _curves(g):
         if part.hasCurvedSegments():
@@ -42,7 +44,10 @@ def geometry_parts(geom: QgsGeometry, curve_angle_deg: float = CURVE_ANGLE_DEG) 
             continue
         xs = [part.xAt(i) for i in range(n)]
         ys = [part.yAt(i) for i in range(n)]
-        if has_z:
+        if has_m:
+            zs = [part.zAt(i) for i in range(n)] if has_z else [float("nan")] * n
+            out.append(np.column_stack([xs, ys, zs, [part.mAt(i) for i in range(n)]]))
+        elif has_z:
             zs = [part.zAt(i) for i in range(n)]
             out.append(np.column_stack([xs, ys, zs]))
         else:

@@ -26,6 +26,14 @@ class _Part:
     length: float
 
 
+def _m_jump(a, b) -> bool:
+    """В общем узле двух частей M разный: узел остаётся дважды, и
+    повтор вершины с другим M читается как пикетажное уравнение."""
+    if len(a) < 4 or len(b) < 4:
+        return False
+    return bool(a[3] == a[3] and b[3] == b[3] and abs(a[3] - b[3]) > 1e-6)
+
+
 class RouteAssembler:
     def __init__(self, snap_tolerance: float = 0.01, allow_gaps: bool = False,
                  use_z: bool = False, reverse: bool = False) -> None:
@@ -159,7 +167,9 @@ class RouteAssembler:
         for q, rev in chain:
             c = self._ps[q].coords
             c = c[::-1] if rev else c
-            out.append(c if not out else c[1:])     # общий узел не дублируем
+            if out and not _m_jump(out[-1][-1], c[0]):
+                c = c[1:]                           # общий узел не дублируем
+            out.append(c)
         return np.vstack(out)
 
     def _nearest_gap(self, chains) -> float:

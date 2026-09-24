@@ -240,6 +240,31 @@ class DemoAlgorithm(RoutelinerAlgorithm):
         self._load(context, res["OUTPUT"], tr("Точечные события, результат"), group)
         self._load(context, res["ERRORS"], tr("Точечные события, ошибки"), group)
 
+        # калибровка: пикетаж ведомости уходит в M, и те же события ставятся
+        # по M без ведомости. Записи с номером участка пропускаются: участки
+        # пикетажа из M нумеруются по изломам масштаба, а не по реперам.
+        res = run("calibrate_routes", dict(OUT_M=2, OUTPUT="memory:", ERRORS="memory:"))
+        cal = res["OUTPUT"]
+        cal_ok = {f["route_id"]: (f["source"], f["equations"]) for f in layer(cal).getFeatures()} == {
+            "R1": ("length", 0), "R2": ("length", 0), "R3": ("ledger", 2)}
+        self._load(context, cal, tr("Калиброванные маршруты"), group)
+        res = processing.run("routeliner:point_events", {
+            **common, "ROUTES": cal, "LEDGER": None, "USE_M": True,
+            "EVENTS": uri("events_points"), "EV_ROUTE": "route_id", "EV_FROM": "pk",
+            "EV_OFFSET": "offset", "OUTPUT": "memory:", "ERRORS": "memory:"},
+            context=context, feedback=None, is_child_algorithm=True)
+
+        def plain(f):
+            return not f["exp_error"] and not isinstance(f["section"], (int, float))
+
+        m_ok = m_total = 0
+        for f in layer(res["OUTPUT"]).getFeatures():
+            if not plain(f):
+                continue
+            m_total += 1
+            m_ok += math.hypot(f["rl_x"] - f["exp_x"], f["rl_y"] - f["exp_y"]) <= TOL
+        m_exp = sum(1 for f in QgsVectorLayer(uri("events_points")).getFeatures() if plain(f))
+
         # линейные события
         res = run("line_events", dict(EVENTS=uri("events_lines"), EV_ROUTE="route_id",
                                       EV_FROM="pk_from", EV_TO="pk_to", EV_OFFSET="offset",
@@ -303,7 +328,7 @@ class DemoAlgorithm(RoutelinerAlgorithm):
         passed = (ok_routes and p_ok == p_total == p_total_all and e_ok == exp_err
                   and l_ok == l_total and l_err == 1 and d_ok == d_total == n_def
                   and g_total == n_table and g_ok == g_total and a_ok == a_total > 0
-                  and n_eq == 2 and drawn)
+                  and n_eq == 2 and drawn and cal_ok and m_ok == m_total == m_exp > 0)
         yes, no = tr("да"), tr("нет")
         lines = [
             tr("Маршруты: не собран только R4 - {v}").format(
@@ -311,6 +336,8 @@ class DemoAlgorithm(RoutelinerAlgorithm):
             tr("Точечные: совпало {a} из {n} (наибольшее расхождение {w:.1f} мм), "
                "ожидаемых ошибок распознано {e} из {en}").format(
                 a=p_ok, n=p_total_all, w=worst * 1000, e=e_ok, en=exp_err),
+            tr("Калибровка: источники и уравнения маршрутов верны - {v}, точечные события "
+               "по M совпали {a} из {n}").format(v=yes if cal_ok else no, a=m_ok, n=m_exp),
             tr("Участки: совпало {a} из {n}, ошибка нулевой длины распознана: {v}").format(
                 a=l_ok, n=l_total, v=yes if l_err == 1 else no),
             tr("Дефекты: привязано верно {a} из {n}").format(a=d_ok, n=n_def),

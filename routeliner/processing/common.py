@@ -16,6 +16,8 @@ from ..core.aliases import (ALIASES, PLAIN_ALIASES, alias_source,  # noqa: F401
                             all_alias_sources, is_raster_field, layer_is_ours,
                             split_gpkg_ref)
 from ..core.assembler import RouteAssembler
+from ..core.chainage import ChainageSystem
+from ..core.errors import CoreError
 from ..core.events import EventLocator
 from ..core.stations import StationFormat, StationParser
 from ..layers.route_source import build_routes
@@ -28,6 +30,9 @@ SRC_ANY = Qgis.ProcessingSourceType.Vector
 DBL = Qgis.ProcessingNumberParameterType.Double
 FIELD_ANY = Qgis.ProcessingFieldParameterDataType.Any
 FIELD_NUM = Qgis.ProcessingFieldParameterDataType.Numeric
+
+# Что пишется в M геометрии результата: ничего, мера по оси или пикетаж
+OUT_M = ["без M", "мера по оси, м", "пикетаж, м"]
 
 FORMATS = [
     (StationFormat.PK_PLUS, "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"),
@@ -336,6 +341,22 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
                 name, tr(desc), parentLayerParameterName="LEDGER", type=t, optional=opt))
         self.addParameter(QgsProcessingParameterString(
             "SYSTEM", tr("Система пикетажа (значение поля системы)"), optional=True))
+        self.addParameter(QgsProcessingParameterBoolean(
+            "USE_M", tr("Пикетаж из M-значений геометрии маршрута"), False))
+        p = QgsProcessingParameterNumber(
+            "M_FACTOR", tr("Метров в единице M (1000, если M в километрах)"), DBL, 1.0,
+            minValue=1e-9)
+        p.setFlags(p.flags() | Qgis.ProcessingParameterFlag.Advanced)
+        self.addParameter(p)
+
+    def add_out_m_param(self, default=0):
+        self.addParameter(QgsProcessingParameterEnum(
+            "OUT_M", tr("M-значения результата"), [tr(d) for d in OUT_M], defaultValue=default))
+
+    def out_m(self, parameters, context) -> int:
+        if self.parameterDefinition("OUT_M") is None:
+            return 0
+        return self.parameterAsEnum(parameters, "OUT_M", context)
 
     def add_error_sink(self):
         self.addParameter(QgsProcessingParameterFeatureSink(
@@ -384,9 +405,36 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
             for e in errors:
                 feedback.reportError(tr("Ведомость, маршрут {rid}: {msg}").format(
                     rid=e.route_id, msg=e.message), False)
+        m_sys, m_err = self.m_systems(parameters, context, feedback, routes, set(systems))
+        systems.update(m_sys)
+        errors = list(errors) + m_err
         loc = EventLocator(routes, parser, systems,
                            self.parameterAsDouble(parameters, "START", context))
         return loc, errors
+
+    def m_systems(self, parameters, context, feedback, routes, skip=()):
+        """Системы пикетажа из M-значений маршрутов, у которых нет ведомости.
+        Маршрут без M остаётся с пикетажем по длине."""
+        if self.parameterDefinition("USE_M") is None or \
+                not self.parameterAsBoolean(parameters, "USE_M", context):
+            return {}, []
+        factor = self.parameterAsDouble(parameters, "M_FACTOR", context) or 1.0
+        out, errors, plain = {}, [], 0
+        for rid, r in routes.items():
+            if rid in skip:
+                continue
+            if not r.has_m:
+                plain += 1
+                continue
+            s = ChainageSystem.from_measures(tr("M геометрии"), r.vertex_measures(), r.length, factor)
+            if isinstance(s, CoreError):
+                errors.append(s.with_key(None, rid))
+                feedback.reportError(tr("M маршрута {rid}: {msg}").format(rid=rid, msg=s.message), False)
+            else:
+                out[rid] = s
+        feedback.pushInfo(tr("Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}").format(
+            a=len(out), b=plain, c=len(errors)))
+        return out, errors
 
     # ------------------------------------------------------------ ошибки
     def write_errors(self, parameters, context, base_fields: QgsFields, items):

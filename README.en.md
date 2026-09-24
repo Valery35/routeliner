@@ -12,6 +12,10 @@ Every record is either placed on the map or sent to the error table with a
 reason code. A longitudinal profile with raster levels, grades and ledger
 stations is built along a route.
 
+The route chainage can be taken from the M values of its geometry and written
+into the M of the results. PostGIS, ArcGIS and the QGIS tools for M read such
+layers.
+
 ## Tools
 
 The tools sit in the Processing Toolbox in the Routeliner group and are
@@ -21,6 +25,7 @@ repeated in the Plugins - Routeliner menu under the same numbers.
 |---|---|---|
 | 1.01 | Demo example | GeoPackage with reference answers and a self-check of the plugin |
 | 1.02 | Route check | Assembled routes, gaps and branches |
+| 1.03 | Calibrate routes | Routes with chainage in the M values of their vertices |
 | 2.01 | Point events | Points by station with an offset from the axis |
 | 2.02 | Sections (line events) | Route pieces between two stations |
 | 3.01 | Live layer of point events | A layer recalculated after edits of the source data |
@@ -76,7 +81,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.3
+Routeliner v0.5.0
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

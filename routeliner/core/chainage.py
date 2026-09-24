@@ -13,6 +13,8 @@ import bisect
 from dataclasses import dataclass, field
 from typing import Iterable, Optional, Sequence, Union
 
+import numpy as np
+
 from ..i18n import tr
 from .errors import CoreError, ErrorCode
 
@@ -104,6 +106,43 @@ class ChainageSystem:
                     a=a.m, b=b.m, s0=s.st_from, s1=s.st_to))
             sections.append(s)
         return cls(name, sections)
+
+    @classmethod
+    def from_measures(cls, name: str, pairs: Sequence[tuple[float, float]],
+                      route_length: Optional[float] = None, factor: float = 1.0
+                      ) -> Union["ChainageSystem", CoreError]:
+        """Пикетаж из M-значений вершин: pairs - (мера по оси, M) по ходу
+        маршрута. factor переводит единицы M в метры (1000 для километров).
+
+        Две вершины с одной мерой и разным M дают уравнение: первая - пикет
+        назад, вторая - пикет вперёд. Вершины без M пропускаются, пикет
+        между соседними вершинами с M идёт линейно. Вершины, лежащие на
+        одной прямой пикетажа, склеиваются, чтобы участки пикетажа
+        начинались только там, где меняется масштаб или стоит уравнение."""
+        pts: list[LedgerPoint] = []
+        for mg, mv in pairs:
+            if mv is None or mv != mv:
+                continue
+            mv = float(mv) * factor
+            if pts and mg - pts[-1].m <= EPS:
+                last = pts[-1]
+                if abs(mv - last.ahead) > EPS:
+                    pts[-1] = LedgerPoint(last.m, last.station, mv)
+                continue
+            pts.append(LedgerPoint(float(mg), mv))
+        if len(pts) < 2:
+            return _bad(name, tr("у маршрута меньше двух вершин с M"))
+        out = [pts[0]]
+        for i in range(1, len(pts) - 1):
+            p, q, a = pts[i], pts[i + 1], out[-1]
+            if not p.is_equation:
+                k1 = (p.station - a.ahead) / (p.m - a.m)
+                k2 = (q.station - p.station) / (q.m - p.m)
+                if abs(k1 - k2) <= 1e-9 * max(1.0, abs(k1)):
+                    continue
+            out.append(p)
+        out.append(pts[-1])
+        return cls.from_points(name, out, route_length)
 
     @classmethod
     def from_ledger(cls, name: str, rows: Sequence[tuple[float, float]],
@@ -228,6 +267,43 @@ class ChainageSystem:
         starts = [s.m_from for s in self.sections]
         i = max(0, bisect.bisect_right(starts, m + EPS) - 1)
         return self.sections[i].station_at(m)
+
+    def to_station_back(self, m: float) -> Union[float, CoreError]:
+        """Пикет в точке m со стороны «назад»: на уравнении это ПК назад,
+        в остальных точках то же, что to_station."""
+        if m < self.m_start - EPS or m > self.m_end + EPS:
+            return self.to_station(m)
+        starts = [s.m_from for s in self.sections]
+        i = max(0, bisect.bisect_left(starts, m - EPS) - 1)
+        return self.sections[i].station_at(m)
+
+    def stations_along(self, coords, ms) -> tuple:
+        """M для вершин линии: вершины (coords) с мерами ms по возрастанию.
+        Внутрь линии вставляются вершины уравнений, по две на уравнение с
+        одинаковыми координатами (ПК назад и ПК вперёд). Возвращает новые
+        coords, меры и пикеты."""
+        c = np.asarray(coords, dtype=float)
+        m = np.asarray(ms, dtype=float)
+        if len(m) < 2:
+            return c, m, np.array([self.to_station(float(v)) for v in m], dtype=float)
+        for me, back, ahead in self.equations():
+            if not m[0] + EPS < me < m[-1] - EPS:
+                continue
+            k = int(np.searchsorted(m, me))
+            if abs(m[k] - me) <= EPS:
+                p = c[k]
+            else:
+                t = (me - m[k - 1]) / (m[k] - m[k - 1])
+                p = c[k - 1] + (c[k] - c[k - 1]) * t
+                c = np.insert(c, k, p, axis=0)
+                m = np.insert(m, k, me)
+            c = np.insert(c, k, p, axis=0)
+            m = np.insert(m, k, me)
+        st = np.empty(len(m))
+        for i, v in enumerate(m):
+            back_side = i == len(m) - 1 or (i + 1 < len(m) and abs(m[i + 1] - v) <= EPS)
+            st[i] = self.to_station_back(float(v)) if back_side else self.to_station(float(v))
+        return c, m, st
 
     def to_measure(self, station: float,
                    section: Optional[int] = None) -> Union[float, CoreError]:

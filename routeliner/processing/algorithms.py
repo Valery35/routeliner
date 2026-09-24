@@ -21,10 +21,22 @@ from .common import (DBL, FIELD_ANY, FIELD_NUM, SRC_ANY, SRC_POINT, T_DBL, T_INT
 FAST = QgsFeatureSink.Flag.FastInsert
 
 
-def _line_geometry(pieces) -> QgsGeometry:
+NAN = float("nan")
+
+
+def _point_m(x, y, m) -> QgsGeometry:
+    return QgsGeometry(QgsPoint(x, y, NAN, m, Qgis.WkbType.PointM))
+
+
+def _line_geometry(pieces, mvals=None) -> QgsGeometry:
+    """Линия или мультилиния из кусков. mvals - M для вершин каждого куска,
+    тогда геометрия LineStringM без Z."""
     lines = []
-    for c in pieces:
-        if c.shape[1] > 2 and not any(v != v for v in c[:, 2]):
+    for i, c in enumerate(pieces):
+        if mvals is not None:
+            lines.append(QgsLineString([QgsPoint(x, y, NAN, m, Qgis.WkbType.PointM)
+                                        for (x, y), m in zip(c[:, :2], mvals[i])]))
+        elif c.shape[1] > 2 and not any(v != v for v in c[:, 2]):
             lines.append(QgsLineString([QgsPoint(x, y, z) for x, y, z in c[:, :3]]))
         else:
             lines.append(QgsLineString([QgsPoint(x, y) for x, y in c[:, :2]]))
@@ -35,6 +47,26 @@ def _line_geometry(pieces) -> QgsGeometry:
         mls.addGeometry(ln)
     return QgsGeometry(mls)
 
+
+def _pieces_m(pieces, piece_m, out_m, system):
+    """Куски участка и M их вершин. Для пикетажа внутрь куска вставляются
+    вершины уравнений, чтобы M скачком повторял пикетаж."""
+    if not out_m:
+        return pieces, None
+    if out_m == 1:
+        return pieces, [list(m) for m in piece_m]
+    cs, ms = [], []
+    for c, m in zip(pieces, piece_m):
+        c2, _, st = system.stations_along(c, m)
+        cs.append(c2)
+        ms.append(list(st))
+    return cs, ms
+
+
+OUT_M_HELP = (
+    "Параметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. "
+    "Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении "
+    "линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.")
 
 ERRORS_HELP = (
     "Таблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), "
@@ -84,6 +116,130 @@ class CheckRoutes(RoutelinerAlgorithm):
         return {"OUTPUT": dest, "ERRORS": err}
 
 
+# ============================================================ 1.03 калибровка маршрутов
+class CalibrateRoutes(RoutelinerAlgorithm):
+    GROUP = "prep"
+    NUMBER = "1.03"
+    TITLE = "Калибровка маршрутов"
+    HELP = (
+        "Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или "
+        "меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком "
+        "порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси "
+        "от пикета начала.\n\n"
+        "Контрольная точка несёт известный пикет. Точка привязывается к ближайшему маршруту "
+        "в пределах радиуса поиска, и её мера становится репером. Между точками пикет идёт "
+        "линейно, до первой и после последней точки с масштабом 1. На пикетажном уравнении "
+        "линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\n"
+        "Поля результата: route_id (ID маршрута), length (длина по оси, м), st_from и "
+        "st_to (пикетаж начала и конца, м), pk_from и pk_to (они же в выбранной записи), "
+        "sections (участков пикетажа), equations (пикетажных уравнений), source (источник "
+        "пикетажа: points, ledger, m или length).")
+    HELP_TAIL = (ERRORS_HELP,)
+
+    def name(self):
+        return "calibrate_routes"
+
+    def initAlgorithm(self, config=None):
+        self.add_route_params()
+        self.add_chainage_params()
+        self.addParameter(QgsProcessingParameterFeatureSource(
+            "CONTROL", tr("Контрольные точки с пикетами (необязательно)"), [SRC_POINT],
+            optional=True))
+        self.addParameter(QgsProcessingParameterField(
+            "CT_STATION", tr("Контрольные точки: поле пикета"), parentLayerParameterName="CONTROL",
+            type=FIELD_ANY, optional=True))
+        self.addParameter(QgsProcessingParameterField(
+            "CT_ROUTE", tr("Контрольные точки: поле ID маршрута (необязательно)"),
+            parentLayerParameterName="CONTROL", type=FIELD_ANY, optional=True))
+        self.addParameter(QgsProcessingParameterNumber(
+            "CT_RADIUS", tr("Радиус поиска контрольных точек, м"), DBL, 10.0, minValue=0))
+        self.add_out_m_param(2)
+        self.addParameter(QgsProcessingParameterFeatureSink(
+            "OUTPUT", tr("Калиброванные маршруты"), Qgis.ProcessingSourceType.VectorLine))
+        self.add_error_sink()
+
+    def control_systems(self, parameters, context, feedback, routes, parser):
+        """Системы пикетажа по контрольным точкам. Возвращает (системы, ошибки)."""
+        from ..core.chainage import ChainageSystem
+        from ..core.events import EventLocator
+        pts = self.parameterAsSource(parameters, "CONTROL", context)
+        if pts is None:
+            return {}, []
+        sf = self.parameterAsString(parameters, "CT_STATION", context)
+        if not sf:
+            raise QgsProcessingException(tr("Для контрольных точек нужно поле пикета"))
+        rf = self.parameterAsString(parameters, "CT_ROUTE", context) or None
+        radius = self.parameterAsDouble(parameters, "CT_RADIUS", context) or None
+        src = self.parameterAsSource(parameters, "ROUTES", context)
+        xform = QgsCoordinateTransform(pts.sourceCrs(), src.sourceCrs(), context.transformContext())
+        plain = EventLocator(routes, parser)
+        rows, errors = {}, []
+        for f in pts.getFeatures():
+            g = f.geometry()
+            if g.isEmpty():
+                continue
+            g.transform(xform)
+            p = g.asPoint() if not g.isMultipart() else g.asMultiPoint()[0]
+            st = parser.parse(f[sf])
+            if isinstance(st, CoreError):
+                errors.append((f, st.with_key(f.id())))
+                continue
+            r = plain.locate_xy(f.id(), p.x(), p.y(), [_key(f[rf])] if rf else None, radius)
+            if isinstance(r, CoreError):
+                errors.append((f, r))
+                continue
+            rows.setdefault(r.route_id, []).append((st.value, r.m, None))
+        systems = {}
+        for rid, rr in rows.items():
+            s = ChainageSystem.from_table(tr("контрольные точки"), rr, routes[rid].length)
+            if isinstance(s, CoreError):
+                errors.append((None, s.with_key(None, rid)))
+            else:
+                systems[rid] = s
+        feedback.pushInfo(tr("Контрольные точки: маршрутов {a}, ошибок {b}").format(
+            a=len(systems), b=len(errors)))
+        return systems, errors
+
+    def processAlgorithm(self, parameters, context, feedback):
+        src, routes, route_errors = self.routes(parameters, context, feedback)
+        loc, lerr = self.locator(parameters, context, feedback, routes)
+        ledger_ids = set()
+        if self.parameterAsSource(parameters, "LEDGER", context) is not None:
+            ledger_ids = {k for k, v in loc.systems.items() if v.name != tr("M геометрии")}
+        m_ids = set(loc.systems) - ledger_ids
+        ct, ct_err = self.control_systems(parameters, context, feedback, routes, loc.parser)
+        loc.systems.update(ct)
+        out_m = self.out_m(parameters, context) or 2
+        fields = fields_of(fld("route_id", T_STR), fld("length", T_DBL), fld("st_from", T_DBL),
+                           fld("st_to", T_DBL), fld("pk_from", T_STR), fld("pk_to", T_STR),
+                           fld("sections", T_INT), fld("equations", T_INT), fld("source", T_STR))
+        sink, dest = self.parameterAsSink(parameters, "OUTPUT", context, fields,
+                                          Qgis.WkbType.MultiLineStringM, src.sourceCrs())
+        fmt = loc.parser.format
+        for rid, r in routes.items():
+            system = loc.system_for(rid)
+            pieces = r.substring_m(0.0, r.length)
+            if isinstance(pieces, CoreError):
+                route_errors.append(pieces.with_key(None, rid))
+                continue
+            cs, ms = _pieces_m([c for c, _ in pieces], [m for _, m in pieces], out_m, system)
+            g = _line_geometry(cs, ms)
+            if not g.isMultipart():
+                g.convertToMultiType()
+            source = "points" if rid in ct else "ledger" if rid in ledger_ids else \
+                "m" if rid in m_ids else "length"
+            s0, s1 = system.to_station(0.0), system.to_station_back(r.length)
+            f = QgsFeature(fields)
+            f.setGeometry(g)
+            f.setAttributes([str(rid), rm(r.length), rm(s0), rm(s1), fmt(s0), fmt(s1),
+                             len(system.sections), len(system.equations()), source])
+            sink.addFeature(f, FAST)
+        items = [(None, e) for e in route_errors] + [(None, e) for e in lerr] + ct_err
+        err = self.write_errors(parameters, context, fields_of(), [(None, e) for _, e in items])
+        feedback.pushInfo(tr("Итого: маршрутов {a}, ошибок {b}").format(a=len(routes), b=len(items)))
+        return {"OUTPUT": dest, "ERRORS": err}
+
+
 # ============================================================ 2.xx события
 class _EventsBase(RoutelinerAlgorithm):
     LINE = False
@@ -114,6 +270,7 @@ class _EventsBase(RoutelinerAlgorithm):
         self.add_outputs()
 
     def add_outputs(self):
+        self.add_out_m_param()
         self.addParameter(QgsProcessingParameterFeatureSink(
             "OUTPUT", tr("События на маршрутах"),
             Qgis.ProcessingSourceType.VectorLine if self.LINE else Qgis.ProcessingSourceType.VectorPoint))
@@ -149,6 +306,9 @@ class _EventsBase(RoutelinerAlgorithm):
             extra = [fld("rl_m", T_DBL), fld("rl_pk", T_STR), fld("rl_x", T_DBL),
                      fld("rl_y", T_DBL), fld("rl_azimuth", T_DBL)]
             wkb = Qgis.WkbType.Point
+        out_m = self.out_m(parameters, context)
+        if out_m:
+            wkb = Qgis.WkbType.MultiLineStringM if self.LINE else Qgis.WkbType.PointM
         fields = fields_of(base, *extra)
         sink, dest = self.parameterAsSink(parameters, "OUTPUT", context, fields, wkb, src.sourceCrs())
         for i, r in enumerate(ok):
@@ -157,13 +317,14 @@ class _EventsBase(RoutelinerAlgorithm):
             f = QgsFeature(fields)
             attrs = list(feats[r.key].attributes())
             if self.LINE:
-                g = _line_geometry(r.pieces)
+                g = _line_geometry(*_pieces_m(r.pieces, r.piece_m, out_m, loc.system_for(r.route_id)))
                 if not g.isMultipart():
                     g.convertToMultiType()
                 attrs += [rm(r.m_from), rm(r.m_to), rm(r.m_to - r.m_from), fmt(r.st_from),
                           fmt(r.st_to), int(r.swapped)]
             else:
-                g = QgsGeometry.fromPointXY(QgsPointXY(r.x, r.y))
+                g = QgsGeometry.fromPointXY(QgsPointXY(r.x, r.y)) if not out_m else \
+                    _point_m(r.x, r.y, r.m if out_m == 1 else r.station)
                 attrs += [rm(r.m), fmt(r.station), rm(r.x), rm(r.y), rdeg(r.azimuth)]
             f.setGeometry(g)
             f.setAttributes(attrs)
@@ -197,7 +358,7 @@ class PointEvents(_EventsBase):
     NUMBER = "2.01"
     TITLE = "Точечные события"
     HELP = POINT_HELP
-    HELP_TAIL = (ERRORS_HELP,)
+    HELP_TAIL = (OUT_M_HELP, ERRORS_HELP)
     LINE = False
 
     def name(self):
@@ -208,7 +369,7 @@ class LineEvents(_EventsBase):
     NUMBER = "2.02"
     TITLE = "Участки (линейные события)"
     HELP = LINE_HELP
-    HELP_TAIL = (ERRORS_HELP,)
+    HELP_TAIL = (OUT_M_HELP, ERRORS_HELP)
     LINE = True
 
     def name(self):
@@ -312,6 +473,7 @@ class Pickets(RoutelinerAlgorithm):
         "Поля результата: route_id (ID маршрута), pk (пикет в выбранной записи), station "
         "(пикетаж, м), m (мера по оси, м), section (номер участка пикетажа, с нуля), azimuth "
         "(азимут оси, градусы), km (1 для пикета, кратного километру).")
+    HELP_TAIL = (OUT_M_HELP,)
 
     def name(self):
         return "pickets"
@@ -321,6 +483,7 @@ class Pickets(RoutelinerAlgorithm):
         self.add_chainage_params()
         self.addParameter(QgsProcessingParameterNumber(
             "STEP", tr("Шаг разбивки, м"), DBL, 100.0, minValue=0.001))
+        self.add_out_m_param()
         self.addParameter(QgsProcessingParameterFeatureSink(
             "OUTPUT", tr("Пикеты"), Qgis.ProcessingSourceType.VectorPoint))
 
@@ -331,8 +494,10 @@ class Pickets(RoutelinerAlgorithm):
         fields = fields_of(fld("route_id", T_STR), fld("pk", T_STR), fld("station", T_DBL),
                            fld("m", T_DBL), fld("section", T_INT), fld("azimuth", T_DBL),
                            fld("km", T_INT))
+        out_m = self.out_m(parameters, context)
         sink, dest = self.parameterAsSink(parameters, "OUTPUT", context, fields,
-                                          Qgis.WkbType.Point, src.sourceCrs())
+                                          Qgis.WkbType.PointM if out_m else Qgis.WkbType.Point,
+                                          src.sourceCrs())
         n = 0
         for rid, r in routes.items():
             items = loc.system_for(rid).whole_stations(step)
@@ -341,7 +506,9 @@ class Pickets(RoutelinerAlgorithm):
             p = r.points_at([m for m, _, _ in items])
             for i, (m, st, sec) in enumerate(items):
                 f = QgsFeature(fields)
-                f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p["x"][i], p["y"][i])))
+                x, y = float(p["x"][i]), float(p["y"][i])
+                f.setGeometry(_point_m(x, y, m if out_m == 1 else st) if out_m
+                              else QgsGeometry.fromPointXY(QgsPointXY(x, y)))
                 f.setAttributes([str(rid), loc.parser.format(st), rm(st), rm(m), sec,
                                  rdeg(p["azimuth"][i]), int(abs(st) % 1000 < 1e-6)])
                 sink.addFeature(f, FAST)
@@ -420,5 +587,5 @@ class LocatePoints(RoutelinerAlgorithm):
         return {"OUTPUT": dest, "ERRORS": err}
 
 
-ALGORITHMS = [CheckRoutes, PointEvents, LineEvents, LivePointEvents, LiveLineEvents,
+ALGORITHMS = [CheckRoutes, CalibrateRoutes, PointEvents, LineEvents, LivePointEvents, LiveLineEvents,
               Pickets, LocatePoints]

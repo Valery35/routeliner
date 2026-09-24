@@ -4,6 +4,10 @@
 по частям; разрывы между частями в длину не входят. Дуги к этому моменту
 уже сегментированы адаптером слоя с заданным допуском.
 
+Части могут нести четвёртый столбец M (мера вершины из геометрии LineStringM).
+Он отделяется от координат при построении и хранится в measures: координаты
+остаются (N, 2) или (N, 3), чтобы M не путался с Z.
+
 Смещение: положительное — влево по направлению маршрута.
 Азимут: в градусах от севера (оси Y) по часовой стрелке.
 """
@@ -52,8 +56,10 @@ class RouteGeometry:
     parts: list[np.ndarray]            # (N, 2) или (N, 3), N >= 2
     use_z: bool = False
     gaps: list[RouteGap] = field(default_factory=list)
+    measures: Optional[list] = None     # M вершин по частям или None
 
     def __post_init__(self) -> None:
+        self._split_m()
         segs = []
         m = 0.0
         self._part_m: list[tuple[float, float]] = []
@@ -81,6 +87,40 @@ class RouteGeometry:
         self._m0 = np.concatenate([s[3] for s in segs]) if segs else np.empty(0)
         self._part = np.concatenate([s[4] for s in segs]).astype(int) if segs else np.empty(0, int)
         self._has_z = dim == 3
+
+    def _split_m(self) -> None:
+        """Отделяет столбец M: (x, y, z, m), где z может быть NaN."""
+        if not any(np.asarray(c).ndim == 2 and np.asarray(c).shape[1] >= 4 for c in self.parts):
+            return
+        ms, parts = [], []
+        for c in self.parts:
+            c = np.asarray(c, dtype=float)
+            if c.shape[1] >= 4:
+                ms.append(c[:, 3].copy())
+                c = c[:, :3] if not np.isnan(c[:, 2]).all() else c[:, :2]
+            else:
+                ms.append(np.full(len(c), np.nan))
+            parts.append(c)
+        self.parts = parts
+        self.measures = ms if any(np.isfinite(m).any() for m in ms) else None
+
+    @property
+    def has_m(self) -> bool:
+        return self.measures is not None
+
+    def vertex_measures(self) -> list[tuple[float, float]]:
+        """(мера по оси, M) для всех вершин по ходу маршрута, включая вершины
+        с нулевым отрезком между ними: две такие вершины с разным M - это
+        пикетажное уравнение. Пустой список, если у маршрута нет M."""
+        if not self.has_m:
+            return []
+        out = []
+        for pi, c in enumerate(self.parts):
+            d = np.diff(c[:, :3] if self.use_z and c.shape[1] > 2 else c[:, :2], axis=0)
+            ln = np.sqrt((d ** 2).sum(axis=1))
+            m = self._part_m[pi][0] + np.concatenate(([0.0], np.cumsum(ln)))
+            out.extend(zip(m.tolist(), self.measures[pi].tolist()))
+        return out
 
     # ------------------------------------------------------------ точки
     def _check(self, m: float) -> Optional[CoreError]:
@@ -164,6 +204,12 @@ class RouteGeometry:
                   offset: float = 0.0) -> Union[list[np.ndarray], CoreError]:
         """Участок маршрута как список полилиний (несколько — если участок
         проходит через разрыв между частями)."""
+        r = self.substring_m(m_from, m_to, offset)
+        return r if isinstance(r, CoreError) else [c for c, _ in r]
+
+    def substring_m(self, m_from: float, m_to: float, offset: float = 0.0
+                    ) -> Union[list[tuple[np.ndarray, np.ndarray]], CoreError]:
+        """То же, что substring, и мера по оси каждой вершины куска."""
         if m_from >= m_to:
             return CoreError(ErrorCode.FROM_GE_TO,
                              tr("начало {a:.3f} не меньше конца {b:.3f}").format(a=m_from, b=m_to),
@@ -181,9 +227,10 @@ class RouteGeometry:
                              & (self._m0 < hi - 1e-9))[0]
             start, end = self._in_part(lo, pi), self._in_part(hi, pi)
             coords = np.vstack([start, self._a[sel], end]) if len(sel) else np.vstack([start, end])
+            ms = np.concatenate(([lo], self._m0[sel], [hi]))
             if offset:
                 coords = offset_polyline(coords, offset)
-            pieces.append(coords)
+            pieces.append((coords, ms))
         return pieces
 
     def _in_part(self, m: float, pi: int) -> np.ndarray:

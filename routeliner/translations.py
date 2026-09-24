@@ -111,6 +111,16 @@ TRANSLATIONS = {
         'Note',
     'Номер события':
         'Event number',
+    'Пикетаж начала, м':
+        'Start chainage, m',
+    'Пикетаж конца, м':
+        'End chainage, m',
+    'Участков пикетажа':
+        'Chainage sections',
+    'Пикетажных уравнений':
+        'Station equations',
+    'Источник пикетажа':
+        'Chainage source',
     'длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК':
         'lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS',
     'нет геометрии':
@@ -123,6 +133,8 @@ TRANSLATIONS = {
         'at least two ledger points are needed',
     'ведомость пуста':
         'the ledger is empty',
+    'у маршрута меньше двух вершин с M':
+        'the route has fewer than two vertices with M',
     'система «{name}»: {why}':
         'system «{name}»: {why}',
     'не удалось разместить уравнения {eqs}':
@@ -251,6 +263,8 @@ TRANSLATIONS = {
         'Demo example',
     'Проверка маршрутов':
         'Route check',
+    'Калибровка маршрутов':
+        'Calibrate routes',
     'Точечные события':
         'Point events',
     'Участки (линейные события)':
@@ -289,6 +303,8 @@ TRANSLATIONS = {
         'Point events, result',
     'Точечные события, ошибки':
         'Point events, errors',
+    'Калиброванные маршруты':
+        'Calibrated routes',
     'Участки, результат':
         'Sections, result',
     'Дефекты, привязка':
@@ -329,6 +345,8 @@ TRANSLATIONS = {
         'Routes: only R4 not assembled - {v}',
     'Точечные: совпало {a} из {n} (наибольшее расхождение {w:.1f} мм), ожидаемых ошибок распознано {e} из {en}':
         'Point events: {a} of {n} match (largest deviation {w:.1f} mm), expected errors recognised {e} of {en}',
+    'Калибровка: источники и уравнения маршрутов верны - {v}, точечные события по M совпали {a} из {n}':
+        'Calibration: route sources and equations correct - {v}, point events by M matched {a} of {n}',
     'Участки: совпало {a} из {n}, ошибка нулевой длины распознана: {v}':
         'Sections: {a} of {n} match, zero-length error recognised: {v}',
     'Дефекты: привязано верно {a} из {n}':
@@ -461,6 +479,8 @@ TRANSLATIONS = {
         'Row «{t}» skipped: {why}',
     'Строка «{t}» пропущена: нет участков с полем «{f}»':
         'Row «{t}» skipped: no sections with the field «{f}»',
+    'Параметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.':
+        'The M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead.',
     'Таблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).':
         'The error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation).',
     'Ставит на маршруты записи таблицы по пикету в выбранной записи, со смещением от оси. Пикет переводится в меру через ведомость маршрута, а без ведомости по длине оси от пикета начала. Запись «+35» берёт пикет предыдущей записи того же маршрута.\n\nК полям исходной записи добавляются rl_m (мера по оси, м), rl_pk (пикет в выбранной записи), rl_x и rl_y (координаты точки в СК маршрутов), rl_azimuth (азимут оси в точке, градусы от севера по часовой стрелке).':
@@ -471,12 +491,26 @@ TRANSLATIONS = {
         'The parameters are those of tool {src}, but the result is not a one-off. The in-memory layer is recalculated by itself when the route geometry, the event table or the ledger changes, including unsaved edits and a CSV or Excel file changed on disk. An error table is created next to it.\n\nThe binding is stored in the project and restored when the project opens. To stop the recalculation, remove the event layer from the project.\n\nThe fields of the layer are those of the result of tool {src}.',
     'Собирает каждый маршрут из всех объектов с одним ID. Мультилинии раскладываются на части, части упорядочиваются по стыкам, а не по порядку хранения, дуги сегментируются. Маршрут с разрывом, развилкой или в географической системе координат попадает в таблицу ошибок.\n\nПоля результата: route_id (ID маршрута), length (длина по оси, м), parts (количество частей после сборки), gaps (количество разрывов), gap_max (наибольший разрыв, м).':
         'Assembles every route from all features with the same ID. Multi-lines are split into parts, the parts are ordered by their joints rather than by storage order, and arcs are segmented. A route with a gap, a branch or in a geographic coordinate system goes to the error table.\n\nResult fields: route_id (route ID), length (length along the axis, m), parts (number of parts after assembly), gaps (number of gaps), gap_max (largest gap, m).',
+    'Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси от пикета начала.\n\nКонтрольная точка несёт известный пикет. Точка привязывается к ближайшему маршруту в пределах радиуса поиска, и её мера становится репером. Между точками пикет идёт линейно, до первой и после последней точки с масштабом 1. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nПоля результата: route_id (ID маршрута), length (длина по оси, м), st_from и st_to (пикетаж начала и конца, м), pk_from и pk_to (они же в выбранной записи), sections (участков пикетажа), equations (пикетажных уравнений), source (источник пикетажа: points, ledger, m или length).':
+        'Assembles the routes and writes M values into their geometry, that is the chainage or the measure along the axis at every vertex. The chainage source is chosen per route in this order: control points, ledger, M values of the routes themselves, length along the axis from the start station.\n\nA control point carries a known station. The point is located on the nearest route within the search radius, and its measure becomes a reference mark. Between the points the station runs linearly, and before the first and after the last point with scale 1. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nResult fields: route_id (route ID), length (length along the axis, m), st_from and st_to (chainage of the start and the end, m), pk_from and pk_to (the same in the selected notation), sections (chainage sections), equations (station equations), source (chainage source: points, ledger, m or length).',
     'Ставит точки целых пикетов по каждому маршруту с подписью и азимутом для поворота подписи. При ведомости учитываются рубленые пикеты и пикетажные уравнения. В прямой вставке пропущенные пикеты не ставятся, в обратной повторяющиеся ставятся дважды с разными номерами участков.\n\nПоля результата: route_id (ID маршрута), pk (пикет в выбранной записи), station (пикетаж, м), m (мера по оси, м), section (номер участка пикетажа, с нуля), azimuth (азимут оси, градусы), km (1 для пикета, кратного километру).':
         'Places points of whole pickets along every route, with a label and an azimuth for label rotation. With a ledger, broken pickets and station equations are taken into account. Pickets skipped by a forward equation are not placed, and pickets repeated by a backward equation are placed twice with different section numbers.\n\nResult fields: route_id (route ID), pk (station in the chosen notation), station (chainage, m), m (measure along the axis, m), section (chainage section number, from zero), azimuth (axis azimuth, degrees), km (1 for a picket that is a whole kilometre).',
     'Обратная задача. Для каждой точки находится ближайший маршрут, и по нему считаются мера, пикет и смещение от оси со знаком. Точки дальше радиуса поиска уходят в таблицу ошибок. Если у точек есть поле ID маршрута, привязка идёт только к этому маршруту.\n\nК полям точки добавляются rl_route (ID маршрута), rl_m (мера по оси, м), rl_pk (пикет в выбранной записи), rl_offset (смещение, м, плюс влево по ходу), rl_side (сторона по ходу маршрута: left, right или axis).':
         'The inverse task. For every point the nearest route is found, and the measure, the station and the signed offset from the axis are computed on it. Points beyond the search radius go to the error table. When the points have a route ID field, they are located on that route only.\n\nThe fields of the point are followed by rl_route (route ID), rl_m (measure along the axis, m), rl_pk (station in the chosen notation), rl_offset (offset, m, positive to the left of the route direction), rl_side (side relative to the route direction: left, right or axis).',
     'События':
         'Events',
+    'Контрольные точки с пикетами (необязательно)':
+        'Control points with stations (optional)',
+    'Контрольные точки: поле пикета':
+        'Control points: station field',
+    'Контрольные точки: поле ID маршрута (необязательно)':
+        'Control points: route ID field (optional)',
+    'Радиус поиска контрольных точек, м':
+        'Search radius for control points, m',
+    'Для контрольных точек нужно поле пикета':
+        'Control points need a station field',
+    'контрольные точки':
+        'control points',
     'Таблица событий (слой, CSV, Excel)':
         'Event table (layer, CSV, Excel)',
     'События: поле ID маршрута':
@@ -509,6 +543,10 @@ TRANSLATIONS = {
         'Points with stations',
     'Итого: собрано {a}, ошибок {b}':
         'Total: assembled {a}, errors {b}',
+    'Контрольные точки: маршрутов {a}, ошибок {b}':
+        'Control points: routes {a}, errors {b}',
+    'Итого: маршрутов {a}, ошибок {b}':
+        'Total: routes {a}, errors {b}',
     'События: поле пикета начала':
         'Events: start station field',
     'События: поле пикета':
@@ -525,12 +563,20 @@ TRANSLATIONS = {
         'Total: pickets {n}',
     'Итого: привязано {a}, ошибок {b}':
         'Total: located {a}, errors {b}',
+    'M геометрии':
+        'geometry M',
     'маршрут не собран: {msg}':
         'route not assembled: {msg}',
     'Не найден слой для параметра «{p}»':
         'No layer for the parameter «{p}»',
     'Слой «{name}» должен быть в проекте, иначе нечего отслеживать':
         'Layer «{name}» must be in the project, otherwise there is nothing to watch',
+    'без M':
+        'no M',
+    'мера по оси, м':
+        'measure along the axis, m',
+    'пикетаж, м':
+        'chainage, m',
     '1. Подготовка':
         '1. Preparation',
     '2. События по пикетам':
@@ -569,6 +615,8 @@ TRANSLATIONS = {
         'Ledger: station ahead field (equation)',
     'Ведомость: поле системы пикетажа':
         'Ledger: chainage system field',
+    'Метров в единице M (1000, если M в километрах)':
+        'Metres per M unit (1000 if M is in kilometres)',
     'Слой маршрутов (линии)':
         'Route layer (lines)',
     'Поле ID маршрута':
@@ -581,6 +629,10 @@ TRANSLATIONS = {
         'Chainage ledger (optional)',
     'Система пикетажа (значение поля системы)':
         'Chainage system (value of the system field)',
+    'Пикетаж из M-значений геометрии маршрута':
+        'Chainage from the M values of the route geometry',
+    'M-значения результата':
+        'M values of the result',
     'Ошибки':
         'Errors',
     'Не задан слой маршрутов':
@@ -593,6 +645,8 @@ TRANSLATIONS = {
         'Routes assembled {a}, not assembled {b}',
     'Для ведомости нужны поля ID маршрута и пикета':
         'The ledger needs the route ID and station fields',
+    'Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}':
+        'Chainage from M: routes {a}, without M {b}, errors {c}',
     'Маршрут {rid}: {msg}':
         'Route {rid}: {msg}',
     'Ведомость: систем пикетажа {a}, ошибок {b}':
@@ -601,6 +655,8 @@ TRANSLATIONS = {
         'Developed with the support of Inform++ LLC',
     'Ведомость, маршрут {rid}: {msg}':
         'Ledger, route {rid}: {msg}',
+    'M маршрута {rid}: {msg}':
+        'M of route {rid}: {msg}',
     'псевдонимы в файл не записаны: {why}':
         'field aliases were not written to the file: {why}',
     'Routeliner, события на маршрутах и пикетаж':

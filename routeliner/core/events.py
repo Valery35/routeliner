@@ -50,6 +50,7 @@ class LineResult:
     st_to: float
     pieces: list
     swapped: bool          # «от» и «до» шли против направления маршрута
+    piece_m: tuple = ()    # мера по оси для вершин каждого куска
 
 
 @dataclass(frozen=True)
@@ -137,11 +138,12 @@ class EventLocator:
                 errors.append(CoreError(ErrorCode.FROM_GE_TO, tr("участок нулевой длины"),
                                         r.key, r.route_id))
                 continue
-            pieces = self.routes[r.route_id].substring(m0, m1, float(r.offset or 0.0))
+            pieces = self.routes[r.route_id].substring_m(m0, m1, float(r.offset or 0.0))
             if isinstance(pieces, CoreError):
                 errors.append(pieces.with_key(r.key, r.route_id))
                 continue
-            out.append(LineResult(r.key, r.route_id, m0, m1, s0, s1, pieces, swapped))
+            out.append(LineResult(r.key, r.route_id, m0, m1, s0, s1, [c for c, _ in pieces],
+                                  swapped, tuple(m for _, m in pieces)))
         return out, errors
 
     # ------------------------------------------------------------ обратная задача

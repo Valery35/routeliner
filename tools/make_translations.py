@@ -368,6 +368,38 @@ EN = {
 "Примечание": "Note",
 "Номер события": "Event number",
 "Растр {name}": "Raster {name}",
+# 0.5.0: M-значения и калибровка
+"Участков пикетажа": "Chainage sections",
+"Пикетажных уравнений": "Station equations",
+"Пикетаж начала, м": "Start chainage, m",
+"Пикетаж конца, м": "End chainage, m",
+"Источник пикетажа": "Chainage source",
+"у маршрута меньше двух вершин с M": "the route has fewer than two vertices with M",
+"Калибровка маршрутов": "Calibrate routes",
+"Калиброванные маршруты": "Calibrated routes",
+"Калибровка: источники и уравнения маршрутов верны - {v}, точечные события по M совпали {a} из {n}":
+    "Calibration: route sources and equations correct - {v}, point events by M matched {a} of {n}",
+"Параметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.":
+    "The M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead.",
+"Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси от пикета начала.\n\nКонтрольная точка несёт известный пикет. Точка привязывается к ближайшему маршруту в пределах радиуса поиска, и её мера становится репером. Между точками пикет идёт линейно, до первой и после последней точки с масштабом 1. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nПоля результата: route_id (ID маршрута), length (длина по оси, м), st_from и st_to (пикетаж начала и конца, м), pk_from и pk_to (они же в выбранной записи), sections (участков пикетажа), equations (пикетажных уравнений), source (источник пикетажа: points, ledger, m или length).":
+    "Assembles the routes and writes M values into their geometry, that is the chainage or the measure along the axis at every vertex. The chainage source is chosen per route in this order: control points, ledger, M values of the routes themselves, length along the axis from the start station.\n\nA control point carries a known station. The point is located on the nearest route within the search radius, and its measure becomes a reference mark. Between the points the station runs linearly, and before the first and after the last point with scale 1. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nResult fields: route_id (route ID), length (length along the axis, m), st_from and st_to (chainage of the start and the end, m), pk_from and pk_to (the same in the selected notation), sections (chainage sections), equations (station equations), source (chainage source: points, ledger, m or length).",
+"Контрольные точки с пикетами (необязательно)": "Control points with stations (optional)",
+"Контрольные точки: поле пикета": "Control points: station field",
+"Контрольные точки: поле ID маршрута (необязательно)": "Control points: route ID field (optional)",
+"Радиус поиска контрольных точек, м": "Search radius for control points, m",
+"Для контрольных точек нужно поле пикета": "Control points need a station field",
+"контрольные точки": "control points",
+"Контрольные точки: маршрутов {a}, ошибок {b}": "Control points: routes {a}, errors {b}",
+"Итого: маршрутов {a}, ошибок {b}": "Total: routes {a}, errors {b}",
+"M геометрии": "geometry M",
+"без M": "no M",
+"мера по оси, м": "measure along the axis, m",
+"пикетаж, м": "chainage, m",
+"Метров в единице M (1000, если M в километрах)": "Metres per M unit (1000 if M is in kilometres)",
+"M-значения результата": "M values of the result",
+"M маршрута {rid}: {msg}": "M of route {rid}: {msg}",
+"Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}": "Chainage from M: routes {a}, without M {b}, errors {c}",
+"Пикетаж из M-значений геометрии маршрута": "Chainage from the M values of the route geometry",
 }
 out = {}
 missing = []

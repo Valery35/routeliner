@@ -64,6 +64,12 @@ design, an as-built and a former system, which differ by the value of the
 system field in the ledger. A route without ledger rows gets its chainage along
 the axis length from the given start station.
 
+**M values.** The fourth coordinate of a line vertex next to X, Y and Z. M
+holds the chainage, odometer readings or a measure from another program. The
+plugin reads the chainage from the M of a route and writes the chainage or the
+measure into the M of a result. PostGIS, ArcGIS and the QGIS tools for M read
+such layers.
+
 **Offset.** The distance from the axis along the normal. A positive offset lies
 to the left of the route direction by default, and a check box in the event
 tools reverses the sign.
@@ -94,8 +100,12 @@ because that is how long pickets are written.
 The tool creates a GeoPackage with a data set on which the whole plugin is
 checked. Every record carries a reference answer computed analytically from the
 formulas of a line and a circle, without the plugin. With the check switched
-on, the example runs through tools 1.02, 2.01, 2.02, 4.01 and 4.02 at once, and
-the result of the comparison goes to the log.
+on, the example runs through tools 1.02, 1.03, 2.01, 2.02, 4.01, 4.02, 5.01
+and 5.02 at once, and the result of the comparison goes to the log.
+
+Calibration is checked in a round trip. Tool 1.03 moves the ledger chainage
+into the M of the routes. Then the same point events are placed by M without
+the ledger and compared with the reference.
 
 | Parameter | Meaning |
 |---|---|
@@ -133,9 +143,44 @@ continues across a gap without counting its length.
 | gaps | integer | Number of gaps |
 | gap_max | number | Largest gap, m |
 
+## 1.03 Calibrate routes
+
+The tool assembles the routes and writes the chainage into the M of every
+vertex. The result serves as a route with ready chainage for other programs and
+for the plugin itself. The chainage source is chosen per route in this order:
+control points, ledger, M of the routes themselves, length along the axis.
+
+A control point carries a known station, for example a marker post on the line
+or a survey point. The point is located on the nearest route within the search
+radius, and its measure becomes a reference point. Between the points the
+station runs linearly, and before the first and after the last point with a
+scale of 1.
+
+At a station equation the line gets two vertices at one point. The first
+carries the station back, the second the station ahead.
+
+| Parameter | Meaning |
+|---|---|
+| Control points with stations | Optional point layer |
+| Control points: station field | Station in the selected notation |
+| Control points: route ID field | Restricts locating to one route |
+| Search radius for control points, m | 10 m by default |
+| M values of the result | Chainage by default, or measure along the axis |
+
+| Result field | Type | Content |
+|---|---|---|
+| route_id | text | Route ID |
+| length | number | Length along the axis, m |
+| st_from, st_to | number | Chainage of the start and the end, m |
+| pk_from, pk_to | text | Stations of the start and the end in the selected notation |
+| sections | integer | Number of chainage sections |
+| equations | integer | Number of station equations |
+| source | text | Chainage source: points, ledger, m or length |
+
 ## Common route and chainage parameters
 
-These parameters belong to tools 1.02, 2.01, 2.02, 3.01, 3.02, 4.01, 4.02 and 5.01.
+These parameters belong to tools 1.02, 1.03, 2.01, 2.02, 3.01, 3.02, 4.01,
+4.02 and 5.01.
 
 | Parameter | Meaning |
 |---|---|
@@ -155,12 +200,26 @@ These parameters belong to tools 1.02, 2.01, 2.02, 3.01, 3.02, 4.01, 4.02 and 5.
 | Ledger: station ahead field | Filled in the equation rows only |
 | Ledger: chainage system field | Field with the system name |
 | Chainage system | Value of the system field, rows of other systems are not read |
+| Chainage from the M values of the route geometry | The route chainage is taken from the M of its vertices |
+| Metres per M unit | 1 by default, 1000 for M in kilometres |
 
 A ledger row with an empty station ahead is a reference point, and a row with a
 station ahead is an equation. The measure of an equation may be empty, in which
 case the equation position is computed from the neighbouring reference points.
 Before the first and after the last reference point the ledger is extended to
 the route ends with a scale of 1.
+
+Chainage from M goes to a route without ledger rows, because the ledger takes
+precedence. A route without M keeps the chainage by length. Between vertices
+the station runs linearly, and a vertex without M is skipped. Two vertices at
+one point with different M are read as a station equation, including at the
+joint of two features.
+
+Tools 1.03, 2.01, 2.02 and 4.01 write M into the result geometry when the
+parameter M values of the result asks for it. By default no M is written, and
+the choices are the measure along the axis and the chainage, both in metres. At
+an equation a section gets two vertices at one point, with the station back and
+the station ahead.
 
 ## 2.01 Point events
 
@@ -177,6 +236,7 @@ previous record of the same route.
 | Events: offset from the axis field, m | Optional offset |
 | Positive offset to the right of the route direction | Reverses the offset sign |
 | Events: section number field | Section number for a station in a backward equation |
+| M values of the result | No M, measure along the axis or chainage |
 
 The result repeats all fields of the source record and adds the fields of the
 plugin.
@@ -513,6 +573,10 @@ terrain levels at all points matched the plane formula with a deviation of at
 most 0.5 mm, which comes from rounding the values to a millimetre. The axis levels of R1 matched at all 194 points, and both
 equations of R3 got into the table.
 
+Calibration in the same run wrote both ledger equations into the M of route
+R3. All 2976 point events without a section number, placed by M without the
+ledger, matched the reference within 1 cm.
+
 The deviation appears on arcs with an offset, because an arc is cut into
 chords, and the normal to a chord differs from the normal to the arc by no
 more than 0.01°. Chainage from a ledger does not depend on the cutting,
@@ -528,6 +592,7 @@ same geometry and adds the event table, the chainage and the ledger to it.
 | Interpolate point on line | A point at a given distance from the start of one line | Station instead of distance, a table of records, offset, ledger |
 | Line substring | Part of one line between two distances | Sections from a table, offset, route assembly from parts |
 | Points along geometry | Points with a constant step | Picket stakeout with equations |
+| Set M value | One M value for all vertices | Chainage in M from a ledger or control points, with equations |
 | Linear Referencing symbol layer (since 3.40) | Distance labels along a line at rendering | Pickets as layer features with fields |
 | Elevation profile (since 3.26) | Profile of surfaces along a line in a separate panel | Profile grid with ledger stations, grades and a straightened plan as layers for a print layout |
 | Network analysis, shortest path | A path over a road graph between points | Builds no networks, a path from network analysis can serve as a route |
@@ -550,6 +615,11 @@ When gaps are allowed, the order of the route parts is set from the first part
 in storage order to the nearest end. For parts lying far from each other, the
 order is worth checking with tool 1.02.
 
+Chainage sections from M are numbered by breaks of scale and by equations, not
+by the ledger reference points. A section number from an events table set by
+the ledger can therefore shift after calibration. The number for chainage from
+M is best taken from the picket stakeout 4.01 of the same route.
+
 The profile drawing is built for one route per run and with one datum. That is
 why the profile of a long alignment with a large height difference comes out
 tall.
@@ -564,7 +634,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.3
+Routeliner v0.5.0
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

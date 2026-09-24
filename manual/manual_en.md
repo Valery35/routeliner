@@ -26,6 +26,10 @@ because the computation runs on the NumPy that ships with QGIS.
 
 The interface language follows the language of QGIS: with a Russian locale the
 labels and messages are Russian, and with any other locale they are English.
+Field names in the results are the same in both languages, so expressions,
+styles and projects work in any locale. The attribute table and forms show
+field aliases in the interface language, for example Measure, m instead of
+rl_m.
 
 # Terms
 
@@ -302,7 +306,8 @@ parameters.
 
 The tool builds the drawing of the longitudinal profile of one route from the
 5.01 table. Surface lines and the elevation scale are drawn above the grid,
-and the grid rows and the straightened plan go below them.
+and the grid rows and the straightened plan go below them. The scale ticks
+are at least 5 mm apart, and the labels at least 10 mm.
 
 The drawing is placed in the same coordinate system as the table, in paper
 millimetres. One map unit equals one millimetre, so in a QGIS print layout the
@@ -354,7 +359,10 @@ message.
 | Straightened plan | plan | |
 
 Grade sections are found by vertical simplification of the line, and the
-simplification tolerance is a parameter with a default of 0.02 m. Sections for
+simplification tolerance is a parameter with a default of 0.02 m. A short
+section is crossed by a diagonal from corner to corner. On a section longer
+than four row heights such a diagonal almost merges with the row border, so a
+grade sign four row heights wide is drawn at the section centre. Sections for
 text rows come from the result of 2.02 or from any table with start and end
 measure fields.
 
@@ -418,8 +426,9 @@ routeliner_demo.gpkg. The fields with the exp_ prefix hold the reference answer
 and are needed for the check only.
 
 The terrain raster routeliner_demo_dem.tif with a 5 m cell is written next to
-it. The terrain is an inclined plane z = 120 + 0.01 (x - 455000) + 0.02 (y -
-6428000), and bilinear interpolation on a plane is exact. That is why profile
+it. The terrain is an inclined plane z = 151.5 + 0.01 (x - 455000) + 0.02 (y -
+6428000), and bilinear interpolation on a plane is exact. Along R1 the ground
+lies 1.5 m above the axis, so on the profile the R1 axis looks like a pipe. That is why profile
 levels are checked against the formula and not against the raster itself.
 
 **routes.** Four routes. R1 is a 2000 m straight line with Z values from 150
@@ -551,7 +560,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.0
+Routeliner v0.4.1
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

@@ -76,7 +76,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.4.0
+Routeliner v0.4.1
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

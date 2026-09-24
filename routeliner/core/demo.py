@@ -32,7 +32,8 @@ DEM_CELL = 5.0
 
 
 def dem_z(x: float, y: float) -> float:
-    return 120.0 + 0.01 * (x - X0) + 0.02 * (y - Y0)
+    # вдоль R1 земля на 1,5 м выше оси с отметками 150-170: ось R1 - труба
+    return 151.5 + 0.01 * (x - X0) + 0.02 * (y - Y0)
 
 
 def r1_z(m: float) -> float:

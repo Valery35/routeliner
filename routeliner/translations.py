@@ -433,6 +433,102 @@ TRANSLATIONS = {
         'No layer for the parameter «{p}»',
     'Слой «{name}» должен быть в проекте, иначе нечего отслеживать':
         'Layer «{name}» must be in the project, otherwise there is nothing to watch',
+    'Мера, м':
+        'Measure, m',
+    'Азимут, °':
+        'Azimuth, °',
+    'Мера начала, м':
+        'Start measure, m',
+    'Мера конца, м':
+        'End measure, m',
+    'Длина участка, м':
+        'Section length, m',
+    'Пикет начала':
+        'Start station',
+    'Пикет конца':
+        'End station',
+    'Начало и конец поменяны':
+        'Start and end swapped',
+    'Маршрут':
+        'Route',
+    'Смещение от оси, м':
+        'Offset from the axis, m',
+    'Сторона':
+        'Side',
+    'Код ошибки':
+        'Error code',
+    'Пояснение ошибки':
+        'Error explanation',
+    'Эталон, мера, м':
+        'Reference, measure, m',
+    'Эталон, X':
+        'Reference, X',
+    'Эталон, Y':
+        'Reference, Y',
+    'Эталон, код ошибки':
+        'Reference, error code',
+    'Эталон, мера начала, м':
+        'Reference, start measure, m',
+    'Эталон, мера конца, м':
+        'Reference, end measure, m',
+    'Эталон, маршрут':
+        'Reference, route',
+    'Эталон, пикетаж, м':
+        'Reference, chainage, m',
+    'Эталон, смещение, м':
+        'Reference, offset, m',
+    'ID маршрута':
+        'Route ID',
+    'Длина по оси, м':
+        'Length along the axis, m',
+    'Частей':
+        'Parts',
+    'Разрывов':
+        'Gaps',
+    'Наибольший разрыв, м':
+        'Largest gap, m',
+    'Пикетаж':
+        'Chainage',
+    'Участок пикетажа':
+        'Chainage section',
+    'Целый километр':
+        'Whole kilometre',
+    'Номер точки':
+        'Point number',
+    'Вид':
+        'Kind',
+    'Пикетаж вперёд':
+        'Chainage ahead',
+    'Отметка оси, м':
+        'Axis level, m',
+    'Угол поворота, °':
+        'Turn angle, °',
+    'Подпись':
+        'Label',
+    'Строка сетки':
+        'Grid row',
+    'Цвет':
+        'Colour',
+    'Толщина линии, мм':
+        'Line width, mm',
+    'Текст':
+        'Text',
+    'Поворот, °':
+        'Rotation, °',
+    'Высота текста, мм':
+        'Text height, mm',
+    'Выравнивание по горизонтали':
+        'Horizontal alignment',
+    'Выравнивание по вертикали':
+        'Vertical alignment',
+    'Название':
+        'Name',
+    'Система пикетажа':
+        'Chainage system',
+    'Примечание':
+        'Note',
+    'Номер события':
+        'Event number',
     '1. Подготовка':
         '1. Preparation',
     '2. События по пикетам':
@@ -503,6 +599,8 @@ TRANSLATIONS = {
         'Developed with the support of Inform++ LLC',
     'Ведомость, маршрут {rid}: {msg}':
         'Ledger, route {rid}: {msg}',
+    'Растр {name}':
+        'Raster {name}',
     'Routeliner, события на маршрутах и пикетаж':
         'Routeliner, route events and chainage',
 }

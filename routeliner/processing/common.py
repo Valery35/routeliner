@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from qgis.core import (Qgis, QgsFeature, QgsFeatureSink, QgsField, QgsFields,
                        QgsProcessingAlgorithm, QgsProcessingException,
+                       QgsProcessingLayerPostProcessorInterface, QgsVectorLayer,
                        QgsProcessingParameterBoolean, QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource,
@@ -50,6 +51,82 @@ def fields_of(*items) -> QgsFields:
 
 
 ERROR_FIELDS = [("rl_route", T_STR), ("rl_error", T_STR), ("rl_message", T_STR)]
+
+# Псевдонимы полей. Имена полей не зависят от языка, чтобы выражения, стили и
+# проекты работали в любой локали, а в таблице атрибутов и формах видны
+# псевдонимы на языке интерфейса.
+ALIASES = {
+    "rl_m": "Мера, м", "rl_pk": "Пикет", "rl_x": "X", "rl_y": "Y", "rl_azimuth": "Азимут, °",
+    "rl_m_from": "Мера начала, м", "rl_m_to": "Мера конца, м", "rl_length": "Длина участка, м",
+    "rl_pk_from": "Пикет начала", "rl_pk_to": "Пикет конца", "rl_swapped": "Начало и конец поменяны",
+    "rl_route": "Маршрут", "rl_offset": "Смещение от оси, м", "rl_side": "Сторона",
+    "rl_error": "Код ошибки", "rl_message": "Пояснение ошибки",
+    "exp_m": "Эталон, мера, м", "exp_x": "Эталон, X", "exp_y": "Эталон, Y",
+    "exp_error": "Эталон, код ошибки", "exp_m_from": "Эталон, мера начала, м",
+    "exp_m_to": "Эталон, мера конца, м", "exp_route": "Эталон, маршрут",
+    "exp_station": "Эталон, пикетаж, м", "exp_offset": "Эталон, смещение, м",
+}
+# Простые имена получают псевдоним только в слоях, целиком созданных модулем,
+# чтобы не переименовать чужое поле с тем же именем в таблице событий.
+PLAIN_ALIASES = {
+    "route_id": "ID маршрута", "length": "Длина по оси, м", "parts": "Частей",
+    "gaps": "Разрывов", "gap_max": "Наибольший разрыв, м", "pk": "Пикет",
+    "station": "Пикетаж", "m": "Мера, м", "section": "Участок пикетажа",
+    "azimuth": "Азимут, °", "km": "Целый километр", "n": "Номер точки", "kind": "Вид",
+    "station_ahead": "Пикетаж вперёд", "x": "X", "y": "Y", "z_axis": "Отметка оси, м",
+    "turn": "Угол поворота, °", "label": "Подпись", "row": "Строка сетки", "color": "Цвет",
+    "width": "Толщина линии, мм", "text": "Текст", "rot": "Поворот, °",
+    "size": "Высота текста, мм", "halign": "Выравнивание по горизонтали",
+    "valign": "Выравнивание по вертикали", "name": "Название", "system": "Система пикетажа",
+    "measure": "Мера, м", "note": "Примечание", "eid": "Номер события", "did": "Номер точки",
+    "offset": "Смещение от оси, м", "pk_from": "Пикет начала", "pk_to": "Пикет конца",
+    "fid": "fid",
+}
+
+
+def apply_aliases(layer) -> None:
+    """Ставит псевдонимы известным полям слоя, не трогая уже заданные."""
+    if not isinstance(layer, QgsVectorLayer) or not layer.isValid():
+        return
+    names = [f.name() for f in layer.fields()]
+    own = all(n in ALIASES or n in PLAIN_ALIASES or n.startswith("z_") for n in names)
+    for i, n in enumerate(names):
+        if layer.attributeAlias(i):
+            continue
+        if n in ALIASES:
+            layer.setFieldAlias(i, tr(ALIASES[n]))
+        elif own and n in PLAIN_ALIASES and n != "fid":
+            layer.setFieldAlias(i, tr(PLAIN_ALIASES[n]))
+        elif own and n.startswith("z_") and n != "z_axis":
+            layer.setFieldAlias(i, tr("Растр {name}").format(name=n[2:]))
+
+
+class AliasPostProcessor(QgsProcessingLayerPostProcessorInterface):
+    """Ставит псевдонимы полей после загрузки слоя, затем передаёт слой
+    прежнему постпроцессору (оформление профиля)."""
+
+    def __init__(self, inner=None):
+        super().__init__()
+        self.inner = inner
+
+    def postProcessLayer(self, layer, context, feedback):
+        if self.inner is not None:
+            self.inner.postProcessLayer(layer, context, feedback)
+        apply_aliases(layer)
+
+
+_POST = []          # постпроцессоры должны жить до загрузки слоёв
+
+
+def alias_loaded_layers(context) -> None:
+    for ref in list(context.layersToLoadOnCompletion().keys()):
+        det = context.layerToLoadOnCompletionDetails(ref)
+        old = det.postProcessor()
+        if isinstance(old, AliasPostProcessor):
+            continue
+        pp = AliasPostProcessor(old)
+        _POST.append(pp)
+        det.setPostProcessor(pp)
 
 
 # Группы и инструменты в панели «Инструменты анализа» идут по алфавиту,
@@ -116,12 +193,17 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
     def createInstance(self):
         return type(self)()
 
+    def postProcessAlgorithm(self, context, feedback):
+        alias_loaded_layers(context)
+        return {}
+
     # ------------------------------------------------------------ параметры
     def add_route_params(self):
         self.addParameter(QgsProcessingParameterFeatureSource(
             "ROUTES", tr("Слой маршрутов (линии)"), [SRC_LINE]))
         self.addParameter(QgsProcessingParameterField(
-            "ROUTE_ID", tr("Поле ID маршрута"), parentLayerParameterName="ROUTES", type=FIELD_ANY))
+            "ROUTE_ID", tr("Поле ID маршрута"), defaultValue="route_id",
+            parentLayerParameterName="ROUTES", type=FIELD_ANY))
         p = QgsProcessingParameterNumber("SNAP", tr("Допуск стыковки частей, м"), DBL, 0.01, minValue=0)
         p.setFlags(p.flags() | Qgis.ProcessingParameterFlag.Advanced)
         self.addParameter(p)

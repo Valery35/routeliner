@@ -173,6 +173,8 @@ class Binding(QObject):
             feats.append(g)
         pr.addFeatures(feats)
         target.updateExtents()
+        from ..processing.common import apply_aliases
+        apply_aliases(target)
         target.triggerRepaint()
         return len(feats)
 

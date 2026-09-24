@@ -244,6 +244,7 @@ class ProfileDrawer:
     GAP = 5.0             # промежуток между заголовками и сеткой, мм
     TEXT = 2.5            # высота подписи, мм
     TITLE = 3.0
+    GRADE_FULL = 4.0      # длиннее 4 высот строки уклон рисуется знаком по центру
 
     def __init__(self, points: list[ProfilePoint], station_labels: Sequence[str],
                  h_scale: float = 500.0, v_scale: float = 100.0,
@@ -374,23 +375,30 @@ class ProfileDrawer:
             for xx in (xa, xb):
                 self._line([(xx, top), (xx, bottom)], "tick")
             gr = g.grade
-            if abs(gr) < 0.05:
-                self._line([(xa, (top + bottom) / 2), (xb, (top + bottom) / 2)], "grade")
-            elif gr > 0:
-                self._line([(xa, bottom), (xb, top)], "grade")
-            else:
-                self._line([(xa, top), (xb, bottom)], "grade")
             gt = f"{abs(gr):.{r.decimals}f}" if r.decimals else f"{abs(gr):.0f}"
             lt = f"{g.length:.0f}" if g.length >= 10 else f"{g.length:.1f}"
-            w = xb - xa
-            if w >= max(text_width(gt, self.TEXT), text_width(lt, self.TEXT)) + 2:
-                h = top - bottom
+            h = top - bottom
+            # диагональ на весь участок, пока она не круче 1:4. На длинном
+            # участке диагональ почти ложится на границу строки, поэтому
+            # рисуется знак уклона шириной 4 высоты строки по центру участка.
+            if xb - xa <= self.GRADE_FULL * h:
+                a, b = xa, xb
+            else:
+                c = (xa + xb) / 2
+                a, b = c - self.GRADE_FULL * h / 2, c + self.GRADE_FULL * h / 2
+            if abs(gr) < 0.05:
+                self._line([(a, (top + bottom) / 2), (b, (top + bottom) / 2)], "grade")
+            elif gr > 0:
+                self._line([(a, bottom), (b, top)], "grade")
+            else:
+                self._line([(a, top), (b, bottom)], "grade")
+            if b - a >= max(text_width(gt, self.TEXT), text_width(lt, self.TEXT)) + 2:
                 if gr >= 0:
-                    self._text(xa + 1, top - h * 0.25, gt, 0, self.TEXT, "Left", "Half", "grade")
-                    self._text(xb - 1, bottom + h * 0.25, lt, 0, self.TEXT, "Right", "Half", "grade")
+                    self._text(a + 1, top - h * 0.25, gt, 0, self.TEXT, "Left", "Half", "grade")
+                    self._text(b - 1, bottom + h * 0.25, lt, 0, self.TEXT, "Right", "Half", "grade")
                 else:
-                    self._text(xb - 1, top - h * 0.25, gt, 0, self.TEXT, "Right", "Half", "grade")
-                    self._text(xa + 1, bottom + h * 0.25, lt, 0, self.TEXT, "Left", "Half", "grade")
+                    self._text(b - 1, top - h * 0.25, gt, 0, self.TEXT, "Right", "Half", "grade")
+                    self._text(a + 1, bottom + h * 0.25, lt, 0, self.TEXT, "Left", "Half", "grade")
 
     def _row_plan(self, r: Row, top, bottom):
         mid = (top + bottom) / 2
@@ -433,16 +441,22 @@ class ProfileDrawer:
         xb = -self.GAP - 2.0
         z0 = self.sheet.horizon
         z1 = math.ceil(max(zmax, z0 + 1.0))
-        step = next(s for s in (0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000)
-                    if s * 1000.0 / self.V >= 5.0)
-        z = z0
+        steps = (0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000)
+        # мелкие деления не чаще 5 мм, подписи не чаще 10 мм на бумаге
+        minor = next(s for s in steps if s * 1000.0 / self.V >= 5.0)
+        major = next(s for s in steps if s * 1000.0 / self.V >= 10.0 and
+                     abs(s / minor - round(s / minor)) < 1e-9)
         ytop = float(self.y(z1))
         self._line([(xb, 0), (xb, ytop)], "scale")
-        while z <= z1 + 1e-9:
+        k = 0
+        while z0 + k * minor <= z1 + 1e-9:
+            z = z0 + k * minor
             yy = float(self.y(z))
-            self._line([(xb - 1.5, yy), (xb, yy)], "scale")
-            self._text(xb - 2.0, yy, f"{z:.2f}", 0, self.TEXT, "Right", "Half", "scale")
-            z += step
+            labelled = abs(z / major - round(z / major)) < 1e-6
+            self._line([(xb - (2.0 if labelled else 1.0), yy), (xb, yy)], "scale")
+            if labelled:
+                self._text(xb - 2.5, yy, f"{z:.2f}", 0, self.TEXT, "Right", "Half", "scale")
+            k += 1
         xl = -self.HEADER - self.GAP + 1.5
         for k, t in enumerate((tr("Условный горизонт {z:.2f}").format(z=z0),
                                tr("М 1:{v:g} по вертикали").format(v=self.V),

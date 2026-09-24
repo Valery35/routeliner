@@ -217,18 +217,16 @@ class _StyleLines(QgsProcessingLayerPostProcessorInterface):
 
 class _StyleTexts(QgsProcessingLayerPostProcessorInterface):
     def postProcessLayer(self, layer, context, feedback):
-        from qgis.core import (QgsMarkerSymbol, QgsPalLayerSettings, QgsRuleBasedRenderer,
-                               QgsTextFormat, QgsVectorLayerSimpleLabeling)
+        from qgis.core import (QgsMarkerSymbol, QgsPalLayerSettings, QgsSingleSymbolRenderer,
+                               QgsSymbolLayer, QgsTextFormat, QgsVectorLayerSimpleLabeling)
         from qgis.PyQt.QtGui import QColor
+        # знак рисуется только у точек плана, остальные объекты несут подписи
         mk = QgsMarkerSymbol.createSimple({"name": "circle", "color": "0,0,0", "size": "1.2"})
         mk.setSizeUnit(Qgis.RenderUnit.MapUnits)
-        root = QgsRuleBasedRenderer.Rule(None)
-        root.appendChild(QgsRuleBasedRenderer.Rule(mk, 0, 0, "\"kind\" = 'plan_point'"))
-        # объекты без символа QGIS не подписывает, поэтому остальным - пустой знак
-        empty = QgsMarkerSymbol.createSimple({"name": "circle", "color": "0,0,0,0",
-                                              "outline_style": "no", "size": "0"})
-        root.appendChild(QgsRuleBasedRenderer.Rule(empty, 0, 0, "ELSE"))
-        layer.setRenderer(QgsRuleBasedRenderer(root))
+        prop = QgsSymbolLayer.Property.Size if hasattr(QgsSymbolLayer, "Property") else QgsSymbolLayer.PropertySize
+        mk.symbolLayer(0).setDataDefinedProperty(
+            prop, QgsProperty.fromExpression("CASE WHEN \"kind\" = 'plan_point' THEN 1.2 ELSE 0 END"))
+        layer.setRenderer(QgsSingleSymbolRenderer(mk))
 
         s = QgsPalLayerSettings()
         s.fieldName = "text"

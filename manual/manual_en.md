@@ -31,6 +31,28 @@ styles and projects work in any locale. The attribute table and forms show
 field aliases in the interface language, for example Measure, m instead of
 rl_m.
 
+# Menu, toolbar and log
+
+The plugin adds the Plugins - Routeliner menu and the Routeliner toolbar. The
+menu holds all tools under their numbers and the items Manual (PDF), Work log
+and About. The toolbar has two buttons. The first opens the same list of tools,
+the second opens the About window.
+
+The About window shows the version and links to the site, the source code and
+the bug tracker. Its buttons open the version history, the manual, the log and
+the log folder. The bottom of the window shows the last lines of the log, so
+an error can be read without looking for the file.
+
+The work log is written to the file routeliner.log in the QGIS profile folder.
+It receives the plugin load with the plugin and QGIS versions, every tool run
+with its parameters and running time, the warnings of a tool and the
+recalculation of live layers. A failure is written together with its call
+stack. When the plugin loads, a file larger than 2 MB is renamed to
+routeliner.log.old, and the log starts anew.
+
+In case of an error it is enough to attach the log to a message on the bug
+tracker. Log entries are written in Russian whatever the interface language.
+
 # Terms
 
 **Measure.** The distance along the route axis from its start, in the units of
@@ -634,7 +656,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.0
+Routeliner v0.5.1
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

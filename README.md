@@ -49,6 +49,10 @@ Routeliner - модуль QGIS, который ставит на оси доро
 Исходный текст лежит в [manual/manual.md](manual/manual.md), английская версия
 в [manual/manual_en.md](manual/manual_en.md).
 
+Кнопка «О модуле» на панели Routeliner показывает версию, историю изменений и
+журнал работы. Журнал пишется в файл routeliner.log в папке профиля QGIS, и при
+ошибке его достаточно приложить к сообщению.
+
 ## Разработка
 
 Ядро в папке routeliner/core не зависит от QGIS и проверяется тестами.
@@ -77,7 +81,7 @@ GNU GPL версии 2 или новее, см. [LICENSE](LICENSE).
 
 Страница плагина: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.0
+Routeliner v0.5.1
 
 Routeliner развивается на задачах реальных предприятий. Если вашему
 производству не хватает функции, напишите нам:

@@ -131,7 +131,7 @@ EN = {
 "Дефекты: привязано верно": "Defects: {a} of {n} located correctly",
 "Таблица ошибок повторяет": "The error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation).",
 "Параметры те же, что у инструмента": (
-    "The parameters are those of tool {src}, but the result is not a one-off. The in-memory layer "
+    "The parameters are those of tool {src}, but the result is live. The in-memory layer "
     "is recalculated by itself when the route geometry, the event table or the ledger changes, "
     "including unsaved edits and a CSV or Excel file changed on disk. An error table is created "
     "next to it.\n\n"
@@ -139,41 +139,65 @@ EN = {
     "recalculation, remove the event layer from the project.\n\n"
     "The fields of the layer are those of the result of tool {src}."),
 "Собирает каждый маршрут": (
-    "Assembles every route from all features with the same ID. Multi-lines are split into parts, "
-    "the parts are ordered by their joints rather than by storage order, and arcs are segmented. "
-    "A route with a gap, a branch or in a geographic coordinate system goes to the error table.\n\n"
-    "Result fields: route_id (route ID), length (length along the axis, m), parts (number of parts "
-    "after assembly), gaps (number of gaps), gap_max (largest gap, m)."),
+    ("Assembles every route from all features with the same ID. Multi-lines are split "
+     "into parts, the parts are ordered by their joints rather than by storage order, "
+     "and arcs are segmented. A route with a gap, a branch or in a geographic "
+     "coordinate system goes to the error table.\n"
+     "\n"
+     "Result fields:\n"
+     "- route_id - route ID\n"
+     "- length - length along the axis, m\n"
+     "- parts - number of parts after assembly\n"
+     "- gaps - number of gaps\n"
+     "- gap_max - largest gap, m")),
 "Ставит на маршруты записи таблицы": (
-    "Places table records on the routes by station in the chosen notation, with an offset from the "
-    "axis. The station is converted to a measure through the route ledger, and without a ledger "
-    "along the axis from the start station. The record «+35» takes the picket of the previous record "
-    "of the same route.\n\n"
-    "The fields of the source record are followed by rl_m (measure along the axis, m), rl_pk "
-    "(station in the chosen notation), rl_x and rl_y (point coordinates in the route CRS), "
-    "rl_azimuth (axis azimuth at the point, degrees clockwise from north)."),
+    ("Places table records on the routes by station in the chosen notation, with an "
+     "offset from the axis. The station is converted to a measure through the route "
+     "ledger, and without a ledger along the axis from the start station. The record "
+     "«+35» takes the picket of the previous record of the same route.\n"
+     "\n"
+     "The fields of the source record are followed by the fields:\n"
+     "- rl_m - measure along the axis, m\n"
+     "- rl_pk - station in the chosen notation\n"
+     "- rl_x and rl_y - point coordinates in the route CRS\n"
+     "- rl_azimuth - axis azimuth at the point, degrees clockwise from north")),
 "Вырезает участки маршрутов": (
-    "Cuts route sections between the start and end stations, with a parallel offset. A section "
-    "recorded against the route direction is turned over. A section across a route gap, when gaps "
-    "are allowed, comes out as a multi-line.\n\n"
-    "The fields of the source record are followed by rl_m_from and rl_m_to (start and end measures, "
-    "m), rl_length (length along the axis, m), rl_pk_from and rl_pk_to (start and end stations), "
-    "rl_swapped (1 when the start and the end were swapped)."),
+    ("Cuts route sections between the start and end stations, with a parallel offset. "
+     "A section recorded against the route direction is turned over. A section across "
+     "a route gap, when gaps are allowed, comes out as a multi-line.\n"
+     "\n"
+     "The fields of the source record are followed by the fields:\n"
+     "- rl_m_from and rl_m_to - start and end measures, m\n"
+     "- rl_length - length along the axis, m\n"
+     "- rl_pk_from and rl_pk_to - start and end stations\n"
+     "- rl_swapped - 1 when the start and the end were swapped")),
 "Ставит точки целых пикетов": (
-    "Places points of whole pickets along every route, with a label and an azimuth for label "
-    "rotation. With a ledger, broken pickets and station equations are taken into account. Pickets "
-    "skipped by a forward equation are not placed, and pickets repeated by a backward equation are "
-    "placed twice with different section numbers.\n\n"
-    "Result fields: route_id (route ID), pk (station in the chosen notation), station (chainage, m), "
-    "m (measure along the axis, m), section (chainage section number, from zero), azimuth (axis "
-    "azimuth, degrees), km (1 for a picket that is a whole kilometre)."),
+    ("Places points of whole pickets along every route, with a label and an azimuth "
+     "for label rotation. With a ledger, broken pickets and station equations are "
+     "taken into account. Pickets skipped by a forward equation are not placed, and "
+     "pickets repeated by a backward equation are placed twice with different section "
+     "numbers.\n"
+     "\n"
+     "Result fields:\n"
+     "- route_id - route ID\n"
+     "- pk - station in the chosen notation\n"
+     "- station - chainage, m\n"
+     "- m - measure along the axis, m\n"
+     "- section - chainage section number, from zero\n"
+     "- azimuth - axis azimuth, degrees\n"
+     "- km - 1 for a picket that is a whole kilometre")),
 "Обратная задача": (
-    "The inverse task. For every point the nearest route is found, and the measure, the station and "
-    "the signed offset from the axis are computed on it. Points beyond the search radius go to the "
-    "error table. When the points have a route ID field, they are located on that route only.\n\n"
-    "The fields of the point are followed by rl_route (route ID), rl_m (measure along the axis, m), "
-    "rl_pk (station in the chosen notation), rl_offset (offset, m, positive to the left of the route "
-    "direction), rl_side (side relative to the route direction: left, right or axis)."),
+    ("The inverse task. For every point the nearest route is found, and the measure, "
+     "the station and the signed offset from the axis are computed on it. Points "
+     "beyond the search radius go to the error table. When the points have a route ID "
+     "field, they are located on that route only.\n"
+     "\n"
+     "The fields of the point are followed by the fields:\n"
+     "- rl_route - route ID\n"
+     "- rl_m - measure along the axis, m\n"
+     "- rl_pk - station in the chosen notation\n"
+     "- rl_offset - offset, m, positive to the left of the route direction\n"
+     "- rl_side - side relative to the route direction: left, right or axis")),
 "События": "Events",
 "Таблица событий (слой, CSV, Excel)": "Event table (layer, CSV, Excel)",
 "События: поле ID маршрута": "Events: route ID field",
@@ -249,7 +273,30 @@ EN = {
 "Таблица профиля": "Profile table",
 "Таблица профиля (результат 5.01)": "Profile table (result of 5.01)",
 "Чертёж профиля": "Profile drawing",
-"Собирает точки продольного профиля": "Collects the points of a longitudinal profile along every route and samples raster values at them. Points are placed at the route start and end, at station equations, at whole pickets, at axis vertices and with a constant step. Points from the event layer (crossings, manholes, boreholes) are placed by projection onto the axis if they lie within the corridor from the axis.\n\nRaster values are interpolated bilinearly between cell centres. A raster may be in any coordinate system, the points are transformed.\n\nResult fields: route_id (route ID), n (point number), kind (start, end, equation, event, picket, vertex, step), m (measure along the axis, m), station (chainage, m), station_ahead (chainage ahead, equations only), pk (station in the chosen notation), section (chainage section number), x and y (coordinates on the axis), z_axis (axis elevation from the route Z, empty if the route has no Z or all Z are zero), turn (turn angle of the alignment at a vertex, degrees, positive to the left), label (event label) and one z_name field for each raster.",
+"Собирает точки продольного профиля": ("Collects the points of a longitudinal profile along every route and samples "
+                                       "raster values at them. Points are placed at the route start and end, at station "
+                                       "equations, at whole pickets, at axis vertices and with a constant step. Points "
+                                       "from the event layer (crossings, manholes, boreholes) are placed by projection "
+                                       "onto the axis if they lie within the corridor from the axis.\n"
+                                       "\n"
+                                       "Raster values are interpolated bilinearly between cell centres. A raster may be "
+                                       "in any coordinate system, the points are transformed.\n"
+                                       "\n"
+                                       "Result fields:\n"
+                                       "- route_id - route ID\n"
+                                       "- n - point number\n"
+                                       "- kind - start, end, equation, event, picket, vertex, step\n"
+                                       "- m - measure along the axis, m\n"
+                                       "- station - chainage, m\n"
+                                       "- station_ahead - chainage ahead, equations only\n"
+                                       "- pk - station in the chosen notation\n"
+                                       "- section - chainage section number\n"
+                                       "- x and y - coordinates on the axis\n"
+                                       "- z_axis - axis elevation from the route Z, empty if the route has no Z or all "
+                                       "Z are zero\n"
+                                       "- turn - turn angle of the alignment at a vertex, degrees, positive to the left\n"
+                                       "- label - event label\n"
+                                       "- z_name - raster value, one field for each raster"),
 "Строит чертёж продольного профиля": "Builds the drawing of the longitudinal profile of one route from the 5.01 table: surface lines above the grid, the profile grid with its rows, the elevation scale and the straightened plan. The drawing is placed in the same coordinate system as the table, in paper millimetres, so one map unit equals one millimetre. In a QGIS print layout the profile prints at full size with the map scale 1:1000.\n\nThe grid rows are set by a table. Row type: value (number from an expression), text (section labels from a field of the section layer), grade (grade and length from an expression), distance (distances between points), station (pickets), plan (straightened plan). Expressions may use the fields of the profile table and the placeholders {ground}, {design}, {pipe}, {d}, {base}, which are replaced by fields and numbers from the parameters. A row without data is not put into the grid.\n\nPoint labels are thinned: if points are closer on paper than the given gap, the label stays at the point with the higher priority (start and end, equation, event, picket, vertex, step).\n\nFields of the line layer: kind (line kind), row (row), color, width (width, mm). Fields of the label layer: text, kind, rot (rotation, degrees), size (height, mm), halign, valign.",
 "Заголовок": "Title",
 "Тип": "Type",
@@ -381,8 +428,44 @@ EN = {
     "Calibration: route sources and equations correct - {v}, point events by M matched {a} of {n}",
 "Параметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.":
     "The M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead.",
-"Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси от пикета начала.\n\nКонтрольная точка несёт известный пикет. Точка привязывается к ближайшему маршруту в пределах радиуса поиска, и её мера становится репером. Между точками пикет идёт линейно, до первой и после последней точки с масштабом 1. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nПоля результата: route_id (ID маршрута), length (длина по оси, м), st_from и st_to (пикетаж начала и конца, м), pk_from и pk_to (они же в выбранной записи), sections (участков пикетажа), equations (пикетажных уравнений), source (источник пикетажа: points, ledger, m или length).":
-    "Assembles the routes and writes M values into their geometry, that is the chainage or the measure along the axis at every vertex. The chainage source is chosen per route in this order: control points, ledger, M values of the routes themselves, length along the axis from the start station.\n\nA control point carries a known station. The point is located on the nearest route within the search radius, and its measure becomes a reference mark. Between the points the station runs linearly, and before the first and after the last point with scale 1. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nResult fields: route_id (route ID), length (length along the axis, m), st_from and st_to (chainage of the start and the end, m), pk_from and pk_to (the same in the selected notation), sections (chainage sections), equations (station equations), source (chainage source: points, ledger, m or length).",
+("Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или "
+ "меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком "
+ "порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси "
+ "от пикета начала.\n"
+ "\n"
+ "Контрольная точка несёт известный пикет. Точка привязывается к ближайшему "
+ "маршруту в пределах радиуса поиска, и её мера становится репером. Между точками "
+ "пикет идёт линейно, до первой и после последней точки с масштабом 1. На "
+ "пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад "
+ "и пикетом вперёд.\n"
+ "\n"
+ "Поля результата:\n"
+ "- route_id - ID маршрута\n"
+ "- length - длина по оси, м\n"
+ "- st_from и st_to - пикетаж начала и конца, м\n"
+ "- pk_from и pk_to - они же в выбранной записи\n"
+ "- sections - количество участков пикетажа\n"
+ "- equations - количество пикетажных уравнений\n"
+ "- source - источник пикетажа: points, ledger, m или length"):
+    ("Assembles the routes and writes M values into their geometry, that is the "
+     "chainage or the measure along the axis at every vertex. The chainage source is "
+     "chosen per route in this order: control points, ledger, M values of the routes "
+     "themselves, length along the axis from the start station.\n"
+     "\n"
+     "A control point carries a known station. The point is located on the nearest "
+     "route within the search radius, and its measure becomes a reference mark. "
+     "Between the points the station runs linearly, and before the first and after "
+     "the last point with scale 1. At a station equation the line gets two vertices "
+     "at one point, with the station back and the station ahead.\n"
+     "\n"
+     "Result fields:\n"
+     "- route_id - route ID\n"
+     "- length - length along the axis, m\n"
+     "- st_from and st_to - chainage of the start and the end, m\n"
+     "- pk_from and pk_to - the same in the selected notation\n"
+     "- sections - number of chainage sections\n"
+     "- equations - number of station equations\n"
+     "- source - chainage source: points, ledger, m or length"),
 "Контрольные точки с пикетами (необязательно)": "Control points with stations (optional)",
 "Контрольные точки: поле пикета": "Control points: station field",
 "Контрольные точки: поле ID маршрута (необязательно)": "Control points: route ID field (optional)",
@@ -400,6 +483,21 @@ EN = {
 "M маршрута {rid}: {msg}": "M of route {rid}: {msg}",
 "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}": "Chainage from M: routes {a}, without M {b}, errors {c}",
 "Пикетаж из M-значений геометрии маршрута": "Chainage from the M values of the route geometry",
+# 0.5.1: окно «О модуле», панель и журнал
+"История изменений": "Version history",
+"не заведён": "not set up",
+"Журнал ещё не заведён.": "The log has not been set up yet.",
+"ООО «Информ++»": "Inform++ LLC",
+"Журнал": "Log",
+"Папка журнала": "Log folder",
+"страница для предприятий": "page for enterprises",
+"Журнал: {p}": "Log: {p}",
+"Исходный код": "Source code",
+"Сообщить об ошибке": "Report a bug",
+"Версия {v}": "Version {v}",
+"Инструменты Routeliner": "Routeliner tools",
+"Версия, ссылки, история изменений, руководство и журнал": "Version, links, version history, manual and log",
+"Журнал работы": "Work log",
 }
 out = {}
 missing = []

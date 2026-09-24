@@ -254,6 +254,12 @@ def version() -> str:
         return ""
 
 
+def help_html(text: str) -> str:
+    """Абзацы через пустую строку, перечни строками с дефиса."""
+    paras = text.split("\n\n")
+    return "".join("<p>" + p.replace("\n", "<br/>") + "</p>" for p in paras)
+
+
 def help_footer() -> str:
     """Подпись в конце справки каждого инструмента."""
     return (
@@ -265,8 +271,62 @@ def help_footer() -> str:
            "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{ORDER_URL}</a></p>')
 
 
+def _journaled(run):
+    """Обёртка processAlgorithm: запуск, параметры, замечания, итог и сбой
+    инструмента пишутся в журнал модуля (trace.py). Ошибка не глотается,
+    Processing показывает её как прежде."""
+    import functools
+    import time
+
+    @functools.wraps(run)
+    def wrapper(self, parameters, context, feedback):
+        from .. import trace
+        title = f"{self.NUMBER} {self.name()}"
+        trace.step(title + ": запуск")
+        trace.data(title + ": " + _params_text(parameters))
+        _journal_feedback(feedback, title)
+        t0 = time.time()
+        try:
+            res = run(self, parameters, context, feedback)
+        except Exception as e:
+            trace.fail(title + ": сбой, " + str(e), e)
+            raise
+        trace.step(title + ": готово за %.1f с" % (time.time() - t0))
+        return res
+    return wrapper
+
+
+def _params_text(parameters) -> str:
+    out = []
+    for k, v in sorted((parameters or {}).items()):
+        v = getattr(v, "sink", v)
+        out.append(f"{k}={v}")
+    return "; ".join(out)[:2000]
+
+
+def _journal_feedback(feedback, title):
+    """Замечания инструмента (reportError) дублируются в журнал."""
+    if feedback is None:
+        return
+    try:
+        orig = feedback.reportError
+
+        def report(msg, fatal=False):
+            from .. import trace
+            trace.write("ЗАМЕЧ", f"{title}: {msg}")
+            return orig(msg, fatal)
+        feedback.reportError = report
+    except Exception:  # nosec - журнал не вправе мешать инструменту
+        pass
+
+
 class RoutelinerAlgorithm(QgsProcessingAlgorithm):
     """Базовый класс: параметры маршрутов, пикетажа и ведомости."""
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if "processAlgorithm" in cls.__dict__:
+            cls.processAlgorithm = _journaled(cls.__dict__["processAlgorithm"])
 
     GROUP = "events"
     NUMBER = ""
@@ -279,7 +339,7 @@ class RoutelinerAlgorithm(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         text = "\n\n".join(tr(t) for t in (self.HELP, *self.HELP_TAIL))
-        return "<p>" + text.replace("\n\n", "</p><p>") + "</p>" + help_footer()
+        return help_html(text) + help_footer()
 
     def group(self):
         return tr(GROUPS[self.GROUP])

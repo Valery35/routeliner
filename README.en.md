@@ -52,6 +52,11 @@ the tool parameters and the fields of every layer the plugin creates. The
 source text is in [manual/manual_en.md](manual/manual_en.md), and the Russian version is in
 [manual/manual.md](manual/manual.md).
 
+The About button on the Routeliner toolbar shows the version, the version
+history and the work log. The log is written to the file routeliner.log in the
+QGIS profile folder, and in case of an error it is enough to attach it to a
+message.
+
 ## Development
 
 The computation core in routeliner/core does not depend on QGIS and is
@@ -81,7 +86,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.0
+Routeliner v0.5.1
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

@@ -38,7 +38,13 @@ manager: Optional["BindingManager"] = None     # ставит модуль пр�
 
 
 def log(msg: str, level=Qgis.MessageLevel.Info):
+    """Сообщение в панель журналов QGIS и в журнал модуля (trace.py)."""
     QgsMessageLog.logMessage(msg, TAG, level)
+    from .. import trace
+    if level == Qgis.MessageLevel.Critical:
+        trace.fail("динамический слой, " + msg)
+    else:
+        trace.step("динамический слой, " + msg)
 
 
 def _file_of(layer: QgsVectorLayer) -> Optional[str]:

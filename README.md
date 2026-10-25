@@ -2,6 +2,8 @@
 
 # Routeliner
 
+[![Support development](https://img.shields.io/badge/Support-development-2ea44f)](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83)
+
 Routeliner is a QGIS plugin that places table records on the axes of roads,
 tracks, pipelines and power lines when a record carries a station instead of
 coordinates. The plugin reads the five station notations
@@ -15,6 +17,8 @@ stations is built along a route.
 The route chainage can be taken from the M values of its geometry and written
 into the M of the results. PostGIS, ArcGIS and the QGIS tools for M read such
 layers.
+
+The plugin is free and open source. [Support development](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83) (Russian bank cards via SBP)
 
 ## Tools
 

@@ -18,6 +18,10 @@ import os
 _HERE = os.path.dirname(__file__)
 SITE = "https://www.informpp.ru"
 ORDER_URL = "https://www.informpp.ru/главная-страница/предприятиям"
+# Раздел «Поддержать разработку» в профиле автора на GitHub.
+SUPPORT_URL = ("https://github.com/Valery35#"
+               "%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-"
+               "%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83")
 
 
 def read_metadata():
@@ -141,7 +145,8 @@ def show_about(parent=None):
 
     links = QLabel(
         f'<a href="{SITE}">www.informpp.ru</a> · <a href="{home}">{tr("Исходный код")}</a> · '
-        f'<a href="{tracker}">{tr("Сообщить об ошибке")}</a><br>' +
+        f'<a href="{tracker}">{tr("Сообщить об ошибке")}</a> · '
+        f'<a href="{SUPPORT_URL}">{tr("Поддержать разработку")}</a><br>' +
         tr("Routeliner развивается на задачах реальных предприятий. Если вашему производству "
            "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{tr("страница для предприятий")}</a>',
         dlg)

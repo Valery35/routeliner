@@ -11,6 +11,7 @@ from qgis.core import (Qgis, QgsFeature, QgsFeatureSink, QgsField, QgsFields,
                        QgsProcessingParameterString)
 from qgis.PyQt.QtCore import QMetaType
 
+from ..about import SUPPORT_URL
 from ..i18n import tr
 from ..core.aliases import (ALIASES, PLAIN_ALIASES, alias_source,  # noqa: F401
                             all_alias_sources, is_raster_field, layer_is_ours,
@@ -268,7 +269,8 @@ def help_footer() -> str:
         tr("Страница плагина") + f': <a href="{HOME_URL}">github.com/Valery35/routeliner</a><br/>'
         f"Routeliner v{version()}<br/>" +
         tr("Routeliner развивается на задачах реальных предприятий. Если вашему производству "
-           "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{ORDER_URL}</a></p>')
+           "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{ORDER_URL}</a><br/>'
+        f'<a href="{SUPPORT_URL}">' + tr("Поддержать разработку") + '</a></p>')
 
 
 def _journaled(run):

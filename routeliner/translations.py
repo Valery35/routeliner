@@ -33,6 +33,8 @@ TRANSLATIONS = {
         'Source code',
     'Сообщить об ошибке':
         'Report a bug',
+    'Поддержать разработку':
+        'Support development',
     'События на маршрутах и пикетаж для QGIS':
         'Route events and chainage for QGIS',
     'Версия {v}':

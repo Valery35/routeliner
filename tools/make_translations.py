@@ -494,6 +494,7 @@ EN = {
 "Журнал: {p}": "Log: {p}",
 "Исходный код": "Source code",
 "Сообщить об ошибке": "Report a bug",
+"Поддержать разработку": "Support development",
 "Версия {v}": "Version {v}",
 "Инструменты Routeliner": "Routeliner tools",
 "Версия, ссылки, история изменений, руководство и журнал": "Version, links, version history, manual and log",

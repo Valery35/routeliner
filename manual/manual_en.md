@@ -38,8 +38,8 @@ menu holds all tools under their numbers and the items Manual (PDF), Work log
 and About. The toolbar has two buttons. The first opens the same list of tools,
 the second opens the About window.
 
-The About window shows the version and links to the site, the source code and
-the bug tracker. Its buttons open the version history, the manual, the log and
+The About window shows the version and links to the site, the source code,
+the bug tracker and the Support development section. Its buttons open the version history, the manual, the log and
 the log folder. The bottom of the window shows the last lines of the log, so
 an error can be read without looking for the file.
 
@@ -656,7 +656,7 @@ Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.inform
 
 Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.1
+Routeliner v0.5.2
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

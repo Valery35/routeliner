@@ -111,7 +111,10 @@ def test_round_trip_ledger_to_m_and_back():
     s2 = ChainageSystem.from_measures("M", r.vertex_measures(), r.length)
     for mm in (0, 50, 99, 101, 150, 309):
         assert s2.to_station(mm) == pytest.approx(s.to_station(mm))
-    assert s2.equations() == pytest.approx(s.equations())
+    # approx не сравнивает вложенные кортежи, поэтому уравнения сверяются плоским списком
+    assert len(s2.equations()) == len(s.equations())
+    assert [v for e in s2.equations() for v in e] == \
+        pytest.approx([v for e in s.equations() for v in e])
 
 
 def test_equation_at_joint_of_two_features():

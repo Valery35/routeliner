@@ -6331,7 +6331,8 @@
        "ru": "Линия (1/0)",
        "en": "Line (1/0)"
       }
-     ]
+     ],
+     "optional": true
     },
     {
      "key": "SECTIONS",

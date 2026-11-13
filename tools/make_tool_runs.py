@@ -13,9 +13,12 @@ Isoliner3D (tools/make_fixtures.py там), README крейта rustgis-kit.
   объекта в GeoPackage примера, Z нет - null.
 - output - выход по ключу: {"geometry", "keep_source", "fields":
   [[имя, тип]], "features": [{"source", "values", "geometry"}]}.
-  Геометрия точки - {"xyz"}, линии - {"points"}, мультилинии - {"parts"},
-  объекта входа - {"source": id}, строки таблицы - null. M-значения
-  результата (OUT_M) идут рядом, "m" - число у точки, список у линии.
+  Геометрия точки - {"xyz"}, линии - {"points"}, мультилинии (участок
+  через разрыв при ALLOW_GAPS) - {"parts": [точки куска]}, объекта входа -
+  {"source": id}, строки таблицы - null. M-значения результата (OUT_M)
+  идут членом "measure" - число у точки, список у линии, у мультилинии
+  список по кускам. Имя "m" занято крейтом, там он хранит метры UTM.
+  Слой RustGIS держит только X и Y, поэтому M в проект не попадает.
 
 Расчёт - тот же, что в tools/make_fixtures.py (ядро без QGIS), только
 геометрия пишется целиком. Чего нет в прогонах и почему - в "skipped".
@@ -96,14 +99,14 @@ def _line_geom(g):
     ms = [[p[2] for p in piece] for piece in g] if g and g[0] and len(g[0][0]) > 2 else None
     out = {"points": pts[0]} if len(pts) == 1 else {"parts": pts}
     if ms is not None:
-        out["m"] = ms[0] if len(ms) == 1 else ms
+        out["measure"] = ms[0] if len(ms) == 1 else ms
     return out
 
 
 def _point_geom(g):
     out = {"xyz": [g[0], g[1], None]}
     if len(g) > 2:
-        out["m"] = g[2]
+        out["measure"] = g[2]
     return out
 
 

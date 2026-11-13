@@ -1,0 +1,39 @@
+name: Пожелание / Feature request
+description: Функция, которой не хватает в работе / A function your work is missing
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Routeliner развивается на задачах реальных предприятий. Опишите задачу так, как она стоит на производстве, а пример данных поможет проверить решение.
+
+        Routeliner grows on the tasks of real enterprises. Describe the task the way it stands in your work, and a data sample helps to check the solution.
+  - type: textarea
+    id: task
+    attributes:
+      label: Задача / Task
+      description: Что нужно получить и для чего / What you need to get and what for
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: Как задача решается сейчас / How the task is solved now
+      description: Другая программа, ручная работа, штатные инструменты QGIS / Another program, manual work, standard QGIS tools
+  - type: dropdown
+    id: area
+    attributes:
+      label: Раздел модуля / Plugin area
+      options:
+        - Маршруты и пикетаж / Routes and chainage
+        - События и участки / Events and sections
+        - Динамические слои / Live layers
+        - Привязка точек / Locating points
+        - Профили / Profiles
+        - M-значения и обмен с другими программами / M values and data exchange
+        - Новая область / New area
+  - type: textarea
+    id: data
+    attributes:
+      label: Пример данных / Data sample
+      description: Небольшой файл или описание полей таблицы и ведомости / A small file or a description of the table and ledger fields

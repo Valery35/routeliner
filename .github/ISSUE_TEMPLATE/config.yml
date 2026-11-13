@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Руководство / Manual
+    url: https://github.com/Valery35/routeliner/blob/main/manual/manual.md
+    about: Параметры инструментов и поля результатов / Tool parameters and result fields
+  - name: Работы для предприятий / Work for enterprises
+    url: https://www.informpp.ru/главная-страница/предприятиям
+    about: Заказ доработки под производство / Ordering development for your operation

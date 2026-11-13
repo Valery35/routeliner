@@ -1,0 +1,67 @@
+name: Ошибка / Bug report
+description: Модуль работает не так, как описано в руководстве / The plugin does not work as the manual says
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Журнал работы открывается кнопкой «Журнал» в окне «О модуле» на панели Routeliner. Файл routeliner.log лежит в папке профиля QGIS, его достаточно перетащить в поле ниже.
+
+        The work log opens with the Log button in the About window on the Routeliner toolbar. The file routeliner.log lies in the QGIS profile folder, drag it into the field below.
+  - type: input
+    id: version
+    attributes:
+      label: Версия Routeliner / Routeliner version
+      description: Окно «О модуле» / About window
+      placeholder: "0.5.2"
+    validations:
+      required: true
+  - type: input
+    id: qgis
+    attributes:
+      label: Версия QGIS и система / QGIS version and OS
+      placeholder: "QGIS 4.0.3, Windows 11"
+    validations:
+      required: true
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Инструмент / Tool
+      options:
+        - 1.01 Демонстрационный пример / Demo example
+        - 1.02 Проверка маршрутов / Route check
+        - 1.03 Калибровка маршрутов / Calibrate routes
+        - 2.01 Точечные события / Point events
+        - 2.02 Участки / Sections
+        - 3.01 Динамический слой точечных событий / Live layer of point events
+        - 3.02 Динамический слой участков / Live layer of sections
+        - 4.01 Пикетная разбивка / Picket stakeout
+        - 4.02 Привязка точек к маршрутам / Locate points on routes
+        - 5.01 Таблица профиля / Profile table
+        - 5.02 Чертёж профиля / Profile drawing
+        - Панель, меню, окно «О модуле» / Toolbar, menu, About window
+        - Другое / Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Что делали / Steps
+      description: Слои, параметры инструмента, запись пикета / Layers, tool parameters, station notation
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что ожидали и что получили / Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Журнал и данные / Log and data
+      description: routeliner.log, снимок экрана, небольшой пример данных / routeliner.log, a screenshot, a small data sample

@@ -1,0 +1,4816 @@
+{
+ "format": 1,
+ "plugin": "Routeliner",
+ "version": "0.5.2",
+ "provider": "routeliner",
+ "note": "Собрано tools/make_tools_json.py из кода модуля, после правки инструментов пересобрать.",
+ "error_codes": [
+  {
+   "name": "ROUTE_NOT_FOUND",
+   "value": "route_not_found",
+   "raised_in": [
+    "core/assembler.py:build",
+    "core/events.py:_measure",
+    "core/events.py:locate_xy",
+    "core/route.py:_check",
+    "core/route.py:locate"
+   ]
+  },
+  {
+   "name": "ROUTE_GAP",
+   "value": "route_gap",
+   "raised_in": [
+    "core/assembler.py:build"
+   ]
+  },
+  {
+   "name": "ROUTE_BRANCHING",
+   "value": "route_branching",
+   "raised_in": [
+    "core/assembler.py:_chains"
+   ]
+  },
+  {
+   "name": "GEOGRAPHIC_CRS",
+   "value": "geographic_crs",
+   "raised_in": [
+    "core/assembler.py:build"
+   ]
+  },
+  {
+   "name": "MEASURE_OUT_OF_RANGE",
+   "value": "measure_out_of_range",
+   "raised_in": [
+    "core/chainage.py:to_station",
+    "core/events.py:_measure",
+    "core/events.py:locate_xy",
+    "core/route.py:_check"
+   ]
+  },
+  {
+   "name": "STATION_PARSE_FAILED",
+   "value": "station_parse_failed",
+   "raised_in": [
+    "core/stations.py:_parse_pk_plus",
+    "core/stations.py:_parse_rail",
+    "core/stations.py:_fail"
+   ]
+  },
+  {
+   "name": "STATION_OUT_OF_RANGE",
+   "value": "station_out_of_range",
+   "raised_in": [
+    "core/chainage.py:to_measure"
+   ]
+  },
+  {
+   "name": "STATION_IN_GAP",
+   "value": "station_in_gap",
+   "raised_in": [
+    "core/chainage.py:to_measure"
+   ]
+  },
+  {
+   "name": "STATION_AMBIGUOUS",
+   "value": "station_ambiguous",
+   "raised_in": [
+    "core/chainage.py:to_measure"
+   ]
+  },
+  {
+   "name": "LEDGER_INVALID",
+   "value": "ledger_invalid",
+   "raised_in": [
+    "core/chainage.py:_bad"
+   ]
+  },
+  {
+   "name": "FROM_GE_TO",
+   "value": "from_ge_to",
+   "raised_in": [
+    "core/events.py:locate_lines",
+    "core/route.py:substring_m"
+   ]
+  }
+ ],
+ "constants": {
+  "rounding": {
+   "meters_decimals": 3,
+   "degrees_decimals": 2
+  },
+  "route_eps": 1e-09,
+  "chainage_eps": 1e-06,
+  "chainage_scale_tol": 0.02,
+  "assembler_defaults": {
+   "snap_tolerance": 0.01,
+   "allow_gaps": false,
+   "use_z": false,
+   "reverse": false
+  },
+  "curve_segmentation_max_angle_deg": 0.02,
+  "offset_miter_limit": 4.0,
+  "station_formats": [
+   {
+    "value": "pk_plus",
+    "label": {
+     "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+     "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+    }
+   },
+   {
+    "value": "km_plus",
+    "label": {
+     "ru": "километр и метры (км 1+535)",
+     "en": "Kilometre and metres (км 1+535)"
+    }
+   },
+   {
+    "value": "rail",
+    "label": {
+     "ru": "железнодорожная запись (км 12 ПК 3+45)",
+     "en": "Railway notation (км 12 ПК 3+45)"
+    }
+   },
+   {
+    "value": "meters",
+    "label": {
+     "ru": "метры числом (1535,5)",
+     "en": "Metres as a number (1535,5)"
+    }
+   },
+   {
+    "value": "km",
+    "label": {
+     "ru": "километры дробью (1,535)",
+     "en": "Kilometres as a decimal (1,535)"
+    }
+   }
+  ],
+  "out_m": [
+   {
+    "ru": "без M",
+    "en": "no M"
+   },
+   {
+    "ru": "мера по оси, м",
+    "en": "measure along the axis, m"
+   },
+   {
+    "ru": "пикетаж, м",
+    "en": "chainage, m"
+   }
+  ],
+  "profile": {
+   "point_priority": {
+    "start": 6,
+    "end": 6,
+    "equation": 5,
+    "event": 4,
+    "picket": 3,
+    "vertex": 2,
+    "step": 1
+   },
+   "merge_tol": 0.01,
+   "row_types": [
+    "value",
+    "text",
+    "grade",
+    "distance",
+    "station",
+    "plan"
+   ],
+   "palette": [
+    "#8c6d1f",
+    "#2e7d32",
+    "#000000",
+    "#1f4fbf",
+    "#b23b3b",
+    "#6a3d9a",
+    "#e08000"
+   ],
+   "drawer": {
+    "HEADER": 60.0,
+    "GAP": 5.0,
+    "TEXT": 2.5,
+    "TITLE": 3.0,
+    "GRADE_FULL": 4.0
+   }
+  },
+  "demo": {
+   "crs": "EPSG:32640",
+   "origin": [
+    455000.0,
+    6428000.0
+   ],
+   "system": "исполнительная",
+   "dem_extent": [
+    454800.0,
+    6427700.0,
+    458000.0,
+    6430100.0
+   ],
+   "dem_cell": 5.0
+  },
+  "groups": {
+   "prep": {
+    "ru": "1. Подготовка",
+    "en": "1. Preparation"
+   },
+   "events": {
+    "ru": "2. События по пикетам",
+    "en": "2. Events by station"
+   },
+   "live": {
+    "ru": "3. Динамические слои",
+    "en": "3. Live layers"
+   },
+   "chainage": {
+    "ru": "4. Пикетаж и привязка",
+    "en": "4. Chainage and locating"
+   },
+   "profile": {
+    "ru": "5. Профили",
+    "en": "5. Profiles"
+   }
+  }
+ },
+ "tools": [
+  {
+   "number": "1.01",
+   "id": "demo",
+   "processing_id": "routeliner:demo",
+   "group": "prep",
+   "title": {
+    "ru": "Демонстрационный пример",
+    "en": "Demo example"
+   },
+   "no_threading": true,
+   "parameters": [
+    {
+     "name": "FOLDER",
+     "type": "folderDestination",
+     "description": {
+      "ru": "Папка для примера",
+      "en": "Folder for the example"
+     },
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "N_POINTS",
+     "type": "number",
+     "description": {
+      "ru": "Количество случайных точечных событий",
+      "en": "Number of random point events"
+     },
+     "number_type": "Integer",
+     "minValue": 3,
+     "maxValue": 200000,
+     "default": 60,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SEED",
+     "type": "number",
+     "description": {
+      "ru": "Зерно случайных чисел",
+      "en": "Random seed"
+     },
+     "number_type": "Integer",
+     "default": 1,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "RUN",
+     "type": "boolean",
+     "description": {
+      "ru": "Сразу прогнать через модуль и сравнить с эталоном",
+      "en": "Run through the plugin at once and compare with the reference"
+     },
+     "default": true,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [
+    {
+     "name": "PASSED",
+     "type": "boolean",
+     "description": {
+      "ru": "Проверка пройдена",
+      "en": "Check passed"
+     }
+    },
+    {
+     "name": "REPORT",
+     "type": "string",
+     "description": {
+      "ru": "Итог проверки",
+      "en": "Check summary"
+     }
+    }
+   ],
+   "result_files": {
+    "gpkg": "routeliner_demo.gpkg",
+    "dem": "routeliner_demo_dem.tif",
+    "csv": "events_points.csv"
+   },
+   "layers": [
+    {
+     "layer": "routes",
+     "geometry": "MultiCurveZ",
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "name",
+       "type": "string",
+       "alias": {
+        "ru": "Название",
+        "en": "Name"
+       }
+      }
+     ]
+    },
+    {
+     "layer": "ledger",
+     "geometry": "None",
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "system",
+       "type": "string",
+       "alias": {
+        "ru": "Система пикетажа",
+        "en": "Chainage system"
+       }
+      },
+      {
+       "name": "station",
+       "type": "string",
+       "alias": {
+        "ru": "Пикетаж",
+        "en": "Chainage"
+       }
+      },
+      {
+       "name": "measure",
+       "type": "double",
+       "alias": {
+        "ru": "Мера, м",
+        "en": "Measure, m"
+       }
+      },
+      {
+       "name": "station_ahead",
+       "type": "string",
+       "alias": {
+        "ru": "Пикетаж вперёд",
+        "en": "Chainage ahead"
+       }
+      },
+      {
+       "name": "note",
+       "type": "string",
+       "alias": {
+        "ru": "Примечание",
+        "en": "Note"
+       }
+      }
+     ]
+    },
+    {
+     "layer": "events_points",
+     "geometry": "None",
+     "fields": [
+      {
+       "name": "eid",
+       "type": "int",
+       "alias": {
+        "ru": "Номер события",
+        "en": "Event number"
+       }
+      },
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "pk",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет",
+        "en": "Station"
+       }
+      },
+      {
+       "name": "offset",
+       "type": "double",
+       "alias": {
+        "ru": "Смещение от оси, м",
+        "en": "Offset from the axis, m"
+       }
+      },
+      {
+       "name": "section",
+       "type": "int",
+       "alias": {
+        "ru": "Участок пикетажа",
+        "en": "Chainage section"
+       }
+      },
+      {
+       "name": "exp_m",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, мера, м",
+        "en": "Reference, measure, m"
+       }
+      },
+      {
+       "name": "exp_x",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, X",
+        "en": "Reference, X"
+       }
+      },
+      {
+       "name": "exp_y",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, Y",
+        "en": "Reference, Y"
+       }
+      },
+      {
+       "name": "exp_error",
+       "type": "string",
+       "alias": {
+        "ru": "Эталон, код ошибки",
+        "en": "Reference, error code"
+       }
+      },
+      {
+       "name": "note",
+       "type": "string",
+       "alias": {
+        "ru": "Примечание",
+        "en": "Note"
+       }
+      }
+     ]
+    },
+    {
+     "layer": "events_lines",
+     "geometry": "None",
+     "fields": [
+      {
+       "name": "eid",
+       "type": "int",
+       "alias": {
+        "ru": "Номер события",
+        "en": "Event number"
+       }
+      },
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "pk_from",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет начала",
+        "en": "Start station"
+       }
+      },
+      {
+       "name": "pk_to",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет конца",
+        "en": "End station"
+       }
+      },
+      {
+       "name": "offset",
+       "type": "double",
+       "alias": {
+        "ru": "Смещение от оси, м",
+        "en": "Offset from the axis, m"
+       }
+      },
+      {
+       "name": "exp_m_from",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, мера начала, м",
+        "en": "Reference, start measure, m"
+       }
+      },
+      {
+       "name": "exp_m_to",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, мера конца, м",
+        "en": "Reference, end measure, m"
+       }
+      },
+      {
+       "name": "exp_error",
+       "type": "string",
+       "alias": {
+        "ru": "Эталон, код ошибки",
+        "en": "Reference, error code"
+       }
+      },
+      {
+       "name": "note",
+       "type": "string",
+       "alias": {
+        "ru": "Примечание",
+        "en": "Note"
+       }
+      }
+     ]
+    },
+    {
+     "layer": "defects",
+     "geometry": "Point",
+     "fields": [
+      {
+       "name": "did",
+       "type": "int",
+       "alias": {
+        "ru": "Номер точки",
+        "en": "Point number"
+       }
+      },
+      {
+       "name": "exp_route",
+       "type": "string",
+       "alias": {
+        "ru": "Эталон, маршрут",
+        "en": "Reference, route"
+       }
+      },
+      {
+       "name": "exp_m",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, мера, м",
+        "en": "Reference, measure, m"
+       }
+      },
+      {
+       "name": "exp_station",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, пикетаж, м",
+        "en": "Reference, chainage, m"
+       }
+      },
+      {
+       "name": "exp_offset",
+       "type": "double",
+       "alias": {
+        "ru": "Эталон, смещение, м",
+        "en": "Reference, offset, m"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "FOLDER"
+   ]
+  },
+  {
+   "number": "1.02",
+   "id": "check_routes",
+   "processing_id": "routeliner:check_routes",
+   "group": "prep",
+   "title": {
+    "ru": "Проверка маршрутов",
+    "en": "Route check"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "Собранные маршруты",
+      "en": "Assembled routes"
+     },
+     "optional": false,
+     "geometry": [
+      "MultiLineString"
+     ],
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "length",
+       "type": "double",
+       "alias": {
+        "ru": "Длина по оси, м",
+        "en": "Length along the axis, m"
+       }
+      },
+      {
+       "name": "parts",
+       "type": "int",
+       "alias": {
+        "ru": "Частей",
+        "en": "Parts"
+       }
+      },
+      {
+       "name": "gaps",
+       "type": "int",
+       "alias": {
+        "ru": "Разрывов",
+        "en": "Gaps"
+       }
+      },
+      {
+       "name": "gap_max",
+       "type": "double",
+       "alias": {
+        "ru": "Наибольший разрыв, м",
+        "en": "Largest gap, m"
+       }
+      }
+     ]
+    },
+    {
+     "name": "ERRORS",
+     "description": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": [
+      "NoGeometry"
+     ],
+     "fields": [
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_error",
+       "type": "string",
+       "alias": {
+        "ru": "Код ошибки",
+        "en": "Error code"
+       }
+      },
+      {
+       "name": "rl_message",
+       "type": "string",
+       "alias": {
+        "ru": "Пояснение ошибки",
+        "en": "Error explanation"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT",
+    "ERRORS"
+   ]
+  },
+  {
+   "number": "1.03",
+   "id": "calibrate_routes",
+   "processing_id": "routeliner:calibrate_routes",
+   "group": "prep",
+   "title": {
+    "ru": "Калибровка маршрутов",
+    "en": "Calibrate routes"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "CONTROL",
+     "type": "featureSource",
+     "description": {
+      "ru": "Контрольные точки с пикетами (необязательно)",
+      "en": "Control points with stations (optional)"
+     },
+     "geometry": [
+      "VectorPoint"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "CT_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Контрольные точки: поле пикета",
+      "en": "Control points: station field"
+     },
+     "parent": "CONTROL",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "CT_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Контрольные точки: поле ID маршрута (необязательно)",
+      "en": "Control points: route ID field (optional)"
+     },
+     "parent": "CONTROL",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "CT_RADIUS",
+     "type": "number",
+     "description": {
+      "ru": "Радиус поиска контрольных точек, м",
+      "en": "Search radius for control points, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 10.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "OUT_M",
+     "type": "enum",
+     "description": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ],
+     "default": 2,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "Калиброванные маршруты",
+      "en": "Calibrated routes"
+     },
+     "optional": false,
+     "geometry": [
+      "MultiLineStringM"
+     ],
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "length",
+       "type": "double",
+       "alias": {
+        "ru": "Длина по оси, м",
+        "en": "Length along the axis, m"
+       }
+      },
+      {
+       "name": "st_from",
+       "type": "double",
+       "alias": {
+        "ru": "Пикетаж начала, м",
+        "en": "Start chainage, m"
+       }
+      },
+      {
+       "name": "st_to",
+       "type": "double",
+       "alias": {
+        "ru": "Пикетаж конца, м",
+        "en": "End chainage, m"
+       }
+      },
+      {
+       "name": "pk_from",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет начала",
+        "en": "Start station"
+       }
+      },
+      {
+       "name": "pk_to",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет конца",
+        "en": "End station"
+       }
+      },
+      {
+       "name": "sections",
+       "type": "int",
+       "alias": {
+        "ru": "Участков пикетажа",
+        "en": "Chainage sections"
+       }
+      },
+      {
+       "name": "equations",
+       "type": "int",
+       "alias": {
+        "ru": "Пикетажных уравнений",
+        "en": "Station equations"
+       }
+      },
+      {
+       "name": "source",
+       "type": "string",
+       "alias": {
+        "ru": "Источник пикетажа",
+        "en": "Chainage source"
+       }
+      }
+     ]
+    },
+    {
+     "name": "ERRORS",
+     "description": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": [
+      "NoGeometry"
+     ],
+     "fields": [
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_error",
+       "type": "string",
+       "alias": {
+        "ru": "Код ошибки",
+        "en": "Error code"
+       }
+      },
+      {
+       "name": "rl_message",
+       "type": "string",
+       "alias": {
+        "ru": "Пояснение ошибки",
+        "en": "Error explanation"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT",
+    "ERRORS"
+   ]
+  },
+  {
+   "number": "2.01",
+   "id": "point_events",
+   "processing_id": "routeliner:point_events",
+   "group": "events",
+   "title": {
+    "ru": "Точечные события",
+    "en": "Point events"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "EVENTS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_FROM",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета",
+      "en": "Events: station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_OFFSET",
+     "type": "field",
+     "description": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "OFFSET_RIGHT",
+     "type": "boolean",
+     "description": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_SECTION",
+     "type": "field",
+     "description": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "OUT_M",
+     "type": "enum",
+     "description": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "События на маршрутах",
+      "en": "Events on routes"
+     },
+     "optional": false,
+     "geometry": [
+      "Point",
+      "PointM"
+     ],
+     "fields": [
+      {
+       "source_fields": "EVENTS"
+      },
+      {
+       "name": "rl_m",
+       "type": "double",
+       "alias": {
+        "ru": "Мера, м",
+        "en": "Measure, m"
+       }
+      },
+      {
+       "name": "rl_pk",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет",
+        "en": "Station"
+       }
+      },
+      {
+       "name": "rl_x",
+       "type": "double",
+       "alias": {
+        "ru": "X",
+        "en": "X"
+       }
+      },
+      {
+       "name": "rl_y",
+       "type": "double",
+       "alias": {
+        "ru": "Y",
+        "en": "Y"
+       }
+      },
+      {
+       "name": "rl_azimuth",
+       "type": "double",
+       "alias": {
+        "ru": "Азимут, °",
+        "en": "Azimuth, °"
+       }
+      }
+     ]
+    },
+    {
+     "name": "ERRORS",
+     "description": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": [
+      "NoGeometry"
+     ],
+     "fields": [
+      {
+       "source_fields": "EVENTS"
+      },
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_error",
+       "type": "string",
+       "alias": {
+        "ru": "Код ошибки",
+        "en": "Error code"
+       }
+      },
+      {
+       "name": "rl_message",
+       "type": "string",
+       "alias": {
+        "ru": "Пояснение ошибки",
+        "en": "Error explanation"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT",
+    "ERRORS"
+   ]
+  },
+  {
+   "number": "2.02",
+   "id": "line_events",
+   "processing_id": "routeliner:line_events",
+   "group": "events",
+   "title": {
+    "ru": "Участки (линейные события)",
+    "en": "Sections (line events)"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "EVENTS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_FROM",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета начала",
+      "en": "Events: start station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_TO",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета конца",
+      "en": "Events: end station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_OFFSET",
+     "type": "field",
+     "description": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "OFFSET_RIGHT",
+     "type": "boolean",
+     "description": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_SECTION",
+     "type": "field",
+     "description": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "OUT_M",
+     "type": "enum",
+     "description": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "События на маршрутах",
+      "en": "Events on routes"
+     },
+     "optional": false,
+     "geometry": [
+      "MultiLineString",
+      "MultiLineStringM"
+     ],
+     "fields": [
+      {
+       "source_fields": "EVENTS"
+      },
+      {
+       "name": "rl_m_from",
+       "type": "double",
+       "alias": {
+        "ru": "Мера начала, м",
+        "en": "Start measure, m"
+       }
+      },
+      {
+       "name": "rl_m_to",
+       "type": "double",
+       "alias": {
+        "ru": "Мера конца, м",
+        "en": "End measure, m"
+       }
+      },
+      {
+       "name": "rl_length",
+       "type": "double",
+       "alias": {
+        "ru": "Длина участка, м",
+        "en": "Section length, m"
+       }
+      },
+      {
+       "name": "rl_pk_from",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет начала",
+        "en": "Start station"
+       }
+      },
+      {
+       "name": "rl_pk_to",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет конца",
+        "en": "End station"
+       }
+      },
+      {
+       "name": "rl_swapped",
+       "type": "int",
+       "alias": {
+        "ru": "Начало и конец поменяны",
+        "en": "Start and end swapped"
+       }
+      }
+     ]
+    },
+    {
+     "name": "ERRORS",
+     "description": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": [
+      "NoGeometry"
+     ],
+     "fields": [
+      {
+       "source_fields": "EVENTS"
+      },
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_error",
+       "type": "string",
+       "alias": {
+        "ru": "Код ошибки",
+        "en": "Error code"
+       }
+      },
+      {
+       "name": "rl_message",
+       "type": "string",
+       "alias": {
+        "ru": "Пояснение ошибки",
+        "en": "Error explanation"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT",
+    "ERRORS"
+   ]
+  },
+  {
+   "number": "3.01",
+   "id": "live_point_events",
+   "processing_id": "routeliner:live_point_events",
+   "group": "live",
+   "title": {
+    "ru": "Динамический слой точечных событий",
+    "en": "Live layer of point events"
+   },
+   "no_threading": true,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "EVENTS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_FROM",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета",
+      "en": "Events: station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_OFFSET",
+     "type": "field",
+     "description": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "OFFSET_RIGHT",
+     "type": "boolean",
+     "description": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_SECTION",
+     "type": "field",
+     "description": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "NAME",
+     "type": "string",
+     "description": {
+      "ru": "Имя слоя",
+      "en": "Layer name"
+     },
+     "default": {
+      "ru": "События",
+      "en": "Events"
+     },
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LAYER_ID",
+     "type": "string",
+     "description": {
+      "ru": "Слой событий",
+      "en": "Event layer"
+     }
+    },
+    {
+     "name": "STATUS",
+     "type": "string",
+     "description": {
+      "ru": "Итог первого расчёта",
+      "en": "Result of the first calculation"
+     }
+    }
+   ],
+   "computes_like": "2.01",
+   "result": "Динамический слой в памяти проекта с полями инструмента 2.01"
+  },
+  {
+   "number": "3.02",
+   "id": "live_line_events",
+   "processing_id": "routeliner:live_line_events",
+   "group": "live",
+   "title": {
+    "ru": "Динамический слой участков",
+    "en": "Live layer of sections"
+   },
+   "no_threading": true,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "EVENTS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_FROM",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета начала",
+      "en": "Events: start station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_TO",
+     "type": "field",
+     "description": {
+      "ru": "События: поле пикета конца",
+      "en": "Events: end station field"
+     },
+     "parent": "EVENTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_OFFSET",
+     "type": "field",
+     "description": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "OFFSET_RIGHT",
+     "type": "boolean",
+     "description": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "EV_SECTION",
+     "type": "field",
+     "description": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "NAME",
+     "type": "string",
+     "description": {
+      "ru": "Имя слоя",
+      "en": "Layer name"
+     },
+     "default": {
+      "ru": "Участки",
+      "en": "Sections"
+     },
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LAYER_ID",
+     "type": "string",
+     "description": {
+      "ru": "Слой событий",
+      "en": "Event layer"
+     }
+    },
+    {
+     "name": "STATUS",
+     "type": "string",
+     "description": {
+      "ru": "Итог первого расчёта",
+      "en": "Result of the first calculation"
+     }
+    }
+   ],
+   "computes_like": "2.02",
+   "result": "Динамический слой в памяти проекта с полями инструмента 2.02"
+  },
+  {
+   "number": "4.01",
+   "id": "pickets",
+   "processing_id": "routeliner:pickets",
+   "group": "chainage",
+   "title": {
+    "ru": "Пикетная разбивка",
+    "en": "Picket stakeout"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "STEP",
+     "type": "number",
+     "description": {
+      "ru": "Шаг разбивки, м",
+      "en": "Stakeout step, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "OUT_M",
+     "type": "enum",
+     "description": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "Пикеты",
+      "en": "Pickets"
+     },
+     "optional": false,
+     "geometry": [
+      "Point",
+      "PointM"
+     ],
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "pk",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет",
+        "en": "Station"
+       }
+      },
+      {
+       "name": "station",
+       "type": "double",
+       "alias": {
+        "ru": "Пикетаж",
+        "en": "Chainage"
+       }
+      },
+      {
+       "name": "m",
+       "type": "double",
+       "alias": {
+        "ru": "Мера, м",
+        "en": "Measure, m"
+       }
+      },
+      {
+       "name": "section",
+       "type": "int",
+       "alias": {
+        "ru": "Участок пикетажа",
+        "en": "Chainage section"
+       }
+      },
+      {
+       "name": "azimuth",
+       "type": "double",
+       "alias": {
+        "ru": "Азимут, °",
+        "en": "Azimuth, °"
+       }
+      },
+      {
+       "name": "km",
+       "type": "int",
+       "alias": {
+        "ru": "Целый километр",
+        "en": "Whole kilometre"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT"
+   ]
+  },
+  {
+   "number": "4.02",
+   "id": "locate_points",
+   "processing_id": "routeliner:locate_points",
+   "group": "chainage",
+   "title": {
+    "ru": "Привязка точек к маршрутам",
+    "en": "Locate points on routes"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "POINTS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Точки",
+      "en": "Points"
+     },
+     "geometry": [
+      "VectorPoint"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PT_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Точки: поле ID маршрута (необязательно)",
+      "en": "Points: route ID field (optional)"
+     },
+     "parent": "POINTS",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "RADIUS",
+     "type": "number",
+     "description": {
+      "ru": "Радиус поиска, м (0 без ограничения)",
+      "en": "Search radius, m (0 for no limit)"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 50.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "Точки с пикетами",
+      "en": "Points with stations"
+     },
+     "optional": false,
+     "geometry": [
+      "Point"
+     ],
+     "fields": [
+      {
+       "source_fields": "POINTS"
+      },
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_m",
+       "type": "double",
+       "alias": {
+        "ru": "Мера, м",
+        "en": "Measure, m"
+       }
+      },
+      {
+       "name": "rl_pk",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет",
+        "en": "Station"
+       }
+      },
+      {
+       "name": "rl_offset",
+       "type": "double",
+       "alias": {
+        "ru": "Смещение от оси, м",
+        "en": "Offset from the axis, m"
+       }
+      },
+      {
+       "name": "rl_side",
+       "type": "string",
+       "alias": {
+        "ru": "Сторона",
+        "en": "Side"
+       }
+      }
+     ]
+    },
+    {
+     "name": "ERRORS",
+     "description": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": [
+      "NoGeometry"
+     ],
+     "fields": [
+      {
+       "source_fields": "POINTS"
+      },
+      {
+       "name": "rl_route",
+       "type": "string",
+       "alias": {
+        "ru": "Маршрут",
+        "en": "Route"
+       }
+      },
+      {
+       "name": "rl_error",
+       "type": "string",
+       "alias": {
+        "ru": "Код ошибки",
+        "en": "Error code"
+       }
+      },
+      {
+       "name": "rl_message",
+       "type": "string",
+       "alias": {
+        "ru": "Пояснение ошибки",
+        "en": "Error explanation"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT",
+    "ERRORS"
+   ]
+  },
+  {
+   "number": "5.01",
+   "id": "profile_table",
+   "processing_id": "routeliner:profile_table",
+   "group": "profile",
+   "title": {
+    "ru": "Таблица профиля",
+    "en": "Profile table"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "ROUTES",
+     "type": "featureSource",
+     "description": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     },
+     "geometry": [
+      "VectorLine"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE_ID",
+     "type": "field",
+     "description": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "parent": "ROUTES",
+     "field_type": "Any",
+     "default": "route_id",
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SNAP",
+     "type": "number",
+     "description": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.01,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ALLOW_GAPS",
+     "type": "boolean",
+     "description": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "USE_Z",
+     "type": "boolean",
+     "description": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "REVERSE",
+     "type": "boolean",
+     "description": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "ROUTE_LIST",
+     "type": "string",
+     "description": {
+      "ru": "Маршруты через запятую (пусто - все)",
+      "en": "Routes separated by commas (empty - all)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "FORMAT",
+     "type": "enum",
+     "description": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET",
+     "type": "number",
+     "description": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "number_type": "Double",
+     "minValue": 0.001,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "START",
+     "type": "number",
+     "description": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "number_type": "Double",
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "LEDGER",
+     "type": "featureSource",
+     "description": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_STATION",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_MEASURE",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_AHEAD",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "LG_SYSTEM",
+     "type": "field",
+     "description": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SYSTEM",
+     "type": "string",
+     "description": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "USE_M",
+     "type": "boolean",
+     "description": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "M_FACTOR",
+     "type": "number",
+     "description": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "number_type": "Double",
+     "minValue": 1e-09,
+     "default": 1.0,
+     "optional": false,
+     "advanced": true
+    },
+    {
+     "name": "RASTERS",
+     "type": "multipleLayers",
+     "description": {
+      "ru": "Растры (рельеф, проектная поверхность, пласт)",
+      "en": "Rasters (terrain, design surface, seam)"
+     },
+     "layer_type": "Raster",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "BAND",
+     "type": "number",
+     "description": {
+      "ru": "Номер канала растров",
+      "en": "Raster band number"
+     },
+     "number_type": "Integer",
+     "minValue": 1,
+     "default": 1,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "PICKET_STEP",
+     "type": "number",
+     "description": {
+      "ru": "Точки на целых пикетах через, м (0 - нет)",
+      "en": "Points at whole pickets every, m (0 - none)"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "STEP",
+     "type": "number",
+     "description": {
+      "ru": "Точки с постоянным шагом, м (0 - нет)",
+      "en": "Points with a constant step, m (0 - none)"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "VERTICES",
+     "type": "enum",
+     "description": {
+      "ru": "Вершины оси",
+      "en": "Axis vertices"
+     },
+     "options": [
+      {
+       "ru": "только с поворотом или изломом уклона",
+       "en": "only with a turn or a grade break"
+      },
+      {
+       "ru": "все вершины",
+       "en": "all vertices"
+      },
+      {
+       "ru": "без вершин",
+       "en": "no vertices"
+      }
+     ],
+     "values": [
+      "significant",
+      "all",
+      "none"
+     ],
+     "default": 0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "POIS",
+     "type": "featureSource",
+     "description": {
+      "ru": "События на профиль: точки (необязательно)",
+      "en": "Events for the profile: points (optional)"
+     },
+     "geometry": [
+      "VectorPoint"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "POI_LABEL",
+     "type": "field",
+     "description": {
+      "ru": "События: поле подписи",
+      "en": "Events: label field"
+     },
+     "parent": "POIS",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "CORRIDOR",
+     "type": "number",
+     "description": {
+      "ru": "События: коридор от оси, м",
+      "en": "Events: corridor from the axis, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 10.0,
+     "optional": false,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "OUTPUT",
+     "description": {
+      "ru": "Таблица профиля",
+      "en": "Profile table"
+     },
+     "optional": false,
+     "geometry": [
+      "Point"
+     ],
+     "fields": [
+      {
+       "name": "route_id",
+       "type": "string",
+       "alias": {
+        "ru": "ID маршрута",
+        "en": "Route ID"
+       }
+      },
+      {
+       "name": "n",
+       "type": "int",
+       "alias": {
+        "ru": "Номер точки",
+        "en": "Point number"
+       }
+      },
+      {
+       "name": "kind",
+       "type": "string",
+       "alias": {
+        "ru": "Вид",
+        "en": "Kind"
+       }
+      },
+      {
+       "name": "m",
+       "type": "double",
+       "alias": {
+        "ru": "Мера, м",
+        "en": "Measure, m"
+       }
+      },
+      {
+       "name": "station",
+       "type": "double",
+       "alias": {
+        "ru": "Пикетаж",
+        "en": "Chainage"
+       }
+      },
+      {
+       "name": "station_ahead",
+       "type": "double",
+       "alias": {
+        "ru": "Пикетаж вперёд",
+        "en": "Chainage ahead"
+       }
+      },
+      {
+       "name": "pk",
+       "type": "string",
+       "alias": {
+        "ru": "Пикет",
+        "en": "Station"
+       }
+      },
+      {
+       "name": "section",
+       "type": "int",
+       "alias": {
+        "ru": "Участок пикетажа",
+        "en": "Chainage section"
+       }
+      },
+      {
+       "name": "x",
+       "type": "double",
+       "alias": {
+        "ru": "X",
+        "en": "X"
+       }
+      },
+      {
+       "name": "y",
+       "type": "double",
+       "alias": {
+        "ru": "Y",
+        "en": "Y"
+       }
+      },
+      {
+       "name": "z_axis",
+       "type": "double",
+       "alias": {
+        "ru": "Отметка оси, м",
+        "en": "Axis level, m"
+       }
+      },
+      {
+       "name": "turn",
+       "type": "double",
+       "alias": {
+        "ru": "Угол поворота, °",
+        "en": "Turn angle, °"
+       }
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "alias": {
+        "ru": "Подпись",
+        "en": "Label"
+       }
+      },
+      {
+       "dynamic": "[fld(n, T_DBL) for n in rfields]",
+       "type": "double"
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "OUTPUT"
+   ]
+  },
+  {
+   "number": "5.02",
+   "id": "profile_drawing",
+   "processing_id": "routeliner:profile_drawing",
+   "group": "profile",
+   "title": {
+    "ru": "Чертёж профиля",
+    "en": "Profile drawing"
+   },
+   "no_threading": false,
+   "parameters": [
+    {
+     "name": "TABLE",
+     "type": "featureSource",
+     "description": {
+      "ru": "Таблица профиля (результат 5.01)",
+      "en": "Profile table (result of 5.01)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROUTE",
+     "type": "string",
+     "description": {
+      "ru": "Маршрут (пусто - первый в таблице)",
+      "en": "Route (empty - the first in the table)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "GROUND",
+     "type": "field",
+     "description": {
+      "ru": "Поле отметки земли {ground}",
+      "en": "Ground level field {ground}"
+     },
+     "parent": "TABLE",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "DESIGN",
+     "type": "field",
+     "description": {
+      "ru": "Поле проектной отметки {design}",
+      "en": "Design level field {design}"
+     },
+     "parent": "TABLE",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "PIPE",
+     "type": "field",
+     "description": {
+      "ru": "Поле отметки трубы или оси {pipe} (пусто - z_axis)",
+      "en": "Pipe or axis level field {pipe} (empty - z_axis)"
+     },
+     "parent": "TABLE",
+     "field_type": "Numeric",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "D",
+     "type": "number",
+     "description": {
+      "ru": "Наружный диаметр трубы {d}, м",
+      "en": "Pipe outer diameter {d}, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.16,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "BASE",
+     "type": "number",
+     "description": {
+      "ru": "Толщина основания {base}, м",
+      "en": "Bedding thickness {base}, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.3,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ROWS",
+     "type": "matrix",
+     "description": {
+      "ru": "Строки сетки профиля",
+      "en": "Profile grid rows"
+     },
+     "headers": [
+      {
+       "ru": "Заголовок",
+       "en": "Title"
+      },
+      {
+       "ru": "Тип",
+       "en": "Type"
+      },
+      {
+       "ru": "Источник",
+       "en": "Source"
+      },
+      {
+       "ru": "Знаков",
+       "en": "Decimals"
+      },
+      {
+       "ru": "Высота, мм",
+       "en": "Height, mm"
+      },
+      {
+       "ru": "Линия (1/0)",
+       "en": "Line (1/0)"
+      }
+     ],
+     "fixed_rows": false,
+     "default": [
+      [
+       "Отметка земли проектная, м",
+       "value",
+       "{design}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка земли фактическая, м",
+       "value",
+       "{ground}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка верха трубы, м",
+       "value",
+       "{pipe}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка дна траншеи, м",
+       "value",
+       "{pipe} - {d} - {base}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Расстояние земля - труба, м",
+       "value",
+       "{ground} - {pipe}",
+       "2",
+       "10",
+       "0"
+      ],
+      [
+       "Глубина траншеи, м",
+       "value",
+       "{ground} - ({pipe} - {d} - {base})",
+       "2",
+       "10",
+       "0"
+      ],
+      [
+       "Обозначение трубы и тип изоляции",
+       "text",
+       "pipe",
+       "",
+       "15",
+       "0"
+      ],
+      [
+       "Основание",
+       "text",
+       "base",
+       "",
+       "10",
+       "0"
+      ],
+      [
+       "Уклон, ‰ / длина, м",
+       "grade",
+       "{pipe}",
+       "1",
+       "15",
+       "0"
+      ],
+      [
+       "Расстояние, м",
+       "distance",
+       "",
+       "1",
+       "10",
+       "0"
+      ],
+      [
+       "Пикет",
+       "station",
+       "",
+       "",
+       "20",
+       "0"
+      ],
+      [
+       "Развёрнутый план",
+       "plan",
+       "",
+       "",
+       "25",
+       "0"
+      ]
+     ],
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "SECTIONS",
+     "type": "featureSource",
+     "description": {
+      "ru": "Участки для текстовых строк (необязательно)",
+      "en": "Sections for text rows (optional)"
+     },
+     "geometry": [
+      "Vector"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SEC_ROUTE",
+     "type": "field",
+     "description": {
+      "ru": "Участки: поле ID маршрута",
+      "en": "Sections: route ID field"
+     },
+     "parent": "SECTIONS",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SEC_FROM",
+     "type": "field",
+     "description": {
+      "ru": "Участки: поле меры начала",
+      "en": "Sections: start measure field"
+     },
+     "parent": "SECTIONS",
+     "field_type": "Numeric",
+     "default": "rl_m_from",
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "SEC_TO",
+     "type": "field",
+     "description": {
+      "ru": "Участки: поле меры конца",
+      "en": "Sections: end measure field"
+     },
+     "parent": "SECTIONS",
+     "field_type": "Numeric",
+     "default": "rl_m_to",
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "PLAN",
+     "type": "featureSource",
+     "description": {
+      "ru": "Точки для развёрнутого плана (результат 4.02, необязательно)",
+      "en": "Points for the straightened plan (result of 4.02, optional)"
+     },
+     "geometry": [
+      "VectorPoint"
+     ],
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "PLAN_LABEL",
+     "type": "field",
+     "description": {
+      "ru": "План: поле подписи",
+      "en": "Plan: label field"
+     },
+     "parent": "PLAN",
+     "field_type": "Any",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "H_SCALE",
+     "type": "number",
+     "description": {
+      "ru": "Масштаб по горизонтали 1:",
+      "en": "Horizontal scale 1:"
+     },
+     "number_type": "Double",
+     "minValue": 1,
+     "default": 500.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "V_SCALE",
+     "type": "number",
+     "description": {
+      "ru": "Масштаб по вертикали 1:",
+      "en": "Vertical scale 1:"
+     },
+     "number_type": "Double",
+     "minValue": 1,
+     "default": 100.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "HORIZON",
+     "type": "number",
+     "description": {
+      "ru": "Условный горизонт, м (пусто - автоматически)",
+      "en": "Datum, m (empty - automatic)"
+     },
+     "number_type": "Double",
+     "default": null,
+     "optional": true,
+     "advanced": false
+    },
+    {
+     "name": "GRADE_TOL",
+     "type": "number",
+     "description": {
+      "ru": "Допуск выделения уклонов, м",
+      "en": "Grade detection tolerance, m"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 0.02,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "MIN_GAP",
+     "type": "number",
+     "description": {
+      "ru": "Наименьший промежуток между подписями, мм",
+      "en": "Smallest gap between labels, mm"
+     },
+     "number_type": "Double",
+     "minValue": 0,
+     "default": 3.0,
+     "optional": false,
+     "advanced": false
+    },
+    {
+     "name": "ORIGIN",
+     "type": "point",
+     "description": {
+      "ru": "Левый нижний угол профиля над сеткой (пусто - под маршрутом)",
+      "en": "Lower left corner of the profile above the grid (empty - below the routes)"
+     },
+     "default": null,
+     "optional": true,
+     "advanced": false
+    }
+   ],
+   "outputs": [],
+   "sinks": [
+    {
+     "name": "LINES",
+     "description": {
+      "ru": "Профиль, линии",
+      "en": "Profile, lines"
+     },
+     "optional": false,
+     "geometry": [
+      "LineString"
+     ],
+     "fields": [
+      {
+       "name": "kind",
+       "type": "string",
+       "alias": {
+        "ru": "Вид",
+        "en": "Kind"
+       }
+      },
+      {
+       "name": "row",
+       "type": "string",
+       "alias": {
+        "ru": "Строка сетки",
+        "en": "Grid row"
+       }
+      },
+      {
+       "name": "color",
+       "type": "string",
+       "alias": {
+        "ru": "Цвет",
+        "en": "Colour"
+       }
+      },
+      {
+       "name": "width",
+       "type": "double",
+       "alias": {
+        "ru": "Толщина линии, мм",
+        "en": "Line width, mm"
+       }
+      }
+     ]
+    },
+    {
+     "name": "TEXTS",
+     "description": {
+      "ru": "Профиль, подписи",
+      "en": "Profile, labels"
+     },
+     "optional": false,
+     "geometry": [
+      "Point"
+     ],
+     "fields": [
+      {
+       "name": "text",
+       "type": "string",
+       "alias": {
+        "ru": "Текст",
+        "en": "Text"
+       }
+      },
+      {
+       "name": "kind",
+       "type": "string",
+       "alias": {
+        "ru": "Вид",
+        "en": "Kind"
+       }
+      },
+      {
+       "name": "rot",
+       "type": "double",
+       "alias": {
+        "ru": "Поворот, °",
+        "en": "Rotation, °"
+       }
+      },
+      {
+       "name": "size",
+       "type": "double",
+       "alias": {
+        "ru": "Высота текста, мм",
+        "en": "Text height, mm"
+       }
+      },
+      {
+       "name": "halign",
+       "type": "string",
+       "alias": {
+        "ru": "Выравнивание по горизонтали",
+        "en": "Horizontal alignment"
+       }
+      },
+      {
+       "name": "valign",
+       "type": "string",
+       "alias": {
+        "ru": "Выравнивание по вертикали",
+        "en": "Vertical alignment"
+       }
+      }
+     ]
+    }
+   ],
+   "returns": [
+    "LINES",
+    "TEXTS",
+    "WIDTH_MM",
+    "HORIZON"
+   ]
+  }
+ ]
+}

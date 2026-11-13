@@ -1,0 +1,57 @@
+{
+ "tool": "1.01",
+ "about": "Итог встроенной проверки примера, посчитанный ядром без QGIS. Входные таблицы лежат в demo_seed1.json.",
+ "cases": [
+  {
+   "name": "seed1",
+   "about": "Параметры инструмента по умолчанию",
+   "params": {
+    "N_POINTS": 60,
+    "SEED": 1,
+    "RUN": true
+   },
+   "expected": {
+    "check": {
+     "routes_not_built": [
+      "R4"
+     ],
+     "points_matched": 62,
+     "points_total": 62,
+     "points_worst_mm": 1.631,
+     "point_errors_recognized": 6,
+     "point_errors_expected": 6,
+     "calibration": {
+      "R1": [
+       "length",
+       0
+      ],
+      "R2": [
+       "length",
+       0
+      ],
+      "R3": [
+       "ledger",
+       2
+      ]
+     },
+     "points_by_m_matched": 61,
+     "points_by_m_total": 61,
+     "lines_matched": 5,
+     "lines_total": 5,
+     "line_errors_recognized": 1,
+     "defects_matched": 30,
+     "defects_total": 30,
+     "profile_points": 127,
+     "profile_ground_matched": 127,
+     "profile_ground_total": 127,
+     "profile_ground_worst_mm": 0.495,
+     "profile_axis_r1_matched": 43,
+     "profile_axis_r1_total": 43,
+     "profile_equations_r3": 2
+    }
+   }
+  }
+ ],
+ "generator": "tools/make_fixtures.py",
+ "version": "0.5.2"
+}

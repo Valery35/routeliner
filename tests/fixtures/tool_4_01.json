@@ -1,0 +1,1250 @@
+{
+ "tool": "4.01",
+ "cases": [
+  {
+   "name": "ledger_100",
+   "about": "Шаг 100 м с ведомостью",
+   "params": {
+    "ROUTES": "demo:routes",
+    "ROUTE_ID": "route_id",
+    "SNAP": 0.01,
+    "ALLOW_GAPS": false,
+    "USE_Z": false,
+    "REVERSE": false,
+    "FORMAT": 0,
+    "PICKET": 100.0,
+    "START": 0.0,
+    "USE_M": false,
+    "M_FACTOR": 1.0,
+    "LEDGER": "demo:ledger",
+    "LG_ROUTE": "route_id",
+    "LG_STATION": "station",
+    "LG_MEASURE": "measure",
+    "LG_AHEAD": "station_ahead",
+    "LG_SYSTEM": "system",
+    "SYSTEM": "исполнительная",
+    "STEP": 100.0,
+    "OUT_M": 0
+   },
+   "expected": {
+    "OUTPUT": [
+     {
+      "route_id": "R1",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455100.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455200.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455300.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455400.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455500.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455600.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 700.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455700.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 800.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455800.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 900.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455900.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [456000.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456100.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456200.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 13+00.00",
+      "station": 1300.0,
+      "m": 1300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456300.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456400.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456500.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 16+00.00",
+      "station": 1600.0,
+      "m": 1600.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456600.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 17+00.00",
+      "station": 1700.0,
+      "m": 1700.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456700.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 18+00.00",
+      "station": 1800.0,
+      "m": 1800.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456800.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 19+00.00",
+      "station": 1900.0,
+      "m": 1900.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456900.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 20+00.00",
+      "station": 2000.0,
+      "m": 2000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [457000.0, 6428000.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455100.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455200.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455300.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455400.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 89.99,
+      "km": 0,
+      "geometry": [455500.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.0,
+      "section": 0,
+      "azimuth": 70.91,
+      "km": 0,
+      "geometry": [455598.1584042005, 6428516.512949161]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 700.0,
+      "section": 0,
+      "azimuth": 51.81,
+      "km": 0,
+      "geometry": [455685.5109262106, 6428564.233873561]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 800.0,
+      "section": 0,
+      "azimuth": 32.71,
+      "km": 0,
+      "geometry": [455752.44127500214, 6428637.909365154]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 900.0,
+      "section": 0,
+      "azimuth": 13.61,
+      "km": 0,
+      "geometry": [455791.5813544925, 6428729.4287826335]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 1,
+      "geometry": [455800.0, 6428828.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1100.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6428928.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1200.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429028.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 13+00.00",
+      "station": 1300.0,
+      "m": 1300.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429128.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1400.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429228.761154702]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455000.0, 6429500.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.1,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455086.68923201587, 6429550.05004588]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.2,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455173.3784640317, 6429600.100091759]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.3,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455260.06769604754, 6429650.150137639]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.4,
+      "section": 1,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455346.7569280384, 6429699.799816438]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.501,
+      "section": 1,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455433.44615379797, 6429649.7497597225]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.601,
+      "section": 1,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455520.13537955756, 6429599.699703007]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 725.7,
+      "section": 2,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455628.47463262605, 6429537.149994977]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 825.7,
+      "section": 2,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455715.07717076613, 6429512.8500089]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 925.7,
+      "section": 2,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455801.67971354997, 6429562.8500047345]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1025.7,
+      "section": 3,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455888.2822563338, 6429612.850000568]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1125.7,
+      "section": 3,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455974.88479911763, 6429662.849996402]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1225.7,
+      "section": 3,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456061.48734029516, 6429687.150004982]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1385.7,
+      "section": 4,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456200.05139874935, 6429607.149994328]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1485.7,
+      "section": 4,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456286.65393528313, 6429557.149987669]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 16+00.00",
+      "station": 1600.0,
+      "m": 1585.7,
+      "section": 4,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456373.256471817, 6429507.14998101]
+     }
+    ]
+   }
+  },
+  {
+   "name": "ledger_500_station",
+   "about": "Шаг 500 м, пикетаж в M",
+   "params": {
+    "ROUTES": "demo:routes",
+    "ROUTE_ID": "route_id",
+    "SNAP": 0.01,
+    "ALLOW_GAPS": false,
+    "USE_Z": false,
+    "REVERSE": false,
+    "FORMAT": 0,
+    "PICKET": 100.0,
+    "START": 0.0,
+    "USE_M": false,
+    "M_FACTOR": 1.0,
+    "LEDGER": "demo:ledger",
+    "LG_ROUTE": "route_id",
+    "LG_STATION": "station",
+    "LG_MEASURE": "measure",
+    "LG_AHEAD": "station_ahead",
+    "LG_SYSTEM": "system",
+    "SYSTEM": "исполнительная",
+    "STEP": 500.0,
+    "OUT_M": 2
+   },
+   "expected": {
+    "OUTPUT": [
+     {
+      "route_id": "R1",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428000.0, 0.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455500.0, 6428000.0, 500.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [456000.0, 6428000.0, 1000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456500.0, 6428000.0, 1500.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 20+00.00",
+      "station": 2000.0,
+      "m": 2000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [457000.0, 6428000.0, 2000.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428500.0, 0.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 89.99,
+      "km": 0,
+      "geometry": [455500.0, 6428500.0, 500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 1,
+      "geometry": [455800.0, 6428828.761154702, 1000.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455000.0, 6429500.0, 0.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.501,
+      "section": 1,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455433.44615379797, 6429649.7497597225, 500.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1025.7,
+      "section": 3,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455888.2822563338, 6429612.850000568, 1000.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1485.7,
+      "section": 4,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456286.65393528313, 6429557.149987669, 1500.0]
+     }
+    ]
+   }
+  },
+  {
+   "name": "length_100",
+   "about": "Без ведомости, пикетаж по длине",
+   "params": {
+    "ROUTES": "demo:routes",
+    "ROUTE_ID": "route_id",
+    "SNAP": 0.01,
+    "ALLOW_GAPS": false,
+    "USE_Z": false,
+    "REVERSE": false,
+    "FORMAT": 0,
+    "PICKET": 100.0,
+    "START": 0.0,
+    "USE_M": false,
+    "M_FACTOR": 1.0,
+    "STEP": 100.0,
+    "OUT_M": 0
+   },
+   "expected": {
+    "OUTPUT": [
+     {
+      "route_id": "R1",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455100.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455200.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455300.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455400.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455500.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455600.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 700.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455700.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 800.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455800.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 900.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455900.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [456000.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456100.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456200.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 13+00.00",
+      "station": 1300.0,
+      "m": 1300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456300.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456400.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1500.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456500.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 16+00.00",
+      "station": 1600.0,
+      "m": 1600.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456600.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 17+00.00",
+      "station": 1700.0,
+      "m": 1700.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456700.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 18+00.00",
+      "station": 1800.0,
+      "m": 1800.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456800.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 19+00.00",
+      "station": 1900.0,
+      "m": 1900.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [456900.0, 6428000.0]
+     },
+     {
+      "route_id": "R1",
+      "pk": "ПК 20+00.00",
+      "station": 2000.0,
+      "m": 2000.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [457000.0, 6428000.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 1,
+      "geometry": [455000.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455100.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455200.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455300.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.0,
+      "section": 0,
+      "azimuth": 90.0,
+      "km": 0,
+      "geometry": [455400.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 89.99,
+      "km": 0,
+      "geometry": [455500.0, 6428500.0]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.0,
+      "section": 0,
+      "azimuth": 70.91,
+      "km": 0,
+      "geometry": [455598.1584042005, 6428516.512949161]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 700.0,
+      "section": 0,
+      "azimuth": 51.81,
+      "km": 0,
+      "geometry": [455685.5109262106, 6428564.233873561]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 800.0,
+      "section": 0,
+      "azimuth": 32.71,
+      "km": 0,
+      "geometry": [455752.44127500214, 6428637.909365154]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 900.0,
+      "section": 0,
+      "azimuth": 13.61,
+      "km": 0,
+      "geometry": [455791.5813544925, 6428729.4287826335]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 1,
+      "geometry": [455800.0, 6428828.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1100.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6428928.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1200.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429028.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 13+00.00",
+      "station": 1300.0,
+      "m": 1300.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429128.761154702]
+     },
+     {
+      "route_id": "R2",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1400.0,
+      "section": 0,
+      "azimuth": 0.0,
+      "km": 0,
+      "geometry": [455800.0, 6429228.761154702]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 0+00.00",
+      "station": 0.0,
+      "m": 0.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455000.0, 6429500.0]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 1+00.00",
+      "station": 100.0,
+      "m": 100.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455086.60254278383, 6429549.999995834]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 2+00.00",
+      "station": 200.0,
+      "m": 200.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455173.20508556766, 6429599.999991667]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 3+00.00",
+      "station": 300.0,
+      "m": 300.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455259.8076283515, 6429649.999987502]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 4+00.00",
+      "station": 400.0,
+      "m": 400.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455346.4101711353, 6429699.999983335]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 5+00.00",
+      "station": 500.0,
+      "m": 500.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455433.0127076692, 6429650.000010006]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 6+00.00",
+      "station": 600.0,
+      "m": 600.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455519.615244203, 6429600.000003347]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 7+00.00",
+      "station": 700.0,
+      "m": 700.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [455606.21778073686, 6429549.999996688]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 8+00.00",
+      "station": 800.0,
+      "m": 800.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455692.82031727064, 6429500.000009972]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 9+00.00",
+      "station": 900.0,
+      "m": 900.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455779.4228600545, 6429550.000005805]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 10+00.00",
+      "station": 1000.0,
+      "m": 1000.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 1,
+      "geometry": [455866.0254028383, 6429600.000001639]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 11+00.00",
+      "station": 1100.0,
+      "m": 1100.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [455952.62794562214, 6429649.999997472]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 12+00.00",
+      "station": 1200.0,
+      "m": 1200.0,
+      "section": 0,
+      "azimuth": 60.0,
+      "km": 0,
+      "geometry": [456039.23048840597, 6429699.999993307]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 13+00.00",
+      "station": 1300.0,
+      "m": 1300.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456125.8330249398, 6429650.000000034]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 14+00.00",
+      "station": 1400.0,
+      "m": 1400.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456212.43556147366, 6429599.9999933755]
+     },
+     {
+      "route_id": "R3",
+      "pk": "ПК 15+00.00",
+      "station": 1500.0,
+      "m": 1500.0,
+      "section": 0,
+      "azimuth": 120.0,
+      "km": 0,
+      "geometry": [456299.0380980075, 6429549.999986717]
+     }
+    ]
+   }
+  }
+ ],
+ "generator": "tools/make_fixtures.py",
+ "version": "0.5.2"
+}

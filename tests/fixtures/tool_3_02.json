@@ -1,0 +1,8 @@
+{
+ "tool": "3.02",
+ "about": "Динамический слой считается тем же инструментом при каждой правке, ожидаемые слои те же, что в tool_2_02.json",
+ "same_as": "tool_2_02.json",
+ "cases": [],
+ "generator": "tools/make_fixtures.py",
+ "version": "0.5.2"
+}

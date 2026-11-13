@@ -1,0 +1,543 @@
+{
+ "tool": "4.02",
+ "cases": [
+  {
+   "name": "radius_50",
+   "about": "Дефекты примера, радиус 50 м",
+   "params": {
+    "ROUTES": "demo:routes",
+    "ROUTE_ID": "route_id",
+    "SNAP": 0.01,
+    "ALLOW_GAPS": false,
+    "USE_Z": false,
+    "REVERSE": false,
+    "FORMAT": 0,
+    "PICKET": 100.0,
+    "START": 0.0,
+    "USE_M": false,
+    "M_FACTOR": 1.0,
+    "LEDGER": "demo:ledger",
+    "LG_ROUTE": "route_id",
+    "LG_STATION": "station",
+    "LG_MEASURE": "measure",
+    "LG_AHEAD": "station_ahead",
+    "LG_SYSTEM": "system",
+    "SYSTEM": "исполнительная",
+    "POINTS": "demo:defects",
+    "PT_ROUTE": null,
+    "RADIUS": 50.0
+   },
+   "expected": {
+    "OUTPUT": [
+     {
+      "key": 1,
+      "rl_route": "R1",
+      "rl_m": 1934.873,
+      "rl_pk": "ПК 19+34.87",
+      "rl_offset": 4.125,
+      "rl_side": "left",
+      "geometry": [456934.8732658637, 6428004.124740924]
+     },
+     {
+      "key": 2,
+      "rl_route": "R2",
+      "rl_m": 585.193,
+      "rl_pk": "ПК 5+85.19",
+      "rl_offset": 10.238,
+      "rl_side": "left",
+      "geometry": [455581.1846352511, 6428521.842955472]
+     },
+     {
+      "key": 3,
+      "rl_route": "R3",
+      "rl_m": 685.027,
+      "rl_pk": "ПК 6+84.34",
+      "rl_offset": 2.76,
+      "rl_side": "left",
+      "geometry": [455594.63059420243, 6429559.876339306]
+     },
+     {
+      "key": 4,
+      "rl_route": "R1",
+      "rl_m": 435.778,
+      "rl_pk": "ПК 4+35.78",
+      "rl_offset": -5.289,
+      "rl_side": "right",
+      "geometry": [455435.7781183425, 6427994.710587315]
+     },
+     {
+      "key": 5,
+      "rl_route": "R2",
+      "rl_m": 1248.739,
+      "rl_pk": "ПК 12+48.74",
+      "rl_offset": 13.84,
+      "rl_side": "left",
+      "geometry": [455786.15953161457, 6429077.500314865]
+     },
+     {
+      "key": 6,
+      "rl_route": "R3",
+      "rl_m": 484.692,
+      "rl_pk": "ПК 4+84.21",
+      "rl_offset": -6.826,
+      "rl_side": "right",
+      "geometry": [455416.3428095503, 6429651.74190559]
+     },
+     {
+      "key": 7,
+      "rl_route": "R1",
+      "rl_m": 514.622,
+      "rl_pk": "ПК 5+14.62",
+      "rl_offset": -8.85,
+      "rl_side": "right",
+      "geometry": [455514.6218804685, 6427991.149957506]
+     },
+     {
+      "key": 8,
+      "rl_route": "R2",
+      "rl_m": 1237.307,
+      "rl_pk": "ПК 12+37.31",
+      "rl_offset": -14.471,
+      "rl_side": "right",
+      "geometry": [455814.4708157525, 6429066.067942951]
+     },
+     {
+      "key": 9,
+      "rl_route": "R3",
+      "rl_m": 909.638,
+      "rl_pk": "ПК 8+83.94",
+      "rl_offset": -12.591,
+      "rl_side": "right",
+      "geometry": [455794.06473951484, 6429543.914905827]
+     },
+     {
+      "key": 10,
+      "rl_route": "R1",
+      "rl_m": 1724.977,
+      "rl_pk": "ПК 17+24.98",
+      "rl_offset": -6.292,
+      "rl_side": "right",
+      "geometry": [456724.97739872785, 6427993.70843632]
+     },
+     {
+      "key": 11,
+      "rl_route": "R2",
+      "rl_m": 314.494,
+      "rl_pk": "ПК 3+14.49",
+      "rl_offset": 9.28,
+      "rl_side": "left",
+      "geometry": [455314.49423076893, 6428509.27973037]
+     },
+     {
+      "key": 12,
+      "rl_route": "R3",
+      "rl_m": 1483.208,
+      "rl_pk": "ПК 14+97.51",
+      "rl_offset": 5.145,
+      "rl_side": "left",
+      "geometry": [456287.06839096197, 6429562.851672401]
+     },
+     {
+      "key": 13,
+      "rl_route": "R1",
+      "rl_m": 999.608,
+      "rl_pk": "ПК 9+99.61",
+      "rl_offset": 9.57,
+      "rl_side": "left",
+      "geometry": [455999.6078475841, 6428009.569797056]
+     },
+     {
+      "key": 14,
+      "rl_route": "R2",
+      "rl_m": 595.823,
+      "rl_pk": "ПК 5+95.82",
+      "rl_offset": 1.253,
+      "rl_side": "left",
+      "geometry": [455593.8081832261, 6428516.363587558]
+     },
+     {
+      "key": 15,
+      "rl_route": "R3",
+      "rl_m": 333.331,
+      "rl_pk": "ПК 3+33.00",
+      "rl_offset": 12.356,
+      "rl_side": "left",
+      "geometry": [455282.49487876357, 6429677.365912799]
+     },
+     {
+      "key": 16,
+      "rl_route": "R1",
+      "rl_m": 1124.147,
+      "rl_pk": "ПК 11+24.15",
+      "rl_offset": -5.747,
+      "rl_side": "right",
+      "geometry": [456124.14744983683, 6427994.25266093]
+     },
+     {
+      "key": 17,
+      "rl_route": "R2",
+      "rl_m": 324.897,
+      "rl_pk": "ПК 3+24.90",
+      "rl_offset": -12.728,
+      "rl_side": "right",
+      "geometry": [455324.89653102146, 6428487.272185018]
+     },
+     {
+      "key": 18,
+      "rl_route": "R3",
+      "rl_m": 1474.212,
+      "rl_pk": "ПК 14+88.51",
+      "rl_offset": 13.802,
+      "rl_side": "left",
+      "geometry": [456283.6065500807, 6429574.84684936]
+     },
+     {
+      "key": 19,
+      "rl_route": "R1",
+      "rl_m": 1661.878,
+      "rl_pk": "ПК 16+61.88",
+      "rl_offset": 11.751,
+      "rl_side": "left",
+      "geometry": [456661.8777902926, 6428011.75131656]
+     },
+     {
+      "key": 20,
+      "rl_route": "R2",
+      "rl_m": 782.164,
+      "rl_pk": "ПК 7+82.16",
+      "rl_offset": -11.157,
+      "rl_side": "right",
+      "geometry": [455751.37720551965, 6428616.620950261]
+     },
+     {
+      "key": 21,
+      "rl_route": "R3",
+      "rl_m": 152.101,
+      "rl_pk": "ПК 1+51.95",
+      "rl_offset": -3.332,
+      "rl_side": "right",
+      "geometry": [455133.3893358815, 6429573.165211964]
+     },
+     {
+      "key": 22,
+      "rl_route": "R1",
+      "rl_m": 1074.889,
+      "rl_pk": "ПК 10+74.89",
+      "rl_offset": 11.628,
+      "rl_side": "left",
+      "geometry": [456074.88912953, 6428011.627626558]
+     },
+     {
+      "key": 23,
+      "rl_route": "R2",
+      "rl_m": 879.042,
+      "rl_pk": "ПК 8+79.04",
+      "rl_offset": 6.153,
+      "rl_side": "left",
+      "geometry": [455780.07890643994, 6428711.109254237]
+     },
+     {
+      "key": 24,
+      "rl_route": "R3",
+      "rl_m": 550.845,
+      "rl_pk": "ПК 5+50.29",
+      "rl_offset": 4.293,
+      "rl_side": "left",
+      "geometry": [455479.19206120475, 6429628.295063384]
+     },
+     {
+      "key": 25,
+      "rl_route": "R1",
+      "rl_m": 1870.23,
+      "rl_pk": "ПК 18+70.23",
+      "rl_offset": 2.895,
+      "rl_side": "left",
+      "geometry": [456870.2300022826, 6428002.894843684]
+     },
+     {
+      "key": 26,
+      "rl_route": "R2",
+      "rl_m": 808.856,
+      "rl_pk": "ПК 8+08.86",
+      "rl_offset": -5.49,
+      "rl_side": "right",
+      "geometry": [455761.82121380133, 6428642.602757577]
+     },
+     {
+      "key": 27,
+      "rl_route": "R3",
+      "rl_m": 654.294,
+      "rl_pk": "ПК 6+53.64",
+      "rl_offset": 13.126,
+      "rl_side": "left",
+      "geometry": [455573.198685306, 6429584.220596238]
+     },
+     {
+      "key": 28,
+      "rl_route": "R1",
+      "rl_m": 1564.708,
+      "rl_pk": "ПК 15+64.71",
+      "rl_offset": -5.773,
+      "rl_side": "right",
+      "geometry": [456564.70823950146, 6427994.227435502]
+     },
+     {
+      "key": 29,
+      "rl_route": "R2",
+      "rl_m": 900.478,
+      "rl_pk": "ПК 9+00.48",
+      "rl_offset": 2.073,
+      "rl_side": "left",
+      "geometry": [455789.6777642067, 6428730.378042173]
+     },
+     {
+      "key": 30,
+      "rl_route": "R3",
+      "rl_m": 878.429,
+      "rl_pk": "ПК 8+52.73",
+      "rl_offset": -14.331,
+      "rl_side": "right",
+      "geometry": [455767.90722033207, 6429526.8029105775]
+     }
+    ],
+    "ERRORS": []
+   }
+  },
+  {
+   "name": "radius_5",
+   "about": "Радиус 5 м, дальние дефекты уходят в ошибки",
+   "params": {
+    "ROUTES": "demo:routes",
+    "ROUTE_ID": "route_id",
+    "SNAP": 0.01,
+    "ALLOW_GAPS": false,
+    "USE_Z": false,
+    "REVERSE": false,
+    "FORMAT": 0,
+    "PICKET": 100.0,
+    "START": 0.0,
+    "USE_M": false,
+    "M_FACTOR": 1.0,
+    "LEDGER": "demo:ledger",
+    "LG_ROUTE": "route_id",
+    "LG_STATION": "station",
+    "LG_MEASURE": "measure",
+    "LG_AHEAD": "station_ahead",
+    "LG_SYSTEM": "system",
+    "SYSTEM": "исполнительная",
+    "POINTS": "demo:defects",
+    "PT_ROUTE": null,
+    "RADIUS": 5.0
+   },
+   "expected": {
+    "OUTPUT": [
+     {
+      "key": 1,
+      "rl_route": "R1",
+      "rl_m": 1934.873,
+      "rl_pk": "ПК 19+34.87",
+      "rl_offset": 4.125,
+      "rl_side": "left",
+      "geometry": [456934.8732658637, 6428004.124740924]
+     },
+     {
+      "key": 3,
+      "rl_route": "R3",
+      "rl_m": 685.027,
+      "rl_pk": "ПК 6+84.34",
+      "rl_offset": 2.76,
+      "rl_side": "left",
+      "geometry": [455594.63059420243, 6429559.876339306]
+     },
+     {
+      "key": 14,
+      "rl_route": "R2",
+      "rl_m": 595.823,
+      "rl_pk": "ПК 5+95.82",
+      "rl_offset": 1.253,
+      "rl_side": "left",
+      "geometry": [455593.8081832261, 6428516.363587558]
+     },
+     {
+      "key": 21,
+      "rl_route": "R3",
+      "rl_m": 152.101,
+      "rl_pk": "ПК 1+51.95",
+      "rl_offset": -3.332,
+      "rl_side": "right",
+      "geometry": [455133.3893358815, 6429573.165211964]
+     },
+     {
+      "key": 24,
+      "rl_route": "R3",
+      "rl_m": 550.845,
+      "rl_pk": "ПК 5+50.29",
+      "rl_offset": 4.293,
+      "rl_side": "left",
+      "geometry": [455479.19206120475, 6429628.295063384]
+     },
+     {
+      "key": 25,
+      "rl_route": "R1",
+      "rl_m": 1870.23,
+      "rl_pk": "ПК 18+70.23",
+      "rl_offset": 2.895,
+      "rl_side": "left",
+      "geometry": [456870.2300022826, 6428002.894843684]
+     },
+     {
+      "key": 29,
+      "rl_route": "R2",
+      "rl_m": 900.478,
+      "rl_pk": "ПК 9+00.48",
+      "rl_offset": 2.073,
+      "rl_side": "left",
+      "geometry": [455789.6777642067, 6428730.378042173]
+     }
+    ],
+    "ERRORS": [
+     {
+      "key": 2,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 10.24 м, дальше радиуса 5"
+     },
+     {
+      "key": 4,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 5.29 м, дальше радиуса 5"
+     },
+     {
+      "key": 5,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 13.84 м, дальше радиуса 5"
+     },
+     {
+      "key": 6,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 6.83 м, дальше радиуса 5"
+     },
+     {
+      "key": 7,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 8.85 м, дальше радиуса 5"
+     },
+     {
+      "key": 8,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 14.47 м, дальше радиуса 5"
+     },
+     {
+      "key": 9,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 12.59 м, дальше радиуса 5"
+     },
+     {
+      "key": 10,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 6.29 м, дальше радиуса 5"
+     },
+     {
+      "key": 11,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 9.28 м, дальше радиуса 5"
+     },
+     {
+      "key": 12,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 5.15 м, дальше радиуса 5"
+     },
+     {
+      "key": 13,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 9.57 м, дальше радиуса 5"
+     },
+     {
+      "key": 15,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 12.36 м, дальше радиуса 5"
+     },
+     {
+      "key": 16,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 5.75 м, дальше радиуса 5"
+     },
+     {
+      "key": 17,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 12.73 м, дальше радиуса 5"
+     },
+     {
+      "key": 18,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 13.80 м, дальше радиуса 5"
+     },
+     {
+      "key": 19,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 11.75 м, дальше радиуса 5"
+     },
+     {
+      "key": 20,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 11.16 м, дальше радиуса 5"
+     },
+     {
+      "key": 22,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 11.63 м, дальше радиуса 5"
+     },
+     {
+      "key": 23,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 6.15 м, дальше радиуса 5"
+     },
+     {
+      "key": 26,
+      "rl_route": "R2",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R2» в 5.49 м, дальше радиуса 5"
+     },
+     {
+      "key": 27,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 13.13 м, дальше радиуса 5"
+     },
+     {
+      "key": 28,
+      "rl_route": "R1",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R1» в 5.77 м, дальше радиуса 5"
+     },
+     {
+      "key": 30,
+      "rl_route": "R3",
+      "rl_error": "measure_out_of_range",
+      "rl_message": "ближайший маршрут «R3» в 14.33 м, дальше радиуса 5"
+     }
+    ]
+   }
+  }
+ ],
+ "generator": "tools/make_fixtures.py",
+ "version": "0.5.2"
+}

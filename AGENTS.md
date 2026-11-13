@@ -12,7 +12,8 @@
 | routeliner/doc | PDF руководства, собранные из manual |
 | manual | Исходный текст руководства, manual.md и manual_en.md |
 | tests/core | Тесты ядра и перевода, запускаются без QGIS |
-| tools | Сборка словаря перевода |
+| tests/fixtures | Эталонные прогоны ядра для сверки расширения RustGIS, собирает tools/make_fixtures.py |
+| tools | Сборка словаря перевода, описания инструментов tools.json (make_tools_json.py) и эталонных прогонов |
 
 ## Код
 

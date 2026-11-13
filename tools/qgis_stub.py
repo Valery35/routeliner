@@ -119,6 +119,10 @@ STUB_NAMES = ("qgis", "qgis.core", "qgis.gui", "qgis.PyQt", "qgis.PyQt.QtCore",
               "qgis.PyQt.QtGui", "qgis.PyQt.QtWidgets", "processing")
 
 
+_STUBBED_PREFIX = ("qgis.", "routeliner.processing", "routeliner.layers", "routeliner.about",
+                   "routeliner.resources")
+
+
 @contextlib.contextmanager
 def stubbed_qgis():
     """Ставит заглушку и по выходе возвращает sys.modules как было."""
@@ -132,8 +136,14 @@ def stubbed_qgis():
     try:
         yield
     finally:
-        sys.modules.clear()
-        sys.modules.update(saved)
+        # убираются только заглушки и модули routeliner, которые их видели.
+        # Прочие модули (numpy) остаются: второй раз numpy не грузится.
+        for n in list(sys.modules):
+            if n in STUB_NAMES or n.startswith(_STUBBED_PREFIX):
+                del sys.modules[n]
+        for n in STUB_NAMES + tuple(k for k in saved if k.startswith(_STUBBED_PREFIX)):
+            if n in saved:
+                sys.modules[n] = saved[n]
         pkg = sys.modules.get("routeliner")
         for sub in ("processing", "layers", "about", "resources"):
             if pkg is not None and f"routeliner.{sub}" not in saved and hasattr(pkg, sub):

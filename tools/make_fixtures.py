@@ -46,6 +46,7 @@ from routeliner.core.stations import StationParser  # noqa: E402
 SEED, N_POINTS = 1, 60
 N_DEFECTS = max(30, N_POINTS // 2)          # как в alg_demo
 CURVE_ANGLE_DEG = 0.02                       # layers/route_source.py
+ARC_ANGLE_DEG = CURVE_ANGLE_DEG              # нарезка дуги R2 в этом прогоне
 IN_DIGITS = 6                                # знаков координат частей на входе
 GEOM_FULL = 400                              # длиннее - геометрия кратко
 TR = i18n.tr
@@ -95,9 +96,11 @@ def _circle(p1, p2, p3):
     return cx, cy, math.hypot(cx - p1[0], cy - p1[1])
 
 
-def segmentize_arc(p1, p2, p3, angle_deg=CURVE_ANGLE_DEG):
+def segmentize_arc(p1, p2, p3, angle_deg=None):
     """Нарезка дуги по наибольшему углу, по образцу QgsGeometryUtils.segmentizeArc.
-    Дуга примера поворачивает влево (против часовой), обращать порядок не нужно."""
+    Дуга примера поворачивает влево (против часовой), обращать порядок не нужно.
+    Без угла берётся ARC_ANGLE_DEG (у модуля - CURVE_ANGLE_DEG)."""
+    angle_deg = ARC_ANGLE_DEG if angle_deg is None else angle_deg
     cx, cy, r = _circle(p1, p2, p3)
     inc = math.radians(angle_deg)
     a1 = math.atan2(p1[1] - cy, p1[0] - cx)

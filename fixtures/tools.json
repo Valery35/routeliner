@@ -1,0 +1,6859 @@
+{
+ "format": 1,
+ "module": "routeliner",
+ "version": "0.5.2",
+ "error_codes": [
+  "route_not_found",
+  "route_gap",
+  "route_branching",
+  "geographic_crs",
+  "measure_out_of_range",
+  "station_parse_failed",
+  "station_out_of_range",
+  "station_in_gap",
+  "station_ambiguous",
+  "ledger_invalid",
+  "from_ge_to"
+ ],
+ "tools": [
+  {
+   "code": "1.01",
+   "name": "demo",
+   "title": {
+    "ru": "Демонстрационный пример",
+    "en": "Demo example"
+   },
+   "group": "1",
+   "help": {
+    "ru": "Создаёт GeoPackage с четырьмя маршрутами: прямая с отметками, настоящая дуга R=300 м, ломаная из частей в произвольном порядке, маршрут с разрывом. В нём же исполнительная ведомость с рублеными пикетами, обратной и прямой вставками, таблицы точечных и линейных событий, в том числе заведомо ошибочных, и точки дефектов. У каждой записи есть эталонный ответ в полях exp_*, посчитанный аналитически, без участия модуля.\n\nС включённой проверкой пример сразу прогоняется через инструменты модуля. Итог сравнения с эталоном выводится в журнал, результаты добавляются в проект.",
+    "en": "Creates a GeoPackage with four routes: a straight line with elevations, a true arc of R=300 m, a polyline stored as parts in arbitrary order, and a route with a gap. It also holds an as-built ledger with broken pickets, a backward and a forward station equation, tables of point and line events, deliberately faulty records among them, and defect points. Every record carries a reference answer in the exp_* fields, computed analytically without the plugin.\n\nWith the check switched on, the example runs through the plugin tools at once. The comparison with the reference goes to the log, and the results are added to the project."
+   },
+   "params": [
+    {
+     "key": "FOLDER",
+     "kind": "folder",
+     "label": {
+      "ru": "Папка для примера",
+      "en": "Folder for the example"
+     }
+    },
+    {
+     "key": "N_POINTS",
+     "kind": "integer",
+     "label": {
+      "ru": "Количество случайных точечных событий",
+      "en": "Number of random point events"
+     },
+     "default": 60,
+     "minimum": 3,
+     "maximum": 200000
+    },
+    {
+     "key": "SEED",
+     "kind": "integer",
+     "label": {
+      "ru": "Зерно случайных чисел",
+      "en": "Random seed"
+     },
+     "default": 1
+    },
+    {
+     "key": "RUN",
+     "kind": "bool",
+     "label": {
+      "ru": "Сразу прогнать через модуль и сравнить с эталоном",
+      "en": "Run through the plugin at once and compare with the reference"
+     },
+     "default": true
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Routeliner, пример",
+     "en": "Routeliner, example"
+    },
+    {
+     "ru": "Рельеф",
+     "en": "Terrain"
+    },
+    {
+     "ru": "Собранные маршруты",
+     "en": "Assembled routes"
+    },
+    {
+     "ru": "Точечные события, результат",
+     "en": "Point events, result"
+    },
+    {
+     "ru": "Точечные события, ошибки",
+     "en": "Point events, errors"
+    },
+    {
+     "ru": "Калиброванные маршруты",
+     "en": "Calibrated routes"
+    },
+    {
+     "ru": "Участки, результат",
+     "en": "Sections, result"
+    },
+    {
+     "ru": "Дефекты, привязка",
+     "en": "Defects, located"
+    },
+    {
+     "ru": "Пикеты",
+     "en": "Pickets"
+    },
+    {
+     "ru": "Таблица профиля",
+     "en": "Profile table"
+    },
+    {
+     "ru": "да",
+     "en": "yes"
+    },
+    {
+     "ru": "нет",
+     "en": "no"
+    },
+    {
+     "ru": "Проверка пройдена",
+     "en": "Check passed"
+    },
+    {
+     "ru": "Итог проверки",
+     "en": "Check summary"
+    },
+    {
+     "ru": "ПРОВЕРКА ПРОЙДЕНА",
+     "en": "CHECK PASSED"
+    },
+    {
+     "ru": "ПРОВЕРКА НЕ ПРОЙДЕНА",
+     "en": "CHECK FAILED"
+    },
+    {
+     "ru": "Пример записан: {path}",
+     "en": "Example written: {path}"
+    },
+    {
+     "ru": "Событий: точечных {a}, линейных {b}, дефектов {c}",
+     "en": "Events: point {a}, line {b}, defects {c}"
+    },
+    {
+     "ru": "Маршруты: не собран только R4 - {v}",
+     "en": "Routes: only R4 not assembled - {v}"
+    },
+    {
+     "ru": "Точечные: совпало {a} из {n} (наибольшее расхождение {w:.1f} мм), ожидаемых ошибок распознано {e} из {en}",
+     "en": "Point events: {a} of {n} match (largest deviation {w:.1f} mm), expected errors recognised {e} of {en}"
+    },
+    {
+     "ru": "Калибровка: источники и уравнения маршрутов верны - {v}, точечные события по M совпали {a} из {n}",
+     "en": "Calibration: route sources and equations correct - {v}, point events by M matched {a} of {n}"
+    },
+    {
+     "ru": "Участки: совпало {a} из {n}, ошибка нулевой длины распознана: {v}",
+     "en": "Sections: {a} of {n} match, zero-length error recognised: {v}"
+    },
+    {
+     "ru": "Дефекты: привязано верно {a} из {n}",
+     "en": "Defects: {a} of {n} located correctly"
+    },
+    {
+     "ru": "Профиль: отметки рельефа совпали {a} из {n} (наибольшее расхождение {w:.1f} мм), отметки оси R1 {b} из {m}, уравнений R3 {e} из 2, чертёж построен: {v}",
+     "en": "Profile: terrain levels match {a} of {n} (largest deviation {w:.1f} mm), R1 axis levels {b} of {m}, R3 equations {e} of 2, drawing built: {v}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "PASSED",
+     "type": "boolean",
+     "description": {
+      "ru": "Проверка пройдена",
+      "en": "Check passed"
+     }
+    },
+    {
+     "name": "REPORT",
+     "type": "string",
+     "description": {
+      "ru": "Итог проверки",
+      "en": "Check summary"
+     }
+    }
+   ]
+  },
+  {
+   "code": "1.02",
+   "name": "check_routes",
+   "title": {
+    "ru": "Проверка маршрутов",
+    "en": "Route check"
+   },
+   "group": "1",
+   "help": {
+    "ru": "Собирает каждый маршрут из всех объектов с одним ID. Мультилинии раскладываются на части, части упорядочиваются по стыкам, а не по порядку хранения, дуги сегментируются. Маршрут с разрывом, развилкой или в географической системе координат попадает в таблицу ошибок.\n\nПоля результата:\n- route_id - ID маршрута\n- length - длина по оси, м\n- parts - количество частей после сборки\n- gaps - количество разрывов\n- gap_max - наибольший разрыв, м",
+    "en": "Assembles every route from all features with the same ID. Multi-lines are split into parts, the parts are ordered by their joints rather than by storage order, and arcs are segmented. A route with a gap, a branch or in a geographic coordinate system goes to the error table.\n\nResult fields:\n- route_id - route ID\n- length - length along the axis, m\n- parts - number of parts after assembly\n- gaps - number of gaps\n- gap_max - largest gap, m"
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "Собранные маршруты",
+      "en": "Assembled routes"
+     },
+     "geometry": "MultiLineString",
+     "fields": [
+      [
+       "route_id",
+       "string"
+      ],
+      [
+       "length",
+       "double"
+      ],
+      [
+       "parts",
+       "int"
+      ],
+      [
+       "gaps",
+       "int"
+      ],
+      [
+       "gap_max",
+       "double"
+      ]
+     ]
+    },
+    {
+     "key": "ERRORS",
+     "kind": "sink",
+     "label": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": "NoGeometry",
+     "fields": [
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_error",
+       "string"
+      ],
+      [
+       "rl_message",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Итого: собрано {a}, ошибок {b}",
+     "en": "Total: assembled {a}, errors {b}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "1.03",
+   "name": "calibrate_routes",
+   "title": {
+    "ru": "Калибровка маршрутов",
+    "en": "Calibrate routes"
+   },
+   "group": "1",
+   "help": {
+    "ru": "Собирает маршруты и записывает в их геометрию M-значения, то есть пикетаж или меру по оси в каждой вершине. Источник пикетажа выбирается по маршруту в таком порядке: контрольные точки, ведомость, M-значения самих маршрутов, длина по оси от пикета начала.\n\nКонтрольная точка несёт известный пикет. Точка привязывается к ближайшему маршруту в пределах радиуса поиска, и её мера становится репером. Между точками пикет идёт линейно, до первой и после последней точки с масштабом 1. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nПоля результата:\n- route_id - ID маршрута\n- length - длина по оси, м\n- st_from и st_to - пикетаж начала и конца, м\n- pk_from и pk_to - они же в выбранной записи\n- sections - количество участков пикетажа\n- equations - количество пикетажных уравнений\n- source - источник пикетажа: points, ledger, m или length\n\nТаблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).",
+    "en": "Assembles the routes and writes M values into their geometry, that is the chainage or the measure along the axis at every vertex. The chainage source is chosen per route in this order: control points, ledger, M values of the routes themselves, length along the axis from the start station.\n\nA control point carries a known station. The point is located on the nearest route within the search radius, and its measure becomes a reference mark. Between the points the station runs linearly, and before the first and after the last point with scale 1. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nResult fields:\n- route_id - route ID\n- length - length along the axis, m\n- st_from and st_to - chainage of the start and the end, m\n- pk_from and pk_to - the same in the selected notation\n- sections - number of chainage sections\n- equations - number of station equations\n- source - chainage source: points, ledger, m or length\n\nThe error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation)."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "CONTROL",
+     "kind": "points",
+     "label": {
+      "ru": "Контрольные точки с пикетами (необязательно)",
+      "en": "Control points with stations (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "CT_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Контрольные точки: поле пикета",
+      "en": "Control points: station field"
+     },
+     "parent": "CONTROL",
+     "optional": true
+    },
+    {
+     "key": "CT_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Контрольные точки: поле ID маршрута (необязательно)",
+      "en": "Control points: route ID field (optional)"
+     },
+     "parent": "CONTROL",
+     "optional": true
+    },
+    {
+     "key": "CT_RADIUS",
+     "kind": "number",
+     "label": {
+      "ru": "Радиус поиска контрольных точек, м",
+      "en": "Search radius for control points, m"
+     },
+     "default": 10.0,
+     "minimum": 0
+    },
+    {
+     "key": "OUT_M",
+     "kind": "enum",
+     "label": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "default": 2,
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ]
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "Калиброванные маршруты",
+      "en": "Calibrated routes"
+     },
+     "geometry": "MultiLineStringM",
+     "fields": [
+      [
+       "route_id",
+       "string"
+      ],
+      [
+       "length",
+       "double"
+      ],
+      [
+       "st_from",
+       "double"
+      ],
+      [
+       "st_to",
+       "double"
+      ],
+      [
+       "pk_from",
+       "string"
+      ],
+      [
+       "pk_to",
+       "string"
+      ],
+      [
+       "sections",
+       "int"
+      ],
+      [
+       "equations",
+       "int"
+      ],
+      [
+       "source",
+       "string"
+      ]
+     ]
+    },
+    {
+     "key": "ERRORS",
+     "kind": "sink",
+     "label": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": "NoGeometry",
+     "fields": [
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_error",
+       "string"
+      ],
+      [
+       "rl_message",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Для контрольных точек нужно поле пикета",
+     "en": "Control points need a station field"
+    },
+    {
+     "ru": "контрольные точки",
+     "en": "control points"
+    },
+    {
+     "ru": "Контрольные точки: маршрутов {a}, ошибок {b}",
+     "en": "Control points: routes {a}, errors {b}"
+    },
+    {
+     "ru": "Итого: маршрутов {a}, ошибок {b}",
+     "en": "Total: routes {a}, errors {b}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "2.01",
+   "name": "point_events",
+   "title": {
+    "ru": "Точечные события",
+    "en": "Point events"
+   },
+   "group": "2",
+   "help": {
+    "ru": "Ставит на маршруты записи таблицы по пикету в выбранной записи, со смещением от оси. Пикет переводится в меру через ведомость маршрута, а без ведомости по длине оси от пикета начала. Запись «+35» берёт пикет предыдущей записи того же маршрута.\n\nК полям исходной записи добавляются поля:\n- rl_m - мера по оси, м\n- rl_pk - пикет в выбранной записи\n- rl_x и rl_y - координаты точки в СК маршрутов\n- rl_azimuth - азимут оси в точке, градусы от севера по часовой стрелке\n\nПараметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nТаблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).",
+    "en": "Places table records on the routes by station in the chosen notation, with an offset from the axis. The station is converted to a measure through the route ledger, and without a ledger along the axis from the start station. The record «+35» takes the picket of the previous record of the same route.\n\nThe fields of the source record are followed by the fields:\n- rl_m - measure along the axis, m\n- rl_pk - station in the chosen notation\n- rl_x and rl_y - point coordinates in the route CRS\n- rl_azimuth - axis azimuth at the point, degrees clockwise from north\n\nThe M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nThe error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation)."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "EVENTS",
+     "kind": "table",
+     "label": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     }
+    },
+    {
+     "key": "EV_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_FROM",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета",
+      "en": "Events: station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_OFFSET",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "OFFSET_RIGHT",
+     "kind": "bool",
+     "label": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false
+    },
+    {
+     "key": "EV_SECTION",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "OUT_M",
+     "kind": "enum",
+     "label": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ]
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "События на маршрутах",
+      "en": "Events on routes"
+     },
+     "geometry": "Point",
+     "fields": [
+      [
+       "@EVENTS",
+       "copy"
+      ],
+      [
+       "rl_m",
+       "double"
+      ],
+      [
+       "rl_pk",
+       "string"
+      ],
+      [
+       "rl_x",
+       "double"
+      ],
+      [
+       "rl_y",
+       "double"
+      ],
+      [
+       "rl_azimuth",
+       "double"
+      ]
+     ]
+    },
+    {
+     "key": "ERRORS",
+     "kind": "sink",
+     "label": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": "NoGeometry",
+     "fields": [
+      [
+       "@EVENTS",
+       "copy"
+      ],
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_error",
+       "string"
+      ],
+      [
+       "rl_message",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "События: поле пикета начала",
+     "en": "Events: start station field"
+    },
+    {
+     "ru": "События: поле пикета конца",
+     "en": "Events: end station field"
+    },
+    {
+     "ru": "Итого: поставлено {a} из {n}, ошибок {b}",
+     "en": "Total: placed {a} of {n}, errors {b}"
+    },
+    {
+     "ru": "маршрут не собран: {msg}",
+     "en": "route not assembled: {msg}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "2.02",
+   "name": "line_events",
+   "title": {
+    "ru": "Участки (линейные события)",
+    "en": "Sections (line events)"
+   },
+   "group": "2",
+   "help": {
+    "ru": "Вырезает участки маршрутов между пикетами начала и конца, с параллельным смещением. Участок, записанный против хода маршрута, переворачивается. Участок через разрыв маршрута при разрешённых разрывах выдаётся мультилинией.\n\nК полям исходной записи добавляются поля:\n- rl_m_from и rl_m_to - меры начала и конца, м\n- rl_length - длина по оси, м\n- rl_pk_from и rl_pk_to - пикеты начала и конца\n- rl_swapped - 1, если начало и конец поменяны местами\n\nПараметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.\n\nТаблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).",
+    "en": "Cuts route sections between the start and end stations, with a parallel offset. A section recorded against the route direction is turned over. A section across a route gap, when gaps are allowed, comes out as a multi-line.\n\nThe fields of the source record are followed by the fields:\n- rl_m_from and rl_m_to - start and end measures, m\n- rl_length - length along the axis, m\n- rl_pk_from and rl_pk_to - start and end stations\n- rl_swapped - 1 when the start and the end were swapped\n\nThe M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead.\n\nThe error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation)."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "EVENTS",
+     "kind": "table",
+     "label": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     }
+    },
+    {
+     "key": "EV_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_FROM",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета начала",
+      "en": "Events: start station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_TO",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета конца",
+      "en": "Events: end station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_OFFSET",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "OFFSET_RIGHT",
+     "kind": "bool",
+     "label": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false
+    },
+    {
+     "key": "EV_SECTION",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "OUT_M",
+     "kind": "enum",
+     "label": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ]
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "События на маршрутах",
+      "en": "Events on routes"
+     },
+     "geometry": "MultiLineString",
+     "fields": [
+      [
+       "@EVENTS",
+       "copy"
+      ],
+      [
+       "rl_m_from",
+       "double"
+      ],
+      [
+       "rl_m_to",
+       "double"
+      ],
+      [
+       "rl_length",
+       "double"
+      ],
+      [
+       "rl_pk_from",
+       "string"
+      ],
+      [
+       "rl_pk_to",
+       "string"
+      ],
+      [
+       "rl_swapped",
+       "int"
+      ]
+     ]
+    },
+    {
+     "key": "ERRORS",
+     "kind": "sink",
+     "label": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": "NoGeometry",
+     "fields": [
+      [
+       "@EVENTS",
+       "copy"
+      ],
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_error",
+       "string"
+      ],
+      [
+       "rl_message",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "События: поле пикета",
+     "en": "Events: station field"
+    },
+    {
+     "ru": "Итого: поставлено {a} из {n}, ошибок {b}",
+     "en": "Total: placed {a} of {n}, errors {b}"
+    },
+    {
+     "ru": "маршрут не собран: {msg}",
+     "en": "route not assembled: {msg}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "3.01",
+   "name": "live_point_events",
+   "title": {
+    "ru": "Динамический слой точечных событий",
+    "en": "Live layer of point events"
+   },
+   "group": "3",
+   "help": {
+    "ru": "Параметры те же, что у инструмента 2.01, но результат динамический. Слой в памяти пересчитывается сам при правке геометрии маршрутов, таблицы событий или ведомости, в том числе при несохранённой правке и при изменении файла CSV или Excel на диске. Рядом создаётся таблица ошибок.\n\nПривязка хранится в проекте и восстанавливается при его открытии. Чтобы отключить пересчёт, удалите слой событий из проекта.\n\nПоля слоя совпадают с полями результата инструмента 2.01.",
+    "en": "The parameters are those of tool 2.01, but the result is live. The in-memory layer is recalculated by itself when the route geometry, the event table or the ledger changes, including unsaved edits and a CSV or Excel file changed on disk. An error table is created next to it.\n\nThe binding is stored in the project and restored when the project opens. To stop the recalculation, remove the event layer from the project.\n\nThe fields of the layer are those of the result of tool 2.01."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "EVENTS",
+     "kind": "table",
+     "label": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     }
+    },
+    {
+     "key": "EV_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_FROM",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета",
+      "en": "Events: station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_OFFSET",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "OFFSET_RIGHT",
+     "kind": "bool",
+     "label": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false
+    },
+    {
+     "key": "EV_SECTION",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "NAME",
+     "kind": "string",
+     "label": {
+      "ru": "Имя слоя",
+      "en": "Layer name"
+     },
+     "default": "События"
+    }
+   ],
+   "messages": [
+    {
+     "ru": "События",
+     "en": "Events"
+    },
+    {
+     "ru": "Слой событий",
+     "en": "Event layer"
+    },
+    {
+     "ru": "Итог первого расчёта",
+     "en": "Result of the first calculation"
+    },
+    {
+     "ru": "Динамические слои работают только в открытом проекте QGIS",
+     "en": "Live layers work only in the open QGIS project"
+    },
+    {
+     "ru": "Участки",
+     "en": "Sections"
+    },
+    {
+     "ru": "Динамический слой «{name}»: {status}",
+     "en": "Live layer «{name}»: {status}"
+    },
+    {
+     "ru": "Не найден слой для параметра «{p}»",
+     "en": "No layer for the parameter «{p}»"
+    },
+    {
+     "ru": "Слой «{name}» должен быть в проекте, иначе нечего отслеживать",
+     "en": "Layer «{name}» must be in the project, otherwise there is nothing to watch"
+    },
+    {
+     "ru": "События на маршрутах",
+     "en": "Events on routes"
+    },
+    {
+     "ru": "События: поле пикета начала",
+     "en": "Events: start station field"
+    },
+    {
+     "ru": "События: поле пикета конца",
+     "en": "Events: end station field"
+    },
+    {
+     "ru": "Итого: поставлено {a} из {n}, ошибок {b}",
+     "en": "Total: placed {a} of {n}, errors {b}"
+    },
+    {
+     "ru": "маршрут не собран: {msg}",
+     "en": "route not assembled: {msg}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ],
+   "computes_like": "2.01",
+   "outputs": [
+    {
+     "name": "LAYER_ID",
+     "type": "string",
+     "description": {
+      "ru": "Слой событий",
+      "en": "Event layer"
+     }
+    },
+    {
+     "name": "STATUS",
+     "type": "string",
+     "description": {
+      "ru": "Итог первого расчёта",
+      "en": "Result of the first calculation"
+     }
+    }
+   ]
+  },
+  {
+   "code": "3.02",
+   "name": "live_line_events",
+   "title": {
+    "ru": "Динамический слой участков",
+    "en": "Live layer of sections"
+   },
+   "group": "3",
+   "help": {
+    "ru": "Параметры те же, что у инструмента 2.02, но результат динамический. Слой в памяти пересчитывается сам при правке геометрии маршрутов, таблицы событий или ведомости, в том числе при несохранённой правке и при изменении файла CSV или Excel на диске. Рядом создаётся таблица ошибок.\n\nПривязка хранится в проекте и восстанавливается при его открытии. Чтобы отключить пересчёт, удалите слой событий из проекта.\n\nПоля слоя совпадают с полями результата инструмента 2.02.",
+    "en": "The parameters are those of tool 2.02, but the result is live. The in-memory layer is recalculated by itself when the route geometry, the event table or the ledger changes, including unsaved edits and a CSV or Excel file changed on disk. An error table is created next to it.\n\nThe binding is stored in the project and restored when the project opens. To stop the recalculation, remove the event layer from the project.\n\nThe fields of the layer are those of the result of tool 2.02."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "EVENTS",
+     "kind": "table",
+     "label": {
+      "ru": "Таблица событий (слой, CSV, Excel)",
+      "en": "Event table (layer, CSV, Excel)"
+     }
+    },
+    {
+     "key": "EV_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле ID маршрута",
+      "en": "Events: route ID field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_FROM",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета начала",
+      "en": "Events: start station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_TO",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле пикета конца",
+      "en": "Events: end station field"
+     },
+     "parent": "EVENTS"
+    },
+    {
+     "key": "EV_OFFSET",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле смещения от оси, м",
+      "en": "Events: offset from the axis field, m"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "OFFSET_RIGHT",
+     "kind": "bool",
+     "label": {
+      "ru": "Положительное смещение вправо по ходу",
+      "en": "Positive offset to the right of the route direction"
+     },
+     "default": false
+    },
+    {
+     "key": "EV_SECTION",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле номера участка (для обратных вставок)",
+      "en": "Events: section number field (for backward equations)"
+     },
+     "parent": "EVENTS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "NAME",
+     "kind": "string",
+     "label": {
+      "ru": "Имя слоя",
+      "en": "Layer name"
+     },
+     "default": "Участки"
+    }
+   ],
+   "messages": [
+    {
+     "ru": "События",
+     "en": "Events"
+    },
+    {
+     "ru": "Слой событий",
+     "en": "Event layer"
+    },
+    {
+     "ru": "Итог первого расчёта",
+     "en": "Result of the first calculation"
+    },
+    {
+     "ru": "Динамические слои работают только в открытом проекте QGIS",
+     "en": "Live layers work only in the open QGIS project"
+    },
+    {
+     "ru": "Участки",
+     "en": "Sections"
+    },
+    {
+     "ru": "Динамический слой «{name}»: {status}",
+     "en": "Live layer «{name}»: {status}"
+    },
+    {
+     "ru": "Не найден слой для параметра «{p}»",
+     "en": "No layer for the parameter «{p}»"
+    },
+    {
+     "ru": "Слой «{name}» должен быть в проекте, иначе нечего отслеживать",
+     "en": "Layer «{name}» must be in the project, otherwise there is nothing to watch"
+    },
+    {
+     "ru": "События на маршрутах",
+     "en": "Events on routes"
+    },
+    {
+     "ru": "События: поле пикета",
+     "en": "Events: station field"
+    },
+    {
+     "ru": "Итого: поставлено {a} из {n}, ошибок {b}",
+     "en": "Total: placed {a} of {n}, errors {b}"
+    },
+    {
+     "ru": "маршрут не собран: {msg}",
+     "en": "route not assembled: {msg}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ],
+   "computes_like": "2.02",
+   "outputs": [
+    {
+     "name": "LAYER_ID",
+     "type": "string",
+     "description": {
+      "ru": "Слой событий",
+      "en": "Event layer"
+     }
+    },
+    {
+     "name": "STATUS",
+     "type": "string",
+     "description": {
+      "ru": "Итог первого расчёта",
+      "en": "Result of the first calculation"
+     }
+    }
+   ]
+  },
+  {
+   "code": "4.01",
+   "name": "pickets",
+   "title": {
+    "ru": "Пикетная разбивка",
+    "en": "Picket stakeout"
+   },
+   "group": "4",
+   "help": {
+    "ru": "Ставит точки целых пикетов по каждому маршруту с подписью и азимутом для поворота подписи. При ведомости учитываются рубленые пикеты и пикетажные уравнения. В прямой вставке пропущенные пикеты не ставятся, в обратной повторяющиеся ставятся дважды с разными номерами участков.\n\nПоля результата:\n- route_id - ID маршрута\n- pk - пикет в выбранной записи\n- station - пикетаж, м\n- m - мера по оси, м\n- section - номер участка пикетажа, с нуля\n- azimuth - азимут оси, градусы\n- km - 1 для пикета, кратного километру\n\nПараметр «M-значения результата» пишет в геометрию меру по оси или пикетаж в метрах. Такой слой читают инструменты QGIS для M, PostGIS и ArcGIS. На пикетажном уравнении линия получает две вершины в одной точке, с пикетом назад и пикетом вперёд.",
+    "en": "Places points of whole pickets along every route, with a label and an azimuth for label rotation. With a ledger, broken pickets and station equations are taken into account. Pickets skipped by a forward equation are not placed, and pickets repeated by a backward equation are placed twice with different section numbers.\n\nResult fields:\n- route_id - route ID\n- pk - station in the chosen notation\n- station - chainage, m\n- m - measure along the axis, m\n- section - chainage section number, from zero\n- azimuth - axis azimuth, degrees\n- km - 1 for a picket that is a whole kilometre\n\nThe M values of the result parameter writes the measure along the axis or the chainage in metres into the geometry. QGIS tools for M, PostGIS and ArcGIS read such a layer. At a station equation the line gets two vertices at one point, with the station back and the station ahead."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "STEP",
+     "kind": "number",
+     "label": {
+      "ru": "Шаг разбивки, м",
+      "en": "Stakeout step, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "OUT_M",
+     "kind": "enum",
+     "label": {
+      "ru": "M-значения результата",
+      "en": "M values of the result"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "без M",
+       "en": "no M"
+      },
+      {
+       "ru": "мера по оси, м",
+       "en": "measure along the axis, m"
+      },
+      {
+       "ru": "пикетаж, м",
+       "en": "chainage, m"
+      }
+     ]
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "Пикеты",
+      "en": "Pickets"
+     },
+     "geometry": "Point",
+     "fields": [
+      [
+       "route_id",
+       "string"
+      ],
+      [
+       "pk",
+       "string"
+      ],
+      [
+       "station",
+       "double"
+      ],
+      [
+       "m",
+       "double"
+      ],
+      [
+       "section",
+       "int"
+      ],
+      [
+       "azimuth",
+       "double"
+      ],
+      [
+       "km",
+       "int"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Итого: пикетов {n}",
+     "en": "Total: pickets {n}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "4.02",
+   "name": "locate_points",
+   "title": {
+    "ru": "Привязка точек к маршрутам",
+    "en": "Locate points on routes"
+   },
+   "group": "4",
+   "help": {
+    "ru": "Обратная задача. Для каждой точки находится ближайший маршрут, и по нему считаются мера, пикет и смещение от оси со знаком. Точки дальше радиуса поиска уходят в таблицу ошибок. Если у точек есть поле ID маршрута, привязка идёт только к этому маршруту.\n\nК полям точки добавляются поля:\n- rl_route - ID маршрута\n- rl_m - мера по оси, м\n- rl_pk - пикет в выбранной записи\n- rl_offset - смещение, м, плюс влево по ходу\n- rl_side - сторона по ходу маршрута: left, right или axis\n\nТаблица ошибок повторяет поля исходной записи и добавляет rl_route (маршрут), rl_error (код причины) и rl_message (пояснение).",
+    "en": "The inverse task. For every point the nearest route is found, and the measure, the station and the signed offset from the axis are computed on it. Points beyond the search radius go to the error table. When the points have a route ID field, they are located on that route only.\n\nThe fields of the point are followed by the fields:\n- rl_route - route ID\n- rl_m - measure along the axis, m\n- rl_pk - station in the chosen notation\n- rl_offset - offset, m, positive to the left of the route direction\n- rl_side - side relative to the route direction: left, right or axis\n\nThe error table repeats the fields of the source record and adds rl_route (route), rl_error (reason code) and rl_message (explanation)."
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "POINTS",
+     "kind": "points",
+     "label": {
+      "ru": "Точки",
+      "en": "Points"
+     }
+    },
+    {
+     "key": "PT_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Точки: поле ID маршрута (необязательно)",
+      "en": "Points: route ID field (optional)"
+     },
+     "parent": "POINTS",
+     "optional": true
+    },
+    {
+     "key": "RADIUS",
+     "kind": "number",
+     "label": {
+      "ru": "Радиус поиска, м (0 без ограничения)",
+      "en": "Search radius, m (0 for no limit)"
+     },
+     "default": 50.0,
+     "minimum": 0
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "Точки с пикетами",
+      "en": "Points with stations"
+     },
+     "geometry": "Point",
+     "fields": [
+      [
+       "@POINTS",
+       "copy"
+      ],
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_m",
+       "double"
+      ],
+      [
+       "rl_pk",
+       "string"
+      ],
+      [
+       "rl_offset",
+       "double"
+      ],
+      [
+       "rl_side",
+       "string"
+      ]
+     ]
+    },
+    {
+     "key": "ERRORS",
+     "kind": "sink",
+     "label": {
+      "ru": "Ошибки",
+      "en": "Errors"
+     },
+     "optional": true,
+     "geometry": "NoGeometry",
+     "fields": [
+      [
+       "@POINTS",
+       "copy"
+      ],
+      [
+       "rl_route",
+       "string"
+      ],
+      [
+       "rl_error",
+       "string"
+      ],
+      [
+       "rl_message",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Итого: привязано {a}, ошибок {b}",
+     "en": "Total: located {a}, errors {b}"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "5.01",
+   "name": "profile_table",
+   "title": {
+    "ru": "Таблица профиля",
+    "en": "Profile table"
+   },
+   "group": "5",
+   "help": {
+    "ru": "Собирает точки продольного профиля по каждому маршруту и снимает в них значения растров. Точки ставятся в начале и конце маршрута, на пикетажных уравнениях, на целых пикетах, на вершинах оси и с постоянным шагом. Точки из слоя событий (переходы, колодцы, скважины) ставятся по проекции на ось, если лежат в коридоре от оси.\n\nЗначения растров интерполируются билинейно по центрам ячеек. Растр может быть в любой системе координат, точки пересчитываются.\n\nПоля результата:\n- route_id - ID маршрута\n- n - номер точки\n- kind - start, end, equation, event, picket, vertex, step\n- m - мера по оси, м\n- station - пикетаж, м\n- station_ahead - пикетаж вперёд, только у уравнения\n- pk - пикет в выбранной записи\n- section - номер участка пикетажа\n- x и y - координаты на оси\n- z_axis - отметка оси по Z маршрута, пусто, если у маршрута нет Z или все Z нулевые\n- turn - угол поворота трассы в вершине, градусы, плюс влево\n- label - подпись события\n- z_имя - значение растра, по одному полю на каждый растр",
+    "en": "Collects the points of a longitudinal profile along every route and samples raster values at them. Points are placed at the route start and end, at station equations, at whole pickets, at axis vertices and with a constant step. Points from the event layer (crossings, manholes, boreholes) are placed by projection onto the axis if they lie within the corridor from the axis.\n\nRaster values are interpolated bilinearly between cell centres. A raster may be in any coordinate system, the points are transformed.\n\nResult fields:\n- route_id - route ID\n- n - point number\n- kind - start, end, equation, event, picket, vertex, step\n- m - measure along the axis, m\n- station - chainage, m\n- station_ahead - chainage ahead, equations only\n- pk - station in the chosen notation\n- section - chainage section number\n- x and y - coordinates on the axis\n- z_axis - axis elevation from the route Z, empty if the route has no Z or all Z are zero\n- turn - turn angle of the alignment at a vertex, degrees, positive to the left\n- label - event label\n- z_name - raster value, one field for each raster"
+   },
+   "params": [
+    {
+     "key": "ROUTES",
+     "kind": "lines",
+     "label": {
+      "ru": "Слой маршрутов (линии)",
+      "en": "Route layer (lines)"
+     }
+    },
+    {
+     "key": "ROUTE_ID",
+     "kind": "field",
+     "label": {
+      "ru": "Поле ID маршрута",
+      "en": "Route ID field"
+     },
+     "default": "route_id",
+     "parent": "ROUTES"
+    },
+    {
+     "key": "SNAP",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск стыковки частей, м",
+      "en": "Part joint tolerance, m"
+     },
+     "default": 0.01,
+     "minimum": 0,
+     "advanced": true
+    },
+    {
+     "key": "ALLOW_GAPS",
+     "kind": "bool",
+     "label": {
+      "ru": "Разрешить разрывы (участок через разрыв выдаётся мультилинией)",
+      "en": "Allow gaps (a section across a gap comes out as a multi-line)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "USE_Z",
+     "kind": "bool",
+     "label": {
+      "ru": "Длина по 3D (с учётом Z)",
+      "en": "3D length (with Z)"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "REVERSE",
+     "kind": "bool",
+     "label": {
+      "ru": "Обратное направление маршрутов",
+      "en": "Reverse route direction"
+     },
+     "default": false,
+     "advanced": true
+    },
+    {
+     "key": "ROUTE_LIST",
+     "kind": "string",
+     "label": {
+      "ru": "Маршруты через запятую (пусто - все)",
+      "en": "Routes separated by commas (empty - all)"
+     },
+     "optional": true
+    },
+    {
+     "key": "FORMAT",
+     "kind": "enum",
+     "label": {
+      "ru": "Запись пикета",
+      "en": "Station notation"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)",
+       "en": "ПК и плюс (ПК 15+35, 15+35,5, ПК -1+50, +35)"
+      },
+      {
+       "ru": "километр и метры (км 1+535)",
+       "en": "Kilometre and metres (км 1+535)"
+      },
+      {
+       "ru": "железнодорожная запись (км 12 ПК 3+45)",
+       "en": "Railway notation (км 12 ПК 3+45)"
+      },
+      {
+       "ru": "метры числом (1535,5)",
+       "en": "Metres as a number (1535,5)"
+      },
+      {
+       "ru": "километры дробью (1,535)",
+       "en": "Kilometres as a decimal (1,535)"
+      }
+     ],
+     "values": [
+      "pk_plus",
+      "km_plus",
+      "rail",
+      "meters",
+      "km"
+     ]
+    },
+    {
+     "key": "PICKET",
+     "kind": "number",
+     "label": {
+      "ru": "Длина пикета, м",
+      "en": "Picket length, m"
+     },
+     "default": 100.0,
+     "minimum": 0.001
+    },
+    {
+     "key": "START",
+     "kind": "number",
+     "label": {
+      "ru": "Пикет начала маршрута (без ведомости), м",
+      "en": "Route start station (without a ledger), m"
+     },
+     "default": 0.0
+    },
+    {
+     "key": "LEDGER",
+     "kind": "table",
+     "label": {
+      "ru": "Пикетажная ведомость (необязательно)",
+      "en": "Chainage ledger (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LG_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле ID маршрута",
+      "en": "Ledger: route ID field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_STATION",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета",
+      "en": "Ledger: station field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_MEASURE",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле метража (мера по оси)",
+      "en": "Ledger: distance field (measure along the axis)"
+     },
+     "parent": "LEDGER",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "LG_AHEAD",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле пикета вперёд (уравнение)",
+      "en": "Ledger: station ahead field (equation)"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "LG_SYSTEM",
+     "kind": "field",
+     "label": {
+      "ru": "Ведомость: поле системы пикетажа",
+      "en": "Ledger: chainage system field"
+     },
+     "parent": "LEDGER",
+     "optional": true
+    },
+    {
+     "key": "SYSTEM",
+     "kind": "string",
+     "label": {
+      "ru": "Система пикетажа (значение поля системы)",
+      "en": "Chainage system (value of the system field)"
+     },
+     "optional": true
+    },
+    {
+     "key": "USE_M",
+     "kind": "bool",
+     "label": {
+      "ru": "Пикетаж из M-значений геометрии маршрута",
+      "en": "Chainage from the M values of the route geometry"
+     },
+     "default": false
+    },
+    {
+     "key": "M_FACTOR",
+     "kind": "number",
+     "label": {
+      "ru": "Метров в единице M (1000, если M в километрах)",
+      "en": "Metres per M unit (1000 if M is in kilometres)"
+     },
+     "default": 1.0,
+     "minimum": 1e-09,
+     "advanced": true
+    },
+    {
+     "key": "RASTERS",
+     "kind": "raster",
+     "label": {
+      "ru": "Растры (рельеф, проектная поверхность, пласт)",
+      "en": "Rasters (terrain, design surface, seam)"
+     },
+     "multiple": true,
+     "optional": true
+    },
+    {
+     "key": "BAND",
+     "kind": "integer",
+     "label": {
+      "ru": "Номер канала растров",
+      "en": "Raster band number"
+     },
+     "default": 1,
+     "minimum": 1
+    },
+    {
+     "key": "PICKET_STEP",
+     "kind": "number",
+     "label": {
+      "ru": "Точки на целых пикетах через, м (0 - нет)",
+      "en": "Points at whole pickets every, m (0 - none)"
+     },
+     "default": 100.0,
+     "minimum": 0
+    },
+    {
+     "key": "STEP",
+     "kind": "number",
+     "label": {
+      "ru": "Точки с постоянным шагом, м (0 - нет)",
+      "en": "Points with a constant step, m (0 - none)"
+     },
+     "default": 0.0,
+     "minimum": 0
+    },
+    {
+     "key": "VERTICES",
+     "kind": "enum",
+     "label": {
+      "ru": "Вершины оси",
+      "en": "Axis vertices"
+     },
+     "default": 0,
+     "options": [
+      {
+       "ru": "только с поворотом или изломом уклона",
+       "en": "only with a turn or a grade break"
+      },
+      {
+       "ru": "все вершины",
+       "en": "all vertices"
+      },
+      {
+       "ru": "без вершин",
+       "en": "no vertices"
+      }
+     ],
+     "values": [
+      "significant",
+      "all",
+      "none"
+     ]
+    },
+    {
+     "key": "POIS",
+     "kind": "points",
+     "label": {
+      "ru": "События на профиль: точки (необязательно)",
+      "en": "Events for the profile: points (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "POI_LABEL",
+     "kind": "field",
+     "label": {
+      "ru": "События: поле подписи",
+      "en": "Events: label field"
+     },
+     "parent": "POIS",
+     "optional": true
+    },
+    {
+     "key": "CORRIDOR",
+     "kind": "number",
+     "label": {
+      "ru": "События: коридор от оси, м",
+      "en": "Events: corridor from the axis, m"
+     },
+     "default": 10.0,
+     "minimum": 0
+    },
+    {
+     "key": "OUTPUT",
+     "kind": "sink",
+     "label": {
+      "ru": "Таблица профиля",
+      "en": "Profile table"
+     },
+     "geometry": "Point",
+     "fields": [
+      [
+       "route_id",
+       "string"
+      ],
+      [
+       "n",
+       "int"
+      ],
+      [
+       "kind",
+       "string"
+      ],
+      [
+       "m",
+       "double"
+      ],
+      [
+       "station",
+       "double"
+      ],
+      [
+       "station_ahead",
+       "double"
+      ],
+      [
+       "pk",
+       "string"
+      ],
+      [
+       "section",
+       "int"
+      ],
+      [
+       "x",
+       "double"
+      ],
+      [
+       "y",
+       "double"
+      ],
+      [
+       "z_axis",
+       "double"
+      ],
+      [
+       "turn",
+       "double"
+      ],
+      [
+       "label",
+       "string"
+      ],
+      [
+       "z_*",
+       "double"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Итого: точек профиля {n}, растров {r}",
+     "en": "Total: profile points {n}, rasters {r}"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  },
+  {
+   "code": "5.02",
+   "name": "profile_drawing",
+   "title": {
+    "ru": "Чертёж профиля",
+    "en": "Profile drawing"
+   },
+   "group": "5",
+   "help": {
+    "ru": "Строит чертёж продольного профиля одного маршрута по таблице 5.01: линии поверхностей над сеткой, сетку профиля со строками, шкалу отметок и развёрнутый план. Чертёж ставится в той же системе координат, что и таблица, в миллиметрах бумаги, так что одна единица карты равна миллиметру. В компоновке QGIS профиль печатается в натуральную величину при масштабе карты 1:1000.\n\nСтроки сетки задаются таблицей. Тип строки: value (число по выражению), text (подписи участков из поля слоя участков), grade (уклон и длина по выражению), distance (расстояния между точками), station (пикеты), plan (развёрнутый план). В выражениях можно писать поля таблицы профиля и подстановки {ground}, {design}, {pipe}, {d}, {base}, которые заменяются полями и числами из параметров. Строка, у которой нет данных, в сетку не выводится.\n\nПодписи точек прореживаются: если точки на бумаге ближе заданного промежутка, подпись остаётся у точки с большим приоритетом (начало и конец, уравнение, событие, пикет, вершина, шаг).\n\nПоля слоя линий: kind (вид линии), row (строка), color, width (толщина, мм). Поля слоя подписей: text, kind, rot (поворот, градусы), size (высота, мм), halign, valign.",
+    "en": "Builds the drawing of the longitudinal profile of one route from the 5.01 table: surface lines above the grid, the profile grid with its rows, the elevation scale and the straightened plan. The drawing is placed in the same coordinate system as the table, in paper millimetres, so one map unit equals one millimetre. In a QGIS print layout the profile prints at full size with the map scale 1:1000.\n\nThe grid rows are set by a table. Row type: value (number from an expression), text (section labels from a field of the section layer), grade (grade and length from an expression), distance (distances between points), station (pickets), plan (straightened plan). Expressions may use the fields of the profile table and the placeholders {ground}, {design}, {pipe}, {d}, {base}, which are replaced by fields and numbers from the parameters. A row without data is not put into the grid.\n\nPoint labels are thinned: if points are closer on paper than the given gap, the label stays at the point with the higher priority (start and end, equation, event, picket, vertex, step).\n\nFields of the line layer: kind (line kind), row (row), color, width (width, mm). Fields of the label layer: text, kind, rot (rotation, degrees), size (height, mm), halign, valign."
+   },
+   "params": [
+    {
+     "key": "TABLE",
+     "kind": "table",
+     "label": {
+      "ru": "Таблица профиля (результат 5.01)",
+      "en": "Profile table (result of 5.01)"
+     }
+    },
+    {
+     "key": "ROUTE",
+     "kind": "string",
+     "label": {
+      "ru": "Маршрут (пусто - первый в таблице)",
+      "en": "Route (empty - the first in the table)"
+     },
+     "optional": true
+    },
+    {
+     "key": "GROUND",
+     "kind": "field",
+     "label": {
+      "ru": "Поле отметки земли {ground}",
+      "en": "Ground level field {ground}"
+     },
+     "parent": "TABLE",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "DESIGN",
+     "kind": "field",
+     "label": {
+      "ru": "Поле проектной отметки {design}",
+      "en": "Design level field {design}"
+     },
+     "parent": "TABLE",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "PIPE",
+     "kind": "field",
+     "label": {
+      "ru": "Поле отметки трубы или оси {pipe} (пусто - z_axis)",
+      "en": "Pipe or axis level field {pipe} (empty - z_axis)"
+     },
+     "parent": "TABLE",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "D",
+     "kind": "number",
+     "label": {
+      "ru": "Наружный диаметр трубы {d}, м",
+      "en": "Pipe outer diameter {d}, m"
+     },
+     "default": 0.16,
+     "minimum": 0
+    },
+    {
+     "key": "BASE",
+     "kind": "number",
+     "label": {
+      "ru": "Толщина основания {base}, м",
+      "en": "Bedding thickness {base}, m"
+     },
+     "default": 0.3,
+     "minimum": 0
+    },
+    {
+     "key": "ROWS",
+     "kind": "matrix",
+     "label": {
+      "ru": "Строки сетки профиля",
+      "en": "Profile grid rows"
+     },
+     "default": [
+      [
+       "Отметка земли проектная, м",
+       "value",
+       "{design}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка земли фактическая, м",
+       "value",
+       "{ground}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка верха трубы, м",
+       "value",
+       "{pipe}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Отметка дна траншеи, м",
+       "value",
+       "{pipe} - {d} - {base}",
+       "2",
+       "15",
+       "1"
+      ],
+      [
+       "Расстояние земля - труба, м",
+       "value",
+       "{ground} - {pipe}",
+       "2",
+       "10",
+       "0"
+      ],
+      [
+       "Глубина траншеи, м",
+       "value",
+       "{ground} - ({pipe} - {d} - {base})",
+       "2",
+       "10",
+       "0"
+      ],
+      [
+       "Обозначение трубы и тип изоляции",
+       "text",
+       "pipe",
+       "",
+       "15",
+       "0"
+      ],
+      [
+       "Основание",
+       "text",
+       "base",
+       "",
+       "10",
+       "0"
+      ],
+      [
+       "Уклон, ‰ / длина, м",
+       "grade",
+       "{pipe}",
+       "1",
+       "15",
+       "0"
+      ],
+      [
+       "Расстояние, м",
+       "distance",
+       "",
+       "1",
+       "10",
+       "0"
+      ],
+      [
+       "Пикет",
+       "station",
+       "",
+       "",
+       "20",
+       "0"
+      ],
+      [
+       "Развёрнутый план",
+       "plan",
+       "",
+       "",
+       "25",
+       "0"
+      ]
+     ],
+     "headers": [
+      {
+       "ru": "Заголовок",
+       "en": "Title"
+      },
+      {
+       "ru": "Тип",
+       "en": "Type"
+      },
+      {
+       "ru": "Источник",
+       "en": "Source"
+      },
+      {
+       "ru": "Знаков",
+       "en": "Decimals"
+      },
+      {
+       "ru": "Высота, мм",
+       "en": "Height, mm"
+      },
+      {
+       "ru": "Линия (1/0)",
+       "en": "Line (1/0)"
+      }
+     ]
+    },
+    {
+     "key": "SECTIONS",
+     "kind": "table",
+     "label": {
+      "ru": "Участки для текстовых строк (необязательно)",
+      "en": "Sections for text rows (optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "SEC_ROUTE",
+     "kind": "field",
+     "label": {
+      "ru": "Участки: поле ID маршрута",
+      "en": "Sections: route ID field"
+     },
+     "parent": "SECTIONS",
+     "optional": true
+    },
+    {
+     "key": "SEC_FROM",
+     "kind": "field",
+     "label": {
+      "ru": "Участки: поле меры начала",
+      "en": "Sections: start measure field"
+     },
+     "default": "rl_m_from",
+     "parent": "SECTIONS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "SEC_TO",
+     "kind": "field",
+     "label": {
+      "ru": "Участки: поле меры конца",
+      "en": "Sections: end measure field"
+     },
+     "default": "rl_m_to",
+     "parent": "SECTIONS",
+     "numeric": true,
+     "optional": true
+    },
+    {
+     "key": "PLAN",
+     "kind": "points",
+     "label": {
+      "ru": "Точки для развёрнутого плана (результат 4.02, необязательно)",
+      "en": "Points for the straightened plan (result of 4.02, optional)"
+     },
+     "optional": true
+    },
+    {
+     "key": "PLAN_LABEL",
+     "kind": "field",
+     "label": {
+      "ru": "План: поле подписи",
+      "en": "Plan: label field"
+     },
+     "parent": "PLAN",
+     "optional": true
+    },
+    {
+     "key": "H_SCALE",
+     "kind": "number",
+     "label": {
+      "ru": "Масштаб по горизонтали 1:",
+      "en": "Horizontal scale 1:"
+     },
+     "default": 500.0,
+     "minimum": 1
+    },
+    {
+     "key": "V_SCALE",
+     "kind": "number",
+     "label": {
+      "ru": "Масштаб по вертикали 1:",
+      "en": "Vertical scale 1:"
+     },
+     "default": 100.0,
+     "minimum": 1
+    },
+    {
+     "key": "HORIZON",
+     "kind": "number",
+     "label": {
+      "ru": "Условный горизонт, м (пусто - автоматически)",
+      "en": "Datum, m (empty - automatic)"
+     },
+     "optional": true
+    },
+    {
+     "key": "GRADE_TOL",
+     "kind": "number",
+     "label": {
+      "ru": "Допуск выделения уклонов, м",
+      "en": "Grade detection tolerance, m"
+     },
+     "default": 0.02,
+     "minimum": 0
+    },
+    {
+     "key": "MIN_GAP",
+     "kind": "number",
+     "label": {
+      "ru": "Наименьший промежуток между подписями, мм",
+      "en": "Smallest gap between labels, mm"
+     },
+     "default": 3.0,
+     "minimum": 0
+    },
+    {
+     "key": "ORIGIN",
+     "kind": "point",
+     "label": {
+      "ru": "Левый нижний угол профиля над сеткой (пусто - под маршрутом)",
+      "en": "Lower left corner of the profile above the grid (empty - below the routes)"
+     },
+     "optional": true
+    },
+    {
+     "key": "LINES",
+     "kind": "sink",
+     "label": {
+      "ru": "Профиль, линии",
+      "en": "Profile, lines"
+     },
+     "geometry": "LineString",
+     "fields": [
+      [
+       "kind",
+       "string"
+      ],
+      [
+       "row",
+       "string"
+      ],
+      [
+       "color",
+       "string"
+      ],
+      [
+       "width",
+       "double"
+      ]
+     ]
+    },
+    {
+     "key": "TEXTS",
+     "kind": "sink",
+     "label": {
+      "ru": "Профиль, подписи",
+      "en": "Profile, labels"
+     },
+     "geometry": "Point",
+     "fields": [
+      [
+       "text",
+       "string"
+      ],
+      [
+       "kind",
+       "string"
+      ],
+      [
+       "rot",
+       "double"
+      ],
+      [
+       "size",
+       "double"
+      ],
+      [
+       "halign",
+       "string"
+      ],
+      [
+       "valign",
+       "string"
+      ]
+     ]
+    }
+   ],
+   "messages": [
+    {
+     "ru": "Не задана таблица профиля",
+     "en": "The profile table is not set"
+    },
+    {
+     "ru": "В слое плана нужны поля rl_m и rl_offset (результат 4.02)",
+     "en": "The plan layer needs the fields rl_m and rl_offset (result of 4.02)"
+    },
+    {
+     "ru": "Профиль маршрута «{rid}»: строк {r}, ширина {w:.0f} мм, условный горизонт {h:.2f}",
+     "en": "Profile of route «{rid}»: rows {r}, width {w:.0f} mm, datum {h:.2f}"
+    },
+    {
+     "ru": "В таблице нет точек маршрута «{rid}»",
+     "en": "The table has no points of route «{rid}»"
+    },
+    {
+     "ru": "В слое участков нет полей меры «{a}» и «{b}»",
+     "en": "The section layer has no measure fields «{a}» and «{b}»"
+    },
+    {
+     "ru": "В таблице нет поля «{f}», нужна таблица инструмента 5.01",
+     "en": "The table has no field «{f}», the table of tool 5.01 is needed"
+    },
+    {
+     "ru": "не задано: {names}",
+     "en": "not set: {names}"
+    },
+    {
+     "ru": "Строка «{t}»: неизвестный тип «{k}»",
+     "en": "Row «{t}»: unknown type «{k}»"
+    },
+    {
+     "ru": "Строка «{t}»: знаков и высота должны быть числами",
+     "en": "Row «{t}»: decimals and height must be numbers"
+    },
+    {
+     "ru": "Строка «{t}» пропущена: {why}",
+     "en": "Row «{t}» skipped: {why}"
+    },
+    {
+     "ru": "Строка «{t}» пропущена: нет участков с полем «{f}»",
+     "en": "Row «{t}» skipped: no sections with the field «{f}»"
+    },
+    {
+     "ru": "Не задан слой маршрутов",
+     "en": "The route layer is not set"
+    },
+    {
+     "ru": "Маршрутов собрано {a}, не собрано {b}",
+     "en": "Routes assembled {a}, not assembled {b}"
+    },
+    {
+     "ru": "Маршрут {rid}: {msg}",
+     "en": "Route {rid}: {msg}"
+    },
+    {
+     "ru": "Для ведомости нужны поля ID маршрута и пикета",
+     "en": "The ledger needs the route ID and station fields"
+    },
+    {
+     "ru": "Ведомость: систем пикетажа {a}, ошибок {b}",
+     "en": "Ledger: chainage systems {a}, errors {b}"
+    },
+    {
+     "ru": "Ведомость, маршрут {rid}: {msg}",
+     "en": "Ledger, route {rid}: {msg}"
+    },
+    {
+     "ru": "M геометрии",
+     "en": "geometry M"
+    },
+    {
+     "ru": "Пикетаж из M: маршрутов {a}, без M {b}, ошибок {c}",
+     "en": "Chainage from M: routes {a}, without M {b}, errors {c}"
+    },
+    {
+     "ru": "M маршрута {rid}: {msg}",
+     "en": "M of route {rid}: {msg}"
+    },
+    {
+     "ru": "длины в географической системе координат считаются в градусах. Перепроецируйте маршруты в метрическую СК",
+     "en": "lengths in a geographic coordinate system are measured in degrees. Reproject the routes to a metric CRS"
+    },
+    {
+     "ru": "нет геометрии",
+     "en": "no geometry"
+    },
+    {
+     "ru": "маршрут распадается на {n} куска, ближайший разрыв {d:.3f} больше допуска {t:g}",
+     "en": "the route falls apart into {n} pieces, the nearest gap {d:.3f} exceeds the tolerance {t:g}"
+    },
+    {
+     "ru": "в точке ({x:.2f}, {y:.2f}) сходятся {n} конца частей",
+     "en": "{n} part ends meet at the point ({x:.2f}, {y:.2f})"
+    },
+    {
+     "ru": "нужно не меньше двух реперов",
+     "en": "at least two ledger points are needed"
+    },
+    {
+     "ru": "ведомость пуста",
+     "en": "the ledger is empty"
+    },
+    {
+     "ru": "у маршрута меньше двух вершин с M",
+     "en": "the route has fewer than two vertices with M"
+    },
+    {
+     "ru": "система «{name}»: {why}",
+     "en": "system «{name}»: {why}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне пикетажа маршрута",
+     "en": "ПК {st:.2f} вне пикетажа маршрута"
+    },
+    {
+     "ru": "не удалось разместить уравнения {eqs}",
+     "en": "the station equations {eqs} could not be placed"
+    },
+    {
+     "ru": "мера {m:.3f} вне {a:.3f}..{b:.3f}",
+     "en": "measure {m:.3f} is outside {a:.3f}..{b:.3f}"
+    },
+    {
+     "ru": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок",
+     "en": "ПК {st:.2f} встречается {n} раза (обратная вставка), укажите участок"
+    },
+    {
+     "ru": "два репера с одной мерой m={m:.3f}",
+     "en": "two ledger points with the same measure m={m:.3f}"
+    },
+    {
+     "ru": "пикетаж не растёт на участке m {a:.2f}..{b:.2f}, от {s0:.2f} до {s1:.2f}",
+     "en": "chainage does not increase on the section m {a:.2f}..{b:.2f}, from {s0:.2f} to {s1:.2f}"
+    },
+    {
+     "ru": "нет участка {n}",
+     "en": "no section {n}"
+    },
+    {
+     "ru": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})",
+     "en": "ПК {st:.2f} вне участка {n} ({a:.2f}..{b:.2f})"
+    },
+    {
+     "ru": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}",
+     "en": "ПК {st:.2f} попал в прямую вставку {a:.2f}={b:.2f}"
+    },
+    {
+     "ru": "уравнение {b}={a} не помещается между реперами m {m0:.2f} и {m1:.2f}",
+     "en": "the equation {b}={a} does not fit between the ledger points m {m0:.2f} and {m1:.2f}"
+    },
+    {
+     "ru": "у репера ПК {st:.2f} не задана мера",
+     "en": "the ledger point at station {st:.2f} has no measure"
+    },
+    {
+     "ru": "репер ПК {st:.2f} (m={m:.2f}) лежит в обратной вставке {b}={a}, и его сторона неизвестна. Задайте мерой положение уравнения",
+     "en": "the ledger point at station {st:.2f} (m={m:.2f}) lies in the backward equation {b}={a}, and its side is unknown. Give the equation position as a measure"
+    },
+    {
+     "ru": "Прямая с отметками",
+     "en": "Straight line with elevations"
+    },
+    {
+     "ru": "Кривая R=300",
+     "en": "Curve R=300"
+    },
+    {
+     "ru": "Части в произвольном порядке",
+     "en": "Parts in arbitrary order"
+    },
+    {
+     "ru": "С разрывом",
+     "en": "With a gap"
+    },
+    {
+     "ru": "начало",
+     "en": "start"
+    },
+    {
+     "ru": "репер, невязка -0.40",
+     "en": "ledger point, misclosure -0.40"
+    },
+    {
+     "ru": "обратная вставка 25 м",
+     "en": "backward equation 25 m"
+    },
+    {
+     "ru": "репер",
+     "en": "ledger point"
+    },
+    {
+     "ru": "прямая вставка 40 м",
+     "en": "forward equation 40 m"
+    },
+    {
+     "ru": "конец",
+     "en": "end"
+    },
+    {
+     "ru": "опорный для относительной записи",
+     "en": "reference for the relative record"
+    },
+    {
+     "ru": "относительная запись: тот же пикет",
+     "en": "relative record, the same picket"
+    },
+    {
+     "ru": "обратная вставка без участка",
+     "en": "backward equation without a section"
+    },
+    {
+     "ru": "попал в прямую вставку",
+     "en": "falls into the forward equation gap"
+    },
+    {
+     "ru": "за концом маршрута",
+     "en": "beyond the route end"
+    },
+    {
+     "ru": "испорченная запись",
+     "en": "damaged record"
+    },
+    {
+     "ru": "нет такого маршрута",
+     "en": "no such route"
+    },
+    {
+     "ru": "маршрут не собран: разрыв",
+     "en": "route not assembled, gap"
+    },
+    {
+     "ru": "простой участок",
+     "en": "plain section"
+    },
+    {
+     "ru": "записан против хода, меняется местами",
+     "en": "recorded against the route direction, swapped"
+    },
+    {
+     "ru": "через дугу, смещение 10 м влево",
+     "en": "across the arc, 10 m offset to the left"
+    },
+    {
+     "ru": "через обратную вставку",
+     "en": "across the backward equation"
+    },
+    {
+     "ru": "через обе вставки и изломы",
+     "en": "across both equations and the bends"
+    },
+    {
+     "ru": "нулевая длина",
+     "en": "zero length"
+    },
+    {
+     "ru": "в обратной вставке, указан участок",
+     "en": "in the backward equation, section given"
+    },
+    {
+     "ru": "нет маршрута для привязки",
+     "en": "no route to locate on"
+    },
+    {
+     "ru": "маршрут «{rid}» не найден",
+     "en": "route «{rid}» is not found"
+    },
+    {
+     "ru": "пикет {pk} даёт меру {m:.2f} при длине маршрута {L:.2f}",
+     "en": "station {pk} gives the measure {m:.2f} with the route length {L:.2f}"
+    },
+    {
+     "ru": "участок нулевой длины",
+     "en": "zero-length section"
+    },
+    {
+     "ru": "ближайший маршрут «{rid}» в {d:.2f} м, дальше радиуса {r:g}",
+     "en": "the nearest route «{rid}» is {d:.2f} m away, beyond the radius {r:g}"
+    },
+    {
+     "ru": "влево",
+     "en": "left"
+    },
+    {
+     "ru": "вправо",
+     "en": "right"
+    },
+    {
+     "ru": "Условный горизонт {z:.2f}",
+     "en": "Datum {z:.2f}"
+    },
+    {
+     "ru": "М 1:{v:g} по вертикали",
+     "en": "Vertical scale 1:{v:g}"
+    },
+    {
+     "ru": "М 1:{h:g} по горизонтали",
+     "en": "Horizontal scale 1:{h:g}"
+    },
+    {
+     "ru": "ВУ{n} {a:.1f}° {side}",
+     "en": "PI{n} {a:.1f}° {side}"
+    },
+    {
+     "ru": "маршрут нулевой длины",
+     "en": "zero-length route"
+    },
+    {
+     "ru": "мера {m:.3f} вне 0..{L:.3f}",
+     "en": "measure {m:.3f} is outside 0..{L:.3f}"
+    },
+    {
+     "ru": "начало {a:.3f} не меньше конца {b:.3f}",
+     "en": "the start {a:.3f} is not less than the end {b:.3f}"
+    },
+    {
+     "ru": "пустое значение",
+     "en": "empty value"
+    },
+    {
+     "ru": "число без «+» в режиме записи с плюсом",
+     "en": "a number without «+» in the station-plus mode"
+    },
+    {
+     "ru": "не соответствует формату {fmt}",
+     "en": "does not match the format {fmt}"
+    },
+    {
+     "ru": "«{s}»: километр с 1, пикет от 1 до 10",
+     "en": "«{s}»: kilometre from 1, picket from 1 to 10"
+    },
+    {
+     "ru": "«{s}»: относительная запись без предыдущего пикета",
+     "en": "«{s}»: relative record without a previous station"
+    }
+   ]
+  }
+ ]
+}

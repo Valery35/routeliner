@@ -29,6 +29,8 @@ TRANSLATIONS = {
         'page for enterprises',
     'Журнал: {p}':
         'Log: {p}',
+    'Страница на сайте':
+        'Page on the site',
     'Исходный код':
         'Source code',
     'Сообщить об ошибке':
@@ -669,8 +671,6 @@ TRANSLATIONS = {
         'Errors',
     'Не задан слой маршрутов':
         'The route layer is not set',
-    'Страница плагина':
-        'Plugin page',
     'Запись пикета':
         'Station notation',
     'Маршрутов собрано {a}, не собрано {b}':
@@ -683,14 +683,16 @@ TRANSLATIONS = {
         'Route {rid}: {msg}',
     'Ведомость: систем пикетажа {a}, ошибок {b}':
         'Ledger: chainage systems {a}, errors {b}',
-    'Разработано при поддержке ООО «Информ++»':
-        'Developed with the support of Inform++ LLC',
     'Ведомость, маршрут {rid}: {msg}':
         'Ledger, route {rid}: {msg}',
     'M маршрута {rid}: {msg}':
         'M of route {rid}: {msg}',
     'псевдонимы в файл не записаны: {why}':
         'field aliases were not written to the file: {why}',
+    'Страница плагина на сайте':
+        'Plugin page on the site',
+    'Разработано при поддержке ООО «Информ++»':
+        'Developed with the support of Inform++ LLC',
     'Routeliner, события на маршрутах и пикетаж':
         'Routeliner, route events and chainage',
 }

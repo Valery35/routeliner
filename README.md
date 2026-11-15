@@ -94,7 +94,7 @@ Plugin page on the site - [www.informpp.ru/главная-страница/qgis-
 
 Source code - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.2
+Routeliner v0.5.3
 
 Routeliner grows on tasks of real enterprises. If your production lacks a
 function, write to us:

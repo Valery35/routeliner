@@ -254,6 +254,8 @@ EN = {
 "Ошибки": "Errors",
 "Не задан слой маршрутов": "The route layer is not set",
 "Страница плагина": "Plugin page",
+"Страница плагина на сайте": "Plugin page on the site",
+"Страница на сайте": "Page on the site",
 "Запись пикета": "Station notation",
 "Маршрутов собрано": "Routes assembled {a}, not assembled {b}",
 "Для ведомости нужны поля": "The ledger needs the route ID and station fields",

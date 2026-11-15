@@ -1,7 +1,7 @@
 {
  "format": 1,
  "module": "routeliner",
- "version": "0.5.2",
+ "version": "0.5.3",
  "error_codes": [
   "route_not_found",
   "route_gap",

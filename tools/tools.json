@@ -1,7 +1,7 @@
 {
  "format": 1,
  "plugin": "Routeliner",
- "version": "0.5.2",
+ "version": "0.5.3",
  "provider": "routeliner",
  "note": "Собрано tools/make_tools_json.py из кода модуля, после правки инструментов пересобрать.",
  "error_codes": [

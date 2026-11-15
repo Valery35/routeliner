@@ -629,7 +629,9 @@ Routeliner использует ту же геометрию, но добавл�
 
 Разработано при поддержке ООО «Информ++» ([www.informpp.ru](https://www.informpp.ru)).
 
-Страница плагина: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
+Страница плагина на сайте - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
+Исходный код - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
 Routeliner v0.5.2
 

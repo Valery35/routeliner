@@ -4,6 +4,8 @@
 
 [![Support development](https://img.shields.io/badge/Support-development-2ea44f)](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83)
 
+Plugin page on the site - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
 Routeliner is a QGIS plugin that places table records on the axes of roads,
 tracks, pipelines and power lines when a record carries a station instead of
 coordinates. The plugin reads the five station notations
@@ -88,7 +90,9 @@ GNU GPL version 2 or later, see [LICENSE](LICENSE).
 
 Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.informpp.ru)).
 
-Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
+Plugin page on the site - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
+Source code - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
 Routeliner v0.5.2
 

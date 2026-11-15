@@ -4,6 +4,8 @@
 
 [![Поддержать СБП](https://img.shields.io/badge/%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D0%A1%D0%91%D0%9F-2ea44f)](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83)
 
+Страница плагина на сайте - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
 Routeliner - модуль QGIS, который ставит на оси дорог, путей, трубопроводов и
 линий электропередачи записи таблиц с пикетом вместо координат. Модуль читает пять принятых в СНГ записей пикета и
 учитывает ведомость с рублеными пикетами и пикетажными уравнениями.
@@ -83,7 +85,9 @@ GNU GPL версии 2 или новее, см. [LICENSE](LICENSE).
 
 Разработано при поддержке ООО «Информ++» ([www.informpp.ru](https://www.informpp.ru)).
 
-Страница плагина: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
+Страница плагина на сайте - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
+Исходный код - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
 Routeliner v0.5.2
 

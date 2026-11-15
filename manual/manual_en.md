@@ -654,7 +654,9 @@ again.
 
 Developed with the support of Inform++ LLC ([www.informpp.ru](https://www.informpp.ru)).
 
-Plugin page: [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
+Plugin page on the site - [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner)
+
+Source code - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
 Routeliner v0.5.2
 

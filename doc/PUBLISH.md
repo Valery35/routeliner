@@ -41,7 +41,7 @@ PlanetX Lite и языка Rust, сюда не вошли. Тексты объя
 | X, @Valery35 | автор | До 280 знаков, ссылка считается за 23 |
 | Mastodon, en.osm.town | Vaery35 | Пост на английском |
 | Reddit r/gis, r/QGIS | автор | Только автор, сайт закрыт для браузеров помощника |
-| Сайт informpp.ru | автор | Страницы модуля на сайте пока нет |
+| Сайт informpp.ru | автор | Страница модуля [www.informpp.ru/главная-страница/qgis-routeliner](https://www.informpp.ru/главная-страница/qgis-routeliner), страница расширения [www.informpp.ru/главная-страница/routeliner-rustgis](https://www.informpp.ru/главная-страница/routeliner-rustgis) |
 
 Особенности площадок:
 

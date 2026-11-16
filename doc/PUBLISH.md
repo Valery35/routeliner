@@ -94,7 +94,7 @@ PlanetX Lite и языка Rust, сюда не вошли. Тексты объя
 - GitHub: https://github.com/Valery35/routeliner/releases/tag/0.5.4
 - Каталог QGIS: https://plugins.qgis.org/plugins/routeliner/version/0.5.4/ - на проверке и одобрении модератора
 - Dropbox - routeliner.zip и routeliner_repo.zip 0.5.4, архивы 0.5.2 перенесены в arhiv
-- Лента сайта - запись 0.5.4 в planetx-scene/site/feed/routeliner.json, страницу собирает сессия PlanetX Lite
+- Лента сайта: https://www.informpp.ru/главная-страница/planetx - запись 0.5.4 от 16.11 опубликована сессией PlanetX Lite (planetx-scene b9005f0)
 - Telegram: https://t.me/s/qgis_isolines - пост 0.5.4 отправлен ботом
 - ВК: https://vk.ru/wall-241229428_84
 - Facebook - пост на странице автора от 16.11.2026 23:06

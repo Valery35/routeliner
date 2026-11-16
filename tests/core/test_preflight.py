@@ -35,6 +35,31 @@ def test_version_found_in_every_place():
                       "manual/manual_en.md", "CHANGELOG.md"}
 
 
+# ------------------------------------------------------------ номер версии
+def numbers(text):
+    return [m.group(1) for m in preflight.VERSION.finditer(text)]
+
+
+def test_prefixed_and_archive_numbers():
+    assert numbers("## 0.5.4") == ["0.5.4"]
+    assert numbers("Routeliner v0.5.4") == ["0.5.4"]
+    assert numbers("routeliner-0.5.4.zip") == ["0.5.4"]
+    assert numbers("сборка 0.5.4.7") == []
+
+
+def test_footer_pattern():
+    assert preflight.FOOTER.match("Routeliner v0.5.4").group(1) == "0.5.4"
+    assert preflight.FOOTER.match("Routeliner v0.5.4.7") is None
+    assert preflight.FOOTER.match("Routeliner для RustGIS 0.1.1") is None
+
+
+def test_footer_mismatch_is_reported(tmp_path, monkeypatch):
+    (tmp_path / "probe.md").write_text("Routeliner v0.0.1\n", encoding="utf-8")
+    monkeypatch.setattr(preflight, "ROOT", str(tmp_path))
+    monkeypatch.setattr(preflight, "VERSION_FILES", ("probe.md",))
+    assert ("probe.md:1", "0.0.1") in preflight.version_mentions()
+
+
 # ------------------------------------------------------------ адреса
 def test_percent_encoding_is_error():
     found = preflight.url_problems({

@@ -42,7 +42,13 @@ REQUIRED = ("name", "qgisMinimumVersion", "qgisMaximumVersion",
 # osgeo - привязки GDAL, processing - модуль Processing из состава QGIS.
 ALLOWED = {"qgis", "PyQt5", "PyQt6", "numpy", "osgeo", "processing"}
 
-VERSION = re.compile(r"\b(\d+\.\d+\.\d+)\b")
+# Номер из трёх частей. Смотрим на соседние цифры и точки, а не на границу
+# слова: «v0.5.4» и «routeliner-0.5.4.zip» находятся, 0.5.4.7 - не номер
+# (шаблон PlanetX после нашей находки).
+VERSION = re.compile(r"(?<![\d.])(\d+\.\d+\.\d+)(?!\.?\d)")
+# Подвал README и руководства. Привязан к «Routeliner v», чтобы чужой номер
+# в той же строке («Routeliner для RustGIS 0.1.1») не считался версией.
+FOOTER = re.compile(r"\s*Routeliner v(\d+\.\d+\.\d+)(?!\.?\d)")
 # Файлы, где номер версии модуля повторяется (AGENTS.md, «Проверка перед
 # выпуском», пункт 3). Ищется номер в строке с именем модуля.
 VERSION_FILES = ("README.md", "README.ru.md", "manual/manual.md",
@@ -94,9 +100,7 @@ def version_mentions():
         if not os.path.exists(path):
             continue
         for number, line in enumerate(read(path).split("\n"), 1):
-            # подвал «Routeliner v0.5.4»: у «v0» нет границы слова, номер
-            # берётся из самого шаблона
-            match = re.match(r"\s*Routeliner v(\d+\.\d+\.\d+)", line)
+            match = FOOTER.match(line)
             if match:
                 found.append(("%s:%d" % (name, number), match.group(1)))
     changelog = os.path.join(ROOT, "CHANGELOG.md")

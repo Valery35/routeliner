@@ -35,4 +35,4 @@
 
 ---
 
-Разработано при поддержке ООО «Информ++» (www.informpp.ru). Страница плагина на сайте - www.informpp.ru/главная-страница/qgis-routeliner, исходный код - github.com/Valery35/routeliner. Routeliner 0.5.3.
+Разработано при поддержке ООО «Информ++» (www.informpp.ru). Страница плагина на сайте - www.informpp.ru/главная-страница/qgis-routeliner, исходный код - github.com/Valery35/routeliner. Routeliner 0.5.4.

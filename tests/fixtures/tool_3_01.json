@@ -4,5 +4,5 @@
  "same_as": "tool_2_01.json",
  "cases": [],
  "generator": "tools/make_fixtures.py",
- "version": "0.5.3"
+ "version": "0.5.4"
 }

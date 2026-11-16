@@ -89,7 +89,7 @@ GNU GPL версии 2 или новее, см. [LICENSE](LICENSE).
 
 Исходный код - [github.com/Valery35/routeliner](https://github.com/Valery35/routeliner)
 
-Routeliner v0.5.3
+Routeliner v0.5.4
 
 Routeliner развивается на задачах реальных предприятий. Если вашему
 производству не хватает функции, напишите нам -

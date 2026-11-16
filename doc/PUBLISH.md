@@ -87,3 +87,19 @@ PlanetX Lite и языка Rust, сюда не вошли. Тексты объя
 - GitHub - релиза 0.5.2 нет, последним стоит 0.5.1
 - Dropbox - архивы обновлены до 0.5.2 5 ноября 2026 года
 - Тексты для всех площадок - doc/posts_0.5.2.md
+
+### Routeliner 0.5.3 и 0.5.4, 16 ноября 2026 года
+
+- 0.5.3 выложена на GitHub, но каталог QGIS её не принял: адрес страницы в metadata.txt был в процент-кодировке. Заметки выпуска 0.5.3 говорят, что её заменяет 0.5.4.
+- GitHub: https://github.com/Valery35/routeliner/releases/tag/0.5.4
+- Каталог QGIS: https://plugins.qgis.org/plugins/routeliner/version/0.5.4/ - на проверке и одобрении модератора
+- Dropbox - routeliner.zip и routeliner_repo.zip 0.5.4, архивы 0.5.2 перенесены в arhiv
+- Лента сайта - запись 0.5.4 в planetx-scene/site/feed/routeliner.json, страницу собирает сессия PlanetX Lite
+- Telegram: https://t.me/s/qgis_isolines - пост 0.5.4 отправлен ботом
+- ВК: https://vk.ru/wall-241229428_84
+- Facebook - пост на странице автора от 16.11.2026 23:06
+- LinkedIn: https://www.linkedin.com/feed/update/urn:li:activity:7528156374153879553/
+- X: https://x.com/Valery35/status/2122390413860274358
+- Mastodon: https://en.osm.town/@Vaery35/117627436344157868
+- OSGeo Discourse и Reddit - не публиковались, площадки группы «иногда»
+- Тексты - doc/posts_0.5.4.md

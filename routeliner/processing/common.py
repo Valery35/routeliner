@@ -271,7 +271,7 @@ def help_footer() -> str:
         tr("Исходный код") + f' - <a href="{HOME_URL}">github.com/Valery35/routeliner</a><br/>'
         f"Routeliner v{version()}<br/>" +
         tr("Routeliner развивается на задачах реальных предприятий. Если вашему производству "
-           "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{ORDER_URL}</a><br/>'
+           "не хватает функции, напишите нам") + f' - <a href="{ORDER_URL}">{ORDER_URL}</a><br/>'
         f'<a href="{SUPPORT_URL}">' + tr("Поддержать разработку") + '</a></p>')
 
 

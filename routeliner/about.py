@@ -151,7 +151,7 @@ def show_about(parent=None):
         f'<a href="{tracker}">{tr("Сообщить об ошибке")}</a> · '
         f'<a href="{SUPPORT_URL}">{tr("Поддержать разработку")}</a><br>' +
         tr("Routeliner развивается на задачах реальных предприятий. Если вашему производству "
-           "не хватает функции, напишите нам") + f': <a href="{ORDER_URL}">{tr("страница для предприятий")}</a>',
+           "не хватает функции, напишите нам") + f' - <a href="{ORDER_URL}">{tr("страница для предприятий")}</a>',
         dlg)
     links.setWordWrap(True)
     links.setOpenExternalLinks(True)

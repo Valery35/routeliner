@@ -53,7 +53,7 @@
 pandoc manual/manual.md -o routeliner/doc/Routeliner.pdf --pdf-engine=xelatex --toc --metadata-file=ru.yaml -V fontfamily=fontspec -V mainfont="DejaVu Serif" -V geometry:margin=2cm
 ```
 
-   В ru.yaml лежат title: Routeliner, subtitle «События на маршрутах и пикетаж для QGIS. Руководство пользователя», date с номером версии вида v0.5.0 и lang: ru. Английская сборка берёт en.yaml с subtitle «Route events and chainage for QGIS. User manual» и lang: en.
+   В ru.yaml лежат ключи `title: Routeliner`, `subtitle` со строкой «События на маршрутах и пикетаж для QGIS. Руководство пользователя» без кавычек, `date` с номером версии вида v0.5.0 и `lang: ru`. Английская сборка берёт en.yaml, где `subtitle` - «Route events and chainage for QGIS. User manual» и `lang: en`.
 
 7. В системе DejaVu Serif может не стоять. Тогда шрифт берётся из matplotlib в Python QGIS без установки, параметрами `-V mainfont=DejaVuSerif -V "mainfontoptions=Path=C:/Program Files/QGIS 4.2.3/apps/Python312/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/,Extension=.ttf,UprightFont=DejaVuSerif,BoldFont=DejaVuSerif-Bold,ItalicFont=DejaVuSerif-Italic,BoldItalicFont=DejaVuSerif-BoldItalic"`.
 

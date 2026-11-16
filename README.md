@@ -13,14 +13,14 @@ accepted in the CIS countries and takes into account a ledger with broken
 pickets and station equations.
 
 Every record is either placed on the map or sent to the error table with a
-reason code, so no table row is lost without an error entry. A longitudinal profile with raster levels, grades and ledger
+reason code. A longitudinal profile with raster levels, grades and ledger
 stations is built along a route.
 
 The route chainage can be taken from the M values of its geometry and written
-into the M of the results, which PostGIS, ArcGIS and the QGIS tools for M then
-read.
+into the M of the results. PostGIS, ArcGIS and the QGIS tools for M read such
+layers.
 
-The plugin is free and open source, and its development can be [supported](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83) with a transfer via SBP from a Russian bank card.
+The plugin is free and open source. [Support development](https://github.com/Valery35#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D1%83) (Russian bank cards via SBP)
 
 ## Tools
 

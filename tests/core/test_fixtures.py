@@ -69,6 +69,10 @@ def test_demo_check_passes(built):
     assert c["profile_ground_matched"] == c["profile_ground_total"] == c["profile_points"]
     assert c["profile_axis_r1_matched"] == c["profile_axis_r1_total"] > 0
     assert c["profile_equations_r3"] == 2
+    # Наибольшие расхождения из прогона 1.01 в QGIS 4.2.3 (зерно 1). Проверка
+    # модуля считает их по округлённым полям, эталон обязан считать так же.
+    assert c["points_worst_mm"] == 2.0
+    assert c["profile_ground_worst_mm"] == 0.5
 
 
 def test_every_tool_has_fixture(built):

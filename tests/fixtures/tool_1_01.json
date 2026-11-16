@@ -17,7 +17,7 @@
      ],
      "points_matched": 62,
      "points_total": 62,
-     "points_worst_mm": 1.631,
+     "points_worst_mm": 2.0,
      "point_errors_recognized": 6,
      "point_errors_expected": 6,
      "calibration": {
@@ -44,7 +44,7 @@
      "profile_points": 127,
      "profile_ground_matched": 127,
      "profile_ground_total": 127,
-     "profile_ground_worst_mm": 0.495,
+     "profile_ground_worst_mm": 0.5,
      "profile_axis_r1_matched": 43,
      "profile_axis_r1_total": 43,
      "profile_equations_r3": 2

@@ -970,7 +970,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 167.081,
-      "geometry": [455549.7688378862, 6428504.157052729]
+      "geometry": [455549.7688378673, 6428504.157052854]
      },
      {
       "route_id": "R2",
@@ -987,7 +987,7 @@
       "turn": null,
       "label": "14",
       "z_routeliner_demo_dem": 167.745,
-      "geometry": [455594.20191263396, 6428515.1737705255]
+      "geometry": [455594.20191256766, 6428515.173770726]
      },
      {
       "route_id": "R2",
@@ -1004,7 +1004,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 167.812,
-      "geometry": [455598.1584042005, 6428516.512949161]
+      "geometry": [455598.15840411885, 6428516.512949399]
      },
      {
       "route_id": "R2",
@@ -1021,7 +1021,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 168.673,
-      "geometry": [455643.8276506366, 6428536.7252779715]
+      "geometry": [455643.82765061106, 6428536.725278017]
      },
      {
       "route_id": "R2",
@@ -1038,7 +1038,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 169.64,
-      "geometry": [455685.5109262106, 6428564.233873561]
+      "geometry": [455685.5109264541, 6428564.233873252]
      },
      {
       "route_id": "R2",
@@ -1055,7 +1055,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 170.686,
-      "geometry": [455722.05303647975, 6428598.276383338]
+      "geometry": [455722.05303678877, 6428598.276383054]
      },
      {
       "route_id": "R2",
@@ -1072,7 +1072,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 171.783,
-      "geometry": [455752.44127500214, 6428637.909365154]
+      "geometry": [455752.44127514807, 6428637.909365063]
      },
      {
       "route_id": "R2",
@@ -1089,7 +1089,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 172.899,
-      "geometry": [455775.8334740954, 6428682.034452288]
+      "geometry": [455775.8334742282, 6428682.034452231]
      },
      {
       "route_id": "R2",
@@ -1106,7 +1106,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 174.004,
-      "geometry": [455791.5813544925, 6428729.4287826335]
+      "geometry": [455791.58135514095, 6428729.428782473]
      },
      {
       "route_id": "R2",
@@ -1123,7 +1123,7 @@
       "turn": null,
       "label": "29",
       "z_routeliner_demo_dem": 174.015,
-      "geometry": [455791.6934951484, 6428729.893737781]
+      "geometry": [455791.6934957259, 6428729.893737642]
      },
      {
       "route_id": "R2",
@@ -1140,7 +1140,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 175.068,
-      "geometry": [455799.2484886529, 6428778.778892495]
+      "geometry": [455799.248488639, 6428778.778892496]
      },
      {
       "route_id": "R2",
@@ -1157,7 +1157,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 176.075,
-      "geometry": [455800.0, 6428828.761154702]
+      "geometry": [455800.0, 6428828.761154699]
      },
      {
       "route_id": "R2",
@@ -1174,7 +1174,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 177.075,
-      "geometry": [455800.0, 6428878.761154702]
+      "geometry": [455800.0, 6428878.761154699]
      },
      {
       "route_id": "R2",
@@ -1191,7 +1191,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 178.075,
-      "geometry": [455800.0, 6428928.761154702]
+      "geometry": [455800.0, 6428928.761154699]
      },
      {
       "route_id": "R2",
@@ -1208,7 +1208,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 179.075,
-      "geometry": [455800.0, 6428978.761154702]
+      "geometry": [455800.0, 6428978.761154699]
      },
      {
       "route_id": "R2",
@@ -1225,7 +1225,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 180.075,
-      "geometry": [455800.0, 6429028.761154702]
+      "geometry": [455800.0, 6429028.761154699]
      },
      {
       "route_id": "R2",
@@ -1242,7 +1242,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 181.075,
-      "geometry": [455800.0, 6429078.761154702]
+      "geometry": [455800.0, 6429078.761154699]
      },
      {
       "route_id": "R2",
@@ -1259,7 +1259,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 182.075,
-      "geometry": [455800.0, 6429128.761154702]
+      "geometry": [455800.0, 6429128.761154699]
      },
      {
       "route_id": "R2",
@@ -1276,7 +1276,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 183.075,
-      "geometry": [455800.0, 6429178.761154702]
+      "geometry": [455800.0, 6429178.761154699]
      },
      {
       "route_id": "R2",
@@ -1293,7 +1293,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 184.075,
-      "geometry": [455800.0, 6429228.761154702]
+      "geometry": [455800.0, 6429228.761154699]
      },
      {
       "route_id": "R2",
@@ -1310,7 +1310,7 @@
       "turn": null,
       "label": null,
       "z_routeliner_demo_dem": 185.075,
-      "geometry": [455800.0, 6429278.761154702]
+      "geometry": [455800.0, 6429278.761154699]
      },
      {
       "route_id": "R2",

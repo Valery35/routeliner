@@ -102,17 +102,19 @@ def segmentize_arc(p1, p2, p3, angle_deg=None):
     Без угла берётся ARC_ANGLE_DEG (у модуля - CURVE_ANGLE_DEG)."""
     angle_deg = ARC_ANGLE_DEG if angle_deg is None else angle_deg
     cx, cy, r = _circle(p1, p2, p3)
-    inc = math.radians(angle_deg)
     a1 = math.atan2(p1[1] - cy, p1[0] - cx)
     a3 = math.atan2(p3[1] - cy, p3[0] - cx)
     if a3 <= a1:
         a3 += 2 * math.pi
+    # QGIS делит угол дуги на целое число равных шагов не больше заданного,
+    # а не идёт постоянным шагом с коротким остатком в конце. Проверено по
+    # curveToLine QGIS 4.2.3, тест test_arc_like_qgis.
+    n = max(1, math.ceil((a3 - a1) / math.radians(angle_deg) - 1e-9))
+    inc = (a3 - a1) / n
     out = [list(p1)]
-    stop = a3 - inc / 100
-    a = a1 + inc
-    while a < stop:
+    for k in range(1, n):
+        a = a1 + k * inc
         out.append([cx + r * math.cos(a), cy + r * math.sin(a), 0.0])
-        a += inc
     out.append(list(p3))
     return out
 
@@ -608,12 +610,13 @@ def build_all() -> dict:
     dfs = {p["did"]: p for p in w.tables["defects"]}
 
     def near(f, e):
-        return math.hypot(f["_raw"].x - e["exp_x"], f["_raw"].y - e["exp_y"])
+        # как alg_demo._check: по полям rl_x и rl_y, округлённым до миллиметра
+        return math.hypot(f["rl_x"] - e["exp_x"], f["rl_y"] - e["exp_y"])
     p_dist = [near(f, pts[f["key"]]) for f in p_res["OUTPUT"] if not pts[f["key"]]["exp_error"]]
     plain = [p for p in w.tables["events_points"] if not p["exp_error"] and p["section"] is None]
     m_ok = sum(near(f, pts[f["key"]]) <= TOL for f in m_res["OUTPUT"]
                if not pts[f["key"]]["exp_error"] and pts[f["key"]]["section"] is None)
-    g_err = [abs(f[zf] - D.dem_z(f["geometry"][0], f["geometry"][1])) for f in table["OUTPUT"]
+    g_err = [abs(f[zf] - D.dem_z(f["x"], f["y"])) for f in table["OUTPUT"]
              if f[zf] is not None]
     a_rows = [f for f in table["OUTPUT"] if f["route_id"] == "R1"]
     check = {
